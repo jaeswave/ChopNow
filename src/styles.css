@@ -1,0 +1,22 @@
+@import "tailwindcss";
+
+/* Global tokens only. Every component carries its own Tailwind classes. */
+@theme {
+  --color-leaf: #0E3B2C;
+  --color-leaf-2: #16503C;
+  --color-pepper: #D52B1E;
+  --color-palm: #F4B52E;
+  --color-paper: #F1F5EE;
+  --color-ink: #15211B;
+  --color-mute: #5A6B61;
+  --color-line: #D5DDD0;
+  --font-display: 'Bricolage Grotesque', 'DM Sans', sans-serif;
+  --font-sans: 'DM Sans', system-ui, sans-serif;
+  --animate-float: float 6s ease-in-out infinite;
+  @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+}
+
+html { scroll-behavior: smooth; }
+body { background: var(--color-paper); color: var(--color-ink); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.02em; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
