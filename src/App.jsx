@@ -20,7 +20,7 @@ function ScrollToHash() {
 }
 
 function Brand({ className = '' }) {
-  return <Link to="/" className={cx('font-display text-2xl font-extrabold text-white', className)}>Chop<span className="text-palm">Now</span></Link>;
+  return <Link to="/" className={cx('font-display text-2xl font-extrabold text-white', className)}>Gbaan<span className="text-palm">Jo</span></Link>;
 }
 
 function Navbar() {
