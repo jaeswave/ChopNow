@@ -5,19 +5,19 @@ import { Art, ART, Card, CardSkeleton, Tag, naira } from '../components';
 import { Button, Chip, Container, Input, Reveal, Select, cx } from '../ui';
 
 const FOODS = ['🍛 Jollof rice', '🍞 Fresh bread', '🥧 Meat pie', '🍅 Tomatoes and pepper', '🐟 Fresh fish', '🥛 Fura da nono', '🍢 Suya and small chops'];
-const FACTS = [['30%+', 'off on every single deal'], ['₦0', 'to reserve. Pay at pickup'], ['8', 'food categories'], ['12', 'Nigerian cities']];
+const FACTS = [['30%+', 'off on every single deal'], ['Paystack', 'secure card, transfer and USSD payments'], ['8', 'food categories'], ['12', 'Nigerian cities']];
 
 const BUYER_STEPS = [
-  ['Pick your city', 'Choose where you are and see what is live, sorted by what ends soonest.'],
-  ['Reserve what you like', 'Choose how many (up to 5) and tap reserve. It is held for you straight away.'],
-  ['Get your pickup code', 'You get a 6-digit code, the exact address and the seller\'s phone number.'],
-  ['Collect and pay', 'Go before the pickup deadline, show your code, and pay when you collect.'],
+  ['Find a deal', 'Choose your city and see what is live, sorted by what ends soonest.'],
+  ['Pay online first', 'Choose how many (up to 5) and pay securely with Paystack. Your food is held while you pay.'],
+  ['Get your order number and code', 'You get an order number, a 6-digit pickup code, and the exact address.'],
+  ['Collect it, or send a friend', 'Show the code to the seller. Anyone with your code can collect for you.'],
 ];
 const SELLER_STEPS = [
-  ['Create a seller account', 'Sign up with your business name and phone number. It takes a minute.'],
-  ['List your surplus', 'Add what it is, the normal price, your price, how many, and when the sale ends.'],
-  ['Buyers reserve', 'Watch reservations come in on your dashboard while the countdown runs.'],
-  ['Hand over and confirm', 'The buyer shows a 6-digit code. Enter it to confirm the handover.'],
+  ['Apply with your CAC number', 'Sign up, verify your email and give us your RC or BN number so we can check your business.'],
+  ['Get approved', 'Once we confirm your registration, you can add your payout account and upload food photos.'],
+  ['List your surplus', 'Add the food, the price, how many, and when the sale ends. GbaanJo takes a 10% fee only when you sell.'],
+  ['Hand over with a code', 'The customer shows a 6-digit code. Type it in, check the order, and confirm.'],
 ];
 const CATS = [
   ['Cooked meals', 'Jollof, fried rice, egusi, pounded yam, rice and stew'], ['Bakery', 'Bread, meat pie, doughnuts, cakes'],
@@ -34,13 +34,16 @@ const RULES = [
   ['Private addresses', 'Exact addresses are only shared with buyers who have reserved.'],
 ];
 const FAQ = [
-  ['Do I pay online?', 'Not yet. You reserve online and pay the seller at pickup. Online payment is coming.'],
-  ['What if I cannot make it?', 'Cancel from My orders before the sale ends and the food goes back for someone else. Please do not just skip it, because no-shows are tracked.'],
+  ['How do I pay?', 'Securely online with Paystack when you reserve, using your card, bank transfer or USSD. Your food is held for a few minutes while you pay.'],
+  ['What if I cannot make it?', 'Cancel from My orders before the sale ends and you get a refund while the food goes back for someone else. Once the sale has ended the order stays with the seller, so please make it.'],
   ['What can be sold here?', 'Cooked meals, bakery items, fresh produce, meat and fish, dairy and drinks, frozen foods, small chops and groceries close to the end of their selling window.'],
   ['Is the food safe?', 'Sellers are responsible for what they list and should be honest about when it was made and how it was stored. Buyers should check food before paying and skip anything that looks or smells wrong.'],
   ['How long can a listing run?', 'From 15 minutes up to 72 hours. Buyers then have up to 24 hours after the sale ends to collect.'],
-  ['What if the seller cancels?', 'Your reservation is cancelled and you will see it in My orders.'],
-  ['How do I start selling?', 'Create a seller account with your business name and phone number, then publish your first listing from My shop.'],
+  ['What if the seller cancels?', 'Your order is cancelled and you are refunded. You will see it in My orders.'],
+  ['How much does it cost to sell?', 'Listing is free. GbaanJo takes a 10% fee on each sale, and Paystack sends the rest straight to your bank account.'],
+  ['How do I start selling?', 'Create a seller account with your business name and CAC number (RC or BN), and verify your email. After we approve your application you can add payout details, upload photos and publish your first listing.'],
+  ['Why do sellers need a CAC number?', 'It lets us confirm that every seller is a registered business before they sell food to the public. This keeps buyers safe and builds trust.'],
+  ['Can someone else collect my order?', 'Yes. After you pay, you get a pickup code. Send it to anyone you trust and they can collect the food by showing it. Only share it with people you trust, because whoever shows the code gets the food.'],
 ];
 
 const Section = ({ id, className = '', children }) => (
@@ -96,8 +99,8 @@ export default function Home() {
         <div className="grid items-center gap-14 lg:grid-cols-[1.15fr_.85fr]">
           <div>
             <p className="inline-block rounded-full bg-white/10 px-4 py-1.5 text-sm font-medium text-palm">Made for Nigerian kitchens, bakeries and markets</p>
-            <h1 className="mt-5 text-5xl font-extrabold leading-[1.02] sm:text-6xl lg:text-7xl">Good food, last call. Pay less before it goes.</h1>
-            <p className="mt-6 max-w-xl text-lg text-white/85 sm:text-xl">Kitchens, bakeries, markets and shops list what they cannot sell today. You reserve it, walk over, and chop. Every deal is at least 30% off.</p>
+            <h1 className="mt-5 text-5xl font-extrabold leading-[1.02] sm:text-6xl lg:text-7xl">Rescue good food. Pay less. Waste less.</h1>
+            <p className="mt-6 max-w-xl text-lg text-white/85 sm:text-xl">Kitchens, bakeries, markets and shops list what they cannot sell today. You pay online, get a pickup code, and collect it. Every deal is at least 30% off.</p>
 
             <form onSubmit={(e) => { e.preventDefault(); setF({ ...f, city: heroCity }); go('deals'); }} className="mt-8 flex max-w-xl flex-col gap-2 rounded-2xl bg-white p-2 shadow-2xl shadow-black/30 sm:flex-row">
               <select aria-label="Your city" value={heroCity} onChange={(e) => setHeroCity(e.target.value)} className="min-h-12 flex-1 cursor-pointer rounded-xl bg-transparent px-4 text-ink outline-none">
@@ -155,10 +158,32 @@ export default function Home() {
         </div>
       </Section>
 
+      {/* MISSION */}
+      <Section id="mission" className="bg-leaf text-white">
+        <div className="grid items-center gap-14 lg:grid-cols-2">
+          <Reveal>
+            <h2 className="text-4xl font-extrabold leading-[1.08] sm:text-5xl">Good food deserves to be eaten, not thrown away.</h2>
+            <p className="mt-5 max-w-lg text-lg text-white/85">GbaanJo is a Nigerian marketplace on a mission to make wasting good food a thing of the past. Every day, kitchens, bakeries, supermarkets and market traders are left with food that is perfectly fine but will not sell in time.</p>
+            <p className="mt-4 max-w-lg text-lg text-white/85">We connect them with people nearby who are happy to buy it at a fair price. The food gets eaten, the business recovers its money, and you eat well for less. Every order is a small win against waste.</p>
+            <Button variant="palm" size="lg" className="mt-8" onClick={() => go('deals')}>Join the movement</Button>
+          </Reveal>
+          <Reveal delay={150}>
+            <div className="grid gap-4">
+              {[['🍽️', 'Food gets eaten', 'Good meals and groceries go to people, not the bin.'], ['💚', 'Businesses recover costs', 'Sellers turn tonight\'s surplus into money.'], ['🤝', 'Communities benefit', 'Neighbours get quality food at a price that works.']].map(([e, t, d]) => (
+                <div key={t} className="flex gap-4 rounded-2xl bg-white/10 p-5">
+                  <span className="grid size-12 flex-none place-items-center rounded-xl bg-palm text-2xl">{e}</span>
+                  <div><h3 className="text-xl font-semibold">{t}</h3><p className="text-white/80">{d}</p></div>
+                </div>
+              ))}
+            </div>
+          </Reveal>
+        </div>
+      </Section>
+
       {/* 3. HOW IT WORKS */}
       <Section id="how" className="bg-white">
         <Reveal className="text-center">
-          <h2 className="text-4xl font-extrabold sm:text-5xl">How ChopNow works</h2>
+          <h2 className="text-4xl font-extrabold sm:text-5xl">How GbaanJo works</h2>
           <p className="mx-auto mt-3 max-w-xl text-lg text-mute">Four simple steps, whether you are hungry or have food to move.</p>
           <div className="mt-6 inline-flex gap-2 rounded-full bg-paper p-1.5">
             {[['buyers', 'I want to buy'], ['sellers', 'I want to sell']].map(([k, t]) => <Chip key={k} on={tab === k} onClick={() => setTab(k)} className="!ring-0">{t}</Chip>)}
@@ -180,7 +205,7 @@ export default function Home() {
               <div className="grid gap-3">
                 <p className="text-sm text-mute">Example reservation</p>
                 <b>2 × Party jollof and chicken</b>
-                <p className="text-sm text-mute">Mama Tee Kitchen · ₦5,000 to pay at pickup</p>
+                <p className="text-sm text-mute">Mama Tee Kitchen · ₦5,000 paid</p>
                 <div className="rounded-xl bg-leaf p-4 text-white"><span className="text-sm">Show this code to the seller</span><div className="font-display text-4xl font-extrabold tracking-[.2em] text-palm">482917</div></div>
                 <p className="text-sm">Collect by <b>Sat 8:30 pm</b>. The exact address shows after you reserve.</p>
               </div>
@@ -260,7 +285,7 @@ export default function Home() {
         <div className="grid items-center gap-14 lg:grid-cols-2">
           <Reveal>
             <h2 className="text-4xl font-extrabold leading-[1.08] sm:text-5xl">Cooking too much? Stock not moving?</h2>
-            <p className="mt-5 max-w-lg text-lg">Turn tonight's surplus into money instead of waste. Listing takes about two minutes, and you only hand food over when the buyer shows their code.</p>
+            <p className="mt-5 max-w-lg text-lg">Turn tonight's surplus into money instead of waste. Listing is free and takes about two minutes. GbaanJo only takes a 10% fee when you make a sale, and Paystack sends the rest to your bank account.</p>
             <ul className="mt-6 grid gap-2 font-semibold sm:grid-cols-2">
               {['Restaurants and mama put', 'Bakeries and pastry shops', 'Caterers after events', 'Supermarkets and mini-marts', 'Fish, meat and produce sellers', 'Market traders'].map((w) => <li key={w} className="rounded-lg bg-white/55 px-4 py-2.5">{w}</li>)}
             </ul>
@@ -270,10 +295,10 @@ export default function Home() {
             <div className="rounded-3xl bg-white p-6 text-ink shadow-xl sm:p-8">
               <p className="text-sm font-medium text-mute">Example only: one evening's surplus</p>
               <div className="mt-4 grid gap-3">
-                {[['Party jollof packs left over', '10 packs'], ['Normal price', '₦6,000 each'], ['Your last-call price', '₦2,500 each'], ['Packs sold', '8 packs']].map(([a, b]) => <div key={a} className="flex justify-between border-b border-line pb-3"><span className="text-mute">{a}</span><b>{b}</b></div>)}
+                {[['Party jollof packs left over', '10 packs'], ['Normal price', '₦6,000 each'], ['Your last-call price', '₦2,500 each'], ['Packs sold', '8 packs'], ['GbaanJo fee (10%)', '− ₦2,000']].map(([a, b]) => <div key={a} className="flex justify-between border-b border-line pb-3"><span className="text-mute">{a}</span><b>{b}</b></div>)}
               </div>
-              <p className="mt-5 text-sm text-mute">Money recovered from food that would have been thrown away</p>
-              <p className="font-display text-5xl font-extrabold text-leaf">₦20,000</p>
+              <p className="mt-5 text-sm text-mute">Paid to your bank account after the fee</p>
+              <p className="font-display text-5xl font-extrabold text-leaf">₦18,000</p>
             </div>
           </Reveal>
         </div>

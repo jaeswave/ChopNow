@@ -14,8 +14,9 @@ export const ART = {
   'Snacks & small chops': ['🍢', '#F7D5C4'], 'Groceries': ['🛒', '#E2E8D0'],
 };
 const ART_SIZE = { sm: 'size-16 shrink-0 rounded-xl text-3xl', md: 'h-36 text-6xl', lg: 'h-48 rounded-2xl text-8xl', xl: 'h-64 rounded-3xl text-9xl sm:h-80' };
-export function Art({ c, size = 'md', className = '' }) {
+export function Art({ c, size = 'md', className = '', src }) {
   const [emoji, bg] = ART[c] || ['🍽️', '#E8EDE4'];
+  if (src) return <img src={src} alt="" loading="lazy" className={cx('object-cover', size === 'sm' ? '' : 'w-full', ART_SIZE[size].replace(/text-\S+/g, ''), className)} />;
   return (
     <div className={cx('relative grid place-items-center overflow-hidden', ART_SIZE[size], className)} style={{ background: bg }}>
       <span className="absolute -right-8 -top-8 size-32 rounded-full bg-white/35" />
@@ -53,15 +54,15 @@ function useNow() {
 }
 
 // Display only. The server decides what has actually expired.
-export function Countdown({ to, className }) {
+export function Countdown({ to, className, ended = 'Sale ended' }) {
   const ms = new Date(to) - useNow();
-  if (ms <= 0) return <Tag tone="over" className={className}>Sale ended</Tag>;
+  if (ms <= 0) return <Tag tone="over" className={className}>{ended}</Tag>;
   const h = Math.floor(ms / 36e5), m = Math.floor((ms % 36e5) / 6e4), s = Math.floor((ms % 6e4) / 1e3);
   return <Tag tone={ms < 36e5 ? 'hot' : 'palm'} className={className}>{h > 0 ? h + 'h ' : ''}{m}m {String(s).padStart(2, '0')}s left</Tag>;
 }
 
 const BADGE = {
-  RESERVED: ['Reserved', 'bg-palm/30 text-[#7a5300]'], PICKED_UP: ['Picked up', 'bg-leaf/10 text-leaf'],
+  PENDING_PAYMENT: ['Awaiting payment', 'bg-palm/30 text-[#7a5300]'], RESERVED: ['Reserved', 'bg-leaf/10 text-leaf'], PICKED_UP: ['Picked up', 'bg-leaf/10 text-leaf'],
   EXPIRED: ['Missed', 'bg-line text-mute'], CANCELLED: ['Cancelled', 'bg-line text-mute'],
   ACTIVE: ['Live', 'bg-leaf/10 text-leaf'], SOLD_OUT: ['Sold out', 'bg-pepper/10 text-pepper'],
 };
@@ -75,13 +76,13 @@ export function Card({ l }) {
   return (
     <Link to={'/listing/' + l.id} className="group flex flex-col overflow-hidden rounded-2xl bg-white ring-[1.5px] ring-line transition duration-200 hover:-translate-y-1 hover:shadow-xl hover:shadow-leaf/10 hover:ring-leaf focus-visible:outline-3 focus-visible:outline-palm">
       <div className="relative">
-        <Art c={l.category} className="transition duration-300 group-hover:scale-105" />
+        <Art c={l.category} src={l.imageUrl} className="transition duration-300 group-hover:scale-105" />
         <div className="absolute left-3 top-3"><Countdown to={l.saleEndsAt} /></div>
         <span className="absolute bottom-2.5 right-2.5 rounded-full bg-pepper px-2.5 py-0.5 text-sm font-extrabold text-white">{pctOff(l.originalPrice, l.price)}% off</span>
       </div>
       <div className="flex flex-1 flex-col p-4">
         <h3 className="text-lg font-semibold leading-tight">{l.title}</h3>
-        <p className="mt-1 text-sm text-mute">{l.seller.businessName} · {l.area}, {l.city}</p>
+        <p className="mt-1 text-sm text-mute">{l.seller.businessName}<Verified v={l.seller.verified} /> · {l.area}, {l.city}</p>
         <div className="mt-3 flex items-baseline gap-2.5">
           <strong className="font-display text-2xl">{naira(l.price)}</strong>
           <s className="text-mute">{naira(l.originalPrice)}</s>
@@ -104,3 +105,5 @@ export const CardSkeleton = () => (
     <div className="grid gap-3 p-4"><div className="h-5 w-3/4 rounded bg-line/70" /><div className="h-4 w-1/2 rounded bg-line/70" /><div className="h-7 w-1/3 rounded bg-line/70" /></div>
   </div>
 );
+
+export const Verified = ({ v }) => v ? <span title="Verified seller" className="ml-1 inline-grid size-4 place-items-center rounded-full bg-leaf text-[10px] text-white">✓</span> : null;
