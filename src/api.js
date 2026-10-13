@@ -1,4 +1,7 @@
-const BASE = import.meta.env.VITE_API_URL;
+const BASE = (import.meta.env.VITE_API_URL || "http://localhost:3000").replace(
+  /\/+$/,
+  "",
+);
 
 export async function api(path, { method = "GET", body } = {}) {
   const token = localStorage.getItem("token");
@@ -17,49 +20,19 @@ export async function api(path, { method = "GET", body } = {}) {
       "Can't reach the server. Check your internet connection and try again.",
     );
   }
-
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) {
+  const isJson = (res.headers.get("content-type") || "").includes(
+    "application/json",
+  );
+  const data = isJson ? await res.json().catch(() => ({})) : null;
+  if (!res.ok)
     throw new Error(
-      Array.isArray(data.message)
+      Array.isArray(data?.message)
         ? data.message.join(". ")
-        : data.message || "Something went wrong",
+        : data?.message || "Something went wrong",
     );
-  }
+  if (data === null)
+    throw new Error(
+      "The server sent an unexpected reply. Check that VITE_API_URL points to your backend.",
+    );
   return data;
-}
-
-/**
- * Fetch and guarantee an array back.
- * Usage: const listings = await apiArray('/listings?city=Lagos');
- */
-export async function apiArray(path, opts) {
-  const data = await api(path, opts);
-  if (Array.isArray(data)) return data;
-  if (Array.isArray(data?.data)) return data.data;
-  if (Array.isArray(data?.items)) return data.items;
-  if (Array.isArray(data?.results)) return data.results;
-  return [];
-}
-
-/**
- * Fetch and guarantee an object with the given keys.
- * Array defaults become [] when the API returns null/undefined.
- * Usage: const meta = await apiShape('/listings/meta', { categories: [], cities: [] });
- */
-export async function apiShape(path, defaults, opts) {
-  const data = await api(path, opts);
-  const out = {};
-  for (const key of Object.keys(defaults)) {
-    const val = data?.[key];
-    const def = defaults[key];
-    if (Array.isArray(def)) {
-      out[key] = Array.isArray(val) ? val : [];
-    } else if (def && typeof def === "object") {
-      out[key] = val && typeof val === "object" ? val : def;
-    } else {
-      out[key] = val ?? def;
-    }
-  }
-  return out;
 }
