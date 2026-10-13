@@ -16,7 +16,7 @@ const BUYER_STEPS = [
 const SELLER_STEPS = [
   ['Apply with your CAC number', 'Sign up, verify your email and give us your RC or BN number so we can check your business.'],
   ['Get approved', 'Once we confirm your registration, you can add your payout account and upload food photos.'],
-  ['List your surplus', 'Add the food, the price, how many, and when the sale ends. GbaanJo takes a 10% fee only when you sell.'],
+  ['List your surplus', 'Add the food, the price, how many, and when the sale ends. ChopNow takes a 10% fee only when you sell.'],
   ['Hand over with a code', 'The customer shows a 6-digit code. Type it in, check the order, and confirm.'],
 ];
 const CATS = [
@@ -40,7 +40,7 @@ const FAQ = [
   ['Is the food safe?', 'Sellers are responsible for what they list and should be honest about when it was made and how it was stored. Buyers should check food before paying and skip anything that looks or smells wrong.'],
   ['How long can a listing run?', 'From 15 minutes up to 72 hours. Buyers then have up to 24 hours after the sale ends to collect.'],
   ['What if the seller cancels?', 'Your order is cancelled and you are refunded. You will see it in My orders.'],
-  ['How much does it cost to sell?', 'Listing is free. GbaanJo takes a 10% fee on each sale, and Paystack sends the rest straight to your bank account.'],
+  ['How much does it cost to sell?', 'Listing is free. ChopNow takes a 10% fee on each sale, and Paystack sends the rest straight to your bank account.'],
   ['How do I start selling?', 'Create a seller account with your business name and CAC number (RC or BN), and verify your email. After we approve your application you can add payout details, upload photos and publish your first listing.'],
   ['Why do sellers need a CAC number?', 'It lets us confirm that every seller is a registered business before they sell food to the public. This keeps buyers safe and builds trust.'],
   ['Can someone else collect my order?', 'Yes. After you pay, you get a pickup code. Send it to anyone you trust and they can collect the food by showing it. Only share it with people you trust, because whoever shows the code gets the food.'],
@@ -163,7 +163,7 @@ export default function Home() {
         <div className="grid items-center gap-14 lg:grid-cols-2">
           <Reveal>
             <h2 className="text-4xl font-extrabold leading-[1.08] sm:text-5xl">Good food deserves to be eaten, not thrown away.</h2>
-            <p className="mt-5 max-w-lg text-lg text-white/85">GbaanJo is a Nigerian marketplace on a mission to make wasting good food a thing of the past. Every day, kitchens, bakeries, supermarkets and market traders are left with food that is perfectly fine but will not sell in time.</p>
+            <p className="mt-5 max-w-lg text-lg text-white/85">ChopNow is a Nigerian marketplace on a mission to make wasting good food a thing of the past. Every day, kitchens, bakeries, supermarkets and market traders are left with food that is perfectly fine but will not sell in time.</p>
             <p className="mt-4 max-w-lg text-lg text-white/85">We connect them with people nearby who are happy to buy it at a fair price. The food gets eaten, the business recovers its money, and you eat well for less. Every order is a small win against waste.</p>
             <Button variant="palm" size="lg" className="mt-8" onClick={() => go('deals')}>Join the movement</Button>
           </Reveal>
@@ -183,7 +183,7 @@ export default function Home() {
       {/* 3. HOW IT WORKS */}
       <Section id="how" className="bg-white">
         <Reveal className="text-center">
-          <h2 className="text-4xl font-extrabold sm:text-5xl">How GbaanJo works</h2>
+          <h2 className="text-4xl font-extrabold sm:text-5xl">How ChopNow works</h2>
           <p className="mx-auto mt-3 max-w-xl text-lg text-mute">Four simple steps, whether you are hungry or have food to move.</p>
           <div className="mt-6 inline-flex gap-2 rounded-full bg-paper p-1.5">
             {[['buyers', 'I want to buy'], ['sellers', 'I want to sell']].map(([k, t]) => <Chip key={k} on={tab === k} onClick={() => setTab(k)} className="!ring-0">{t}</Chip>)}
@@ -285,7 +285,7 @@ export default function Home() {
         <div className="grid items-center gap-14 lg:grid-cols-2">
           <Reveal>
             <h2 className="text-4xl font-extrabold leading-[1.08] sm:text-5xl">Cooking too much? Stock not moving?</h2>
-            <p className="mt-5 max-w-lg text-lg">Turn tonight's surplus into money instead of waste. Listing is free and takes about two minutes. GbaanJo only takes a 10% fee when you make a sale, and Paystack sends the rest to your bank account.</p>
+            <p className="mt-5 max-w-lg text-lg">Turn tonight's surplus into money instead of waste. Listing is free and takes about two minutes. ChopNow only takes a 10% fee when you make a sale, and Paystack sends the rest to your bank account.</p>
             <ul className="mt-6 grid gap-2 font-semibold sm:grid-cols-2">
               {['Restaurants and mama put', 'Bakeries and pastry shops', 'Caterers after events', 'Supermarkets and mini-marts', 'Fish, meat and produce sellers', 'Market traders'].map((w) => <li key={w} className="rounded-lg bg-white/55 px-4 py-2.5">{w}</li>)}
             </ul>
@@ -295,7 +295,7 @@ export default function Home() {
             <div className="rounded-3xl bg-white p-6 text-ink shadow-xl sm:p-8">
               <p className="text-sm font-medium text-mute">Example only: one evening's surplus</p>
               <div className="mt-4 grid gap-3">
-                {[['Party jollof packs left over', '10 packs'], ['Normal price', '₦6,000 each'], ['Your last-call price', '₦2,500 each'], ['Packs sold', '8 packs'], ['GbaanJo fee (10%)', '− ₦2,000']].map(([a, b]) => <div key={a} className="flex justify-between border-b border-line pb-3"><span className="text-mute">{a}</span><b>{b}</b></div>)}
+                {[['Party jollof packs left over', '10 packs'], ['Normal price', '₦6,000 each'], ['Your last-call price', '₦2,500 each'], ['Packs sold', '8 packs'], ['ChopNow fee (10%)', '− ₦2,000']].map(([a, b]) => <div key={a} className="flex justify-between border-b border-line pb-3"><span className="text-mute">{a}</span><b>{b}</b></div>)}
               </div>
               <p className="mt-5 text-sm text-mute">Paid to your bank account after the fee</p>
               <p className="font-display text-5xl font-extrabold text-leaf">₦18,000</p>
