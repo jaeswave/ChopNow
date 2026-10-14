@@ -92,7 +92,7 @@ function Footer() {
   return (
     <footer className="bg-leaf pt-14 text-sm text-[#cfe0d6]">
       <Container className="grid gap-10 md:grid-cols-[1.4fr_1fr_1fr_1.2fr]">
-        <div><Brand /><p className="mt-3 max-w-xs">Good food at last-call prices, from Nigerian kitchens, bakeries, markets and shops. Less waste, more chop.</p></div>
+        <div><Brand /><p className="mt-3 max-w-xs">Good food at last-call prices, from Nigerian kitchens, bakeries, markets and shops. Less waste, more good food.</p></div>
         <div className={col}><b className="text-white">Buyers</b><Link className={a} to="/#how">How it works</Link><Link className={a} to="/#deals">Live deals</Link><Link className={a} to="/#faq">FAQ</Link><Link className={a} to="/terms">Terms and refunds</Link></div>
         <div className={col}><b className="text-white">Sellers</b><Link className={a} to="/#sell">Why sell here</Link><Link className={a} to="/auth">Create a seller account</Link><Link className={a} to="/seller">My shop</Link></div>
         <div className={col}><b className="text-white">Food safety</b><p>Only buy food that looks, smells and is stored properly. Sellers are responsible for the food they list.</p></div>

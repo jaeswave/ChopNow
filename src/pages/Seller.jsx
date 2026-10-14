@@ -111,7 +111,7 @@ export default function Seller() {
     if (!user) return nav('/auth');
     if (user.role !== 'SELLER') return nav('/');
     if (!approved) return;
-    api('/listings/meta').then(setMeta).catch(() => {}); reload();
+    api('/listings/meta').then((m) => setMeta({ categories: m.categories || [], cities: m.cities || [], rules: m.rules })).catch(() => {}); reload();
   }, [user]);
 
   if (!user || user.role !== 'SELLER') return null;

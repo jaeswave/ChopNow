@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../api';
 import { Art, ART, Card, CardSkeleton, Tag, naira } from '../components';
-import { Button, Chip, Container, Input, Reveal, Select, cx } from '../ui';
+import { Button, Chip, Container, Input, Reveal, Select, Spinner, cx } from '../ui';
 
 const FOODS = ['🍛 Jollof rice', '🍞 Fresh bread', '🥧 Meat pie', '🍅 Tomatoes and pepper', '🐟 Fresh fish', '🥛 Fura da nono', '🍢 Suya and small chops'];
 const FACTS = [['30%+', 'off on every single deal'], ['Paystack', 'secure card, transfer and USSD payments'], ['8', 'food categories'], ['12', 'Nigerian cities']];
@@ -16,7 +16,7 @@ const BUYER_STEPS = [
 const SELLER_STEPS = [
   ['Apply with your CAC number', 'Sign up, verify your email and give us your RC or BN number so we can check your business.'],
   ['Get approved', 'Once we confirm your registration, you can add your payout account and upload food photos.'],
-  ['List your surplus', 'Add the food, the price, how many, and when the sale ends. ChopNow takes a 10% fee only when you sell.'],
+  ['List your surplus', 'Add the food, the price, how many, and when the sale ends. GbaanJo takes a 10% fee only when you sell.'],
   ['Hand over with a code', 'The customer shows a 6-digit code. Type it in, check the order, and confirm.'],
 ];
 const CATS = [
@@ -40,7 +40,7 @@ const FAQ = [
   ['Is the food safe?', 'Sellers are responsible for what they list and should be honest about when it was made and how it was stored. Buyers should check food before paying and skip anything that looks or smells wrong.'],
   ['How long can a listing run?', 'From 15 minutes up to 72 hours. Buyers then have up to 24 hours after the sale ends to collect.'],
   ['What if the seller cancels?', 'Your order is cancelled and you are refunded. You will see it in My orders.'],
-  ['How much does it cost to sell?', 'Listing is free. ChopNow takes a 10% fee on each sale, and Paystack sends the rest straight to your bank account.'],
+  ['How much does it cost to sell?', 'Listing is free. GbaanJo takes a 10% fee on each sale, and Paystack sends the rest straight to your bank account.'],
   ['How do I start selling?', 'Create a seller account with your business name and CAC number (RC or BN), and verify your email. After we approve your application you can add payout details, upload photos and publish your first listing.'],
   ['Why do sellers need a CAC number?', 'It lets us confirm that every seller is a registered business before they sell food to the public. This keeps buyers safe and builds trust.'],
   ['Can someone else collect my order?', 'Yes. After you pay, you get a pickup code. Send it to anyone you trust and they can collect the food by showing it. Only share it with people you trust, because whoever shows the code gets the food.'],
@@ -69,23 +69,49 @@ function MockCard({ cat, size, tone, time, title, sub, price, was, off, classNam
   );
 }
 
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
 export default function Home() {
   const [meta, setMeta] = useState({ categories: [], cities: [] });
   const [f, setF] = useState({ city: '', category: '', q: '' });
   const [items, setItems] = useState(null);
-  const [err, setErr] = useState('');
+  const [failed, setFailed] = useState(false);
+  const [waking, setWaking] = useState(false);
+  const reqId = useRef(0);
   const [tab, setTab] = useState('buyers');
   const [heroCity, setHeroCity] = useState('');
   const [meals, setMeals] = useState(12);
 
   const go = (id) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
-  const load = () => {
+  // Render's free server sleeps when idle and can take up to a minute to wake, so we retry a few times before showing an error
+  const load = async () => {
+    const id = ++reqId.current;
     const qs = new URLSearchParams(Object.entries(f).filter(([, v]) => v)).toString();
-    setErr('');
-    return api('/listings?' + qs).then(setItems).catch((e) => { setErr(e.message); setItems([]); });
+    setFailed(false);
+    const wakeTimer = setTimeout(() => { if (reqId.current === id) setWaking(true); }, 5000);
+    for (let i = 0; i < 6; i++) {
+      try {
+        const data = await api('/listings?' + qs);
+        if (reqId.current !== id) return;
+        clearTimeout(wakeTimer); setWaking(false); setItems(data);
+        return;
+      } catch {
+        if (reqId.current !== id) return;
+        await sleep(6000);
+      }
+    }
+    if (reqId.current !== id) return;
+    clearTimeout(wakeTimer); setWaking(false); setFailed(true); setItems([]);
   };
 
-  useEffect(() => { api('/listings/meta').then(setMeta).catch(() => {}); }, []);
+  useEffect(() => {
+    (async () => {
+      for (let i = 0; i < 6; i++) {
+        try { const m = await api('/listings/meta'); setMeta({ categories: m.categories || [], cities: m.cities || [], rules: m.rules }); return; }
+        catch { await sleep(6000); }
+      }
+    })();
+  }, []);
   useEffect(() => { const t = setTimeout(load, 250); return () => clearTimeout(t); }, [f]);
 
   const steps = tab === 'buyers' ? BUYER_STEPS : SELLER_STEPS;
@@ -163,7 +189,7 @@ export default function Home() {
         <div className="grid items-center gap-14 lg:grid-cols-2">
           <Reveal>
             <h2 className="text-4xl font-extrabold leading-[1.08] sm:text-5xl">Good food deserves to be eaten, not thrown away.</h2>
-            <p className="mt-5 max-w-lg text-lg text-white/85">ChopNow is a Nigerian marketplace on a mission to make wasting good food a thing of the past. Every day, kitchens, bakeries, supermarkets and market traders are left with food that is perfectly fine but will not sell in time.</p>
+            <p className="mt-5 max-w-lg text-lg text-white/85">GbaanJo is a Nigerian marketplace on a mission to make wasting good food a thing of the past. Every day, kitchens, bakeries, supermarkets and market traders are left with food that is perfectly fine but will not sell in time.</p>
             <p className="mt-4 max-w-lg text-lg text-white/85">We connect them with people nearby who are happy to buy it at a fair price. The food gets eaten, the business recovers its money, and you eat well for less. Every order is a small win against waste.</p>
             <Button variant="palm" size="lg" className="mt-8" onClick={() => go('deals')}>Join the movement</Button>
           </Reveal>
@@ -183,7 +209,7 @@ export default function Home() {
       {/* 3. HOW IT WORKS */}
       <Section id="how" className="bg-white">
         <Reveal className="text-center">
-          <h2 className="text-4xl font-extrabold sm:text-5xl">How ChopNow works</h2>
+          <h2 className="text-4xl font-extrabold sm:text-5xl">How GbaanJo works</h2>
           <p className="mx-auto mt-3 max-w-xl text-lg text-mute">Four simple steps, whether you are hungry or have food to move.</p>
           <div className="mt-6 inline-flex gap-2 rounded-full bg-paper p-1.5">
             {[['buyers', 'I want to buy'], ['sellers', 'I want to sell']].map(([k, t]) => <Chip key={k} on={tab === k} onClick={() => setTab(k)} className="!ring-0">{t}</Chip>)}
@@ -243,14 +269,18 @@ export default function Home() {
             </div>
           </div>
 
-          {err && (
-            <div className="mt-8 rounded-2xl bg-white p-8 text-center ring-[1.5px] ring-pepper/40">
-              <p className="text-lg font-bold text-pepper">{err}</p>
-              <p className="mt-1 text-mute">If you are running this locally, make sure the backend is started.</p>
+          {waking && !failed && items === null && (
+            <div className="mt-6 flex items-center gap-3 rounded-2xl bg-palm/25 p-4 font-semibold"><Spinner /> Waking up the server. The first load can take up to a minute…</div>
+          )}
+          {failed && (
+            <div className="mt-8 rounded-2xl bg-white p-10 text-center ring-[1.5px] ring-pepper/40">
+              <div className="text-5xl">😕</div>
+              <p className="mt-3 text-xl font-bold text-pepper">Something went wrong</p>
+              <p className="mx-auto mt-1 max-w-md text-mute">We could not load the deals. The server may still be waking up, which can take up to a minute. Please try again.</p>
               <Button className="mt-4" onClick={load}>Try again</Button>
             </div>
           )}
-          {!err && items && items.length === 0 && (
+          {!failed && items && items.length === 0 && (
             <div className="mt-8 rounded-2xl bg-white p-10 text-center ring-[1.5px] ring-line">
               <div className="text-6xl">🍽️</div>
               <p className="mt-3 text-xl font-bold">Nothing live here right now</p>
@@ -285,7 +315,7 @@ export default function Home() {
         <div className="grid items-center gap-14 lg:grid-cols-2">
           <Reveal>
             <h2 className="text-4xl font-extrabold leading-[1.08] sm:text-5xl">Cooking too much? Stock not moving?</h2>
-            <p className="mt-5 max-w-lg text-lg">Turn tonight's surplus into money instead of waste. Listing is free and takes about two minutes. ChopNow only takes a 10% fee when you make a sale, and Paystack sends the rest to your bank account.</p>
+            <p className="mt-5 max-w-lg text-lg">Turn tonight's surplus into money instead of waste. Listing is free and takes about two minutes. GbaanJo only takes a 10% fee when you make a sale, and Paystack sends the rest to your bank account.</p>
             <ul className="mt-6 grid gap-2 font-semibold sm:grid-cols-2">
               {['Restaurants and mama put', 'Bakeries and pastry shops', 'Caterers after events', 'Supermarkets and mini-marts', 'Fish, meat and produce sellers', 'Market traders'].map((w) => <li key={w} className="rounded-lg bg-white/55 px-4 py-2.5">{w}</li>)}
             </ul>
@@ -295,7 +325,7 @@ export default function Home() {
             <div className="rounded-3xl bg-white p-6 text-ink shadow-xl sm:p-8">
               <p className="text-sm font-medium text-mute">Example only: one evening's surplus</p>
               <div className="mt-4 grid gap-3">
-                {[['Party jollof packs left over', '10 packs'], ['Normal price', '₦6,000 each'], ['Your last-call price', '₦2,500 each'], ['Packs sold', '8 packs'], ['ChopNow fee (10%)', '− ₦2,000']].map(([a, b]) => <div key={a} className="flex justify-between border-b border-line pb-3"><span className="text-mute">{a}</span><b>{b}</b></div>)}
+                {[['Party jollof packs left over', '10 packs'], ['Normal price', '₦6,000 each'], ['Your last-call price', '₦2,500 each'], ['Packs sold', '8 packs'], ['GbaanJo fee (10%)', '− ₦2,000']].map(([a, b]) => <div key={a} className="flex justify-between border-b border-line pb-3"><span className="text-mute">{a}</span><b>{b}</b></div>)}
               </div>
               <p className="mt-5 text-sm text-mute">Paid to your bank account after the fee</p>
               <p className="font-display text-5xl font-extrabold text-leaf">₦18,000</p>
@@ -332,7 +362,7 @@ export default function Home() {
             </div>
           </div>
           <div className="self-center rounded-3xl bg-leaf p-8 text-white shadow-xl shadow-leaf/20">
-            <h2 className="text-3xl font-extrabold">Ready to chop for less?</h2>
+            <h2 className="text-3xl font-extrabold">Ready to save good food?</h2>
             <p className="mt-3 text-white/80">Join as a buyer to grab deals near you, or as a seller to turn surplus into cash.</p>
             <div className="mt-6 grid gap-3">
               <Button variant="palm" size="lg" onClick={() => go('deals')}>See live deals</Button>
