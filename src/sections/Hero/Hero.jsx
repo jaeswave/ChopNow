@@ -4,6 +4,8 @@ import { Section } from "../../components/Section";
 import { Button } from "../../ui";
 import MockCard from "./MockCard";
 import { FACTS, FOODS } from "./hero.data";
+import dealOne from "./assets/deal-1.webp";
+import dealTwo from "./assets/deal-2.webp";
 
 // cities: list for the dropdown. onSearch(city): called when the visitor presses "Find deals near me".
 export default function Hero({ cities = [], onSearch }) {
@@ -16,13 +18,18 @@ export default function Hero({ cities = [], onSearch }) {
           <p className="inline-block rounded-full bg-white/10 px-4 py-1.5 text-sm font-medium text-palm">
             Build for kitchens, bakeries and markets
           </p>
-          <h1 className="mt-5 text-5xl font-extrabold leading-[1.02] sm:text-6xl lg:text-7xl">
-            Surprise your taste buds, not your wallet — 30% off or more.
+          <h1 className="mt-5 text-4xl font-extrabold leading-[1.08] sm:text-5xl md:text-6xl lg:text-7xl">
+            Surprise your taste buds,
+            <br className="hidden sm:block" />
+            <span className="text-palm"> not your wallet.</span>
           </h1>
-          <p className="mt-6 max-w-xl text-lg text-white/85 sm:text-xl">
-            Kitchens, bakeries, markets and shops list what they cannot sell
-            today. You pay online, get a pickup code, and collect it. Every deal
-            is at least 30% off.
+
+          <p className="mt-5 max-w-xl text-base text-white/85 sm:mt-6 sm:text-lg md:text-xl">
+            Local kitchens, bakeries and shops list time-limited deals —{" "}
+            <strong className="font-bold text-white">
+              every deal at least 30% off
+            </strong>
+            . Pay online, get a pickup code, and collect near you.
           </p>
 
           <form
@@ -78,13 +85,13 @@ export default function Hero({ cities = [], onSearch }) {
         </div>
 
         <div
-          className="relative mx-auto hidden h-[470px] w-full max-w-md sm:block"
+          className="relative mx-auto hidden h-[10vh] w-full max-w-md lg:block"
           aria-hidden="true"
         >
           <MockCard
             className="absolute right-0 top-0 w-80 rotate-3 animate-float"
-            cat="Cooked meals"
-            size="lg"
+            image={dealOne}
+            alt="Party jollof and chicken"
             tone="hot"
             time="1h 12m left"
             title="Party jollof and chicken, 10 packs"
@@ -95,8 +102,8 @@ export default function Hero({ cities = [], onSearch }) {
           />
           <MockCard
             className="absolute bottom-0 left-0 w-60 -rotate-6 animate-float [animation-delay:-3s]"
-            cat="Bakery"
-            size="md"
+            image={dealTwo}
+            alt="Fresh bread"
             tone="palm"
             time="3h 05m left"
             title="Fresh bread, 12 loaves"
@@ -106,21 +113,21 @@ export default function Hero({ cities = [], onSearch }) {
         </div>
       </div>
 
-      <div className="mt-16 grid grid-cols-2 gap-6 border-t border-white/15 pt-8 md:grid-cols-4">
+      <div className=" mt-16 grid grid-cols-2 gap-6 border-t border-white/15 pt-8 md:grid-cols-4">
         {FACTS.map(([n, t]) => (
           <div key={t}>
-            <div className="font-display text-4xl font-extrabold text-palm">
+            <div className="text-center font-display text-4xl font-extrabold text-palm">
               {n}
             </div>
-            <p className="text-sm text-white/75">{t}</p>
+            <p className="text-center text-sm text-white/75">{t}</p>
           </div>
         ))}
       </div>
-      <div className="mt-8 flex flex-wrap gap-2">
+      <div className="mt-6 flex flex-wrap justify-center gap-2 sm:mt-8">
         {FOODS.map((t) => (
           <span
             key={t}
-            className="rounded-full bg-white/10 px-4 py-1.5 text-sm text-white/90"
+            className="rounded-full bg-white/10 px-3 py-1 text-xs text-white/90 sm:px-4 sm:py-1.5 sm:text-sm"
           >
             {t}
           </span>

@@ -1,9 +1,10 @@
-import { Art, Tag } from "../../components";
+import ProductImage from "../../components/ProductImage";
+import { Tag } from "../../components";
 import { cx } from "../../ui";
 
 export default function MockCard({
-  cat,
-  size,
+  image,
+  alt,
   tone,
   time,
   title,
@@ -21,7 +22,12 @@ export default function MockCard({
       )}
     >
       <div className="relative">
-        <Art c={cat} size={size} />
+        <ProductImage
+          src={image}
+          alt={alt || title}
+          eager
+          className="rounded-xl"
+        />
         <div className="absolute left-3 top-3">
           <Tag tone={tone}>{time}</Tag>
         </div>
