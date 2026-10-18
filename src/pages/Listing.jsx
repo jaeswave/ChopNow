@@ -51,7 +51,7 @@ export default function Listing() {
           <div className="rounded-2xl bg-white p-6 ring-[1.5px] ring-line">
             <h2 className="text-xl font-bold">How pickup works</h2>
             <ol className="mt-4 grid gap-4">
-              {[['Reserve and pay', 'Pay securely online with Paystack. Your portion is held for a few minutes while you pay.'], ['Get your code', 'You get a 6-digit code, the exact address and the seller\'s phone number.'], ['Collect by ' + when(l.pickupBy), 'Show your code to the seller. It is already paid for.']].map(([t, d], i) => (
+              {[['Reserve and pay', 'Pay securely online. Your portion is held for a few minutes while you pay.'], ['Get your code', 'You get a 6-digit code, the exact address and the seller\'s phone number.'], ['Collect by ' + when(l.pickupBy), 'Show your code to the seller. It is already paid for.']].map(([t, d], i) => (
                 <li key={t} className="flex gap-3"><span className="grid size-8 flex-none place-items-center rounded-full bg-leaf text-sm font-extrabold text-palm">{i + 1}</span><div><b>{t}</b><p className="text-sm text-mute">{d}</p></div></li>
               ))}
             </ol>
@@ -91,7 +91,7 @@ export default function Listing() {
                 </>
               )}
             <ul className="mt-1 grid gap-1.5 text-sm text-mute">
-              <li>✓ Secure payment by Paystack</li><li>✓ Cancel for a refund before the sale ends</li><li>✓ Up to 5 per reservation</li>
+              <li>✓ Secure online payment</li><li>✓ Cancel for a refund before the sale ends</li><li>✓ Up to 5 per reservation</li>
             </ul>
           </div>
         </aside>

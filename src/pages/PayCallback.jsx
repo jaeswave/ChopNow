@@ -3,7 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { api } from '../api';
 import { Button } from '../ui';
 
-// Paystack sends the buyer back here. We ask our own server (which asks Paystack) whether the payment really went through.
+// The payment page sends the buyer back here. We ask our own server (which asks the gateway) whether the payment really went through.
 export default function PayCallback() {
   const [sp] = useSearchParams();
   const ref = sp.get('reference') || sp.get('trxref');

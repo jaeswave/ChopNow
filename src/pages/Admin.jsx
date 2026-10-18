@@ -33,12 +33,12 @@ function Refunds() {
   const load = () => api('/admin/refunds').then(setItems).catch((e) => toast(e.message, 'err'));
   useEffect(() => { load(); }, []);
   const done = async (id) => {
-    if (!window.confirm('Only click this after you have refunded the payment in your Paystack dashboard. Continue?')) return;
+    if (!window.confirm('Only click this after you have refunded the payment in your payment dashboard. Continue?')) return;
     try { await api(`/admin/orders/${id}/refunded`, { method: 'PATCH' }); toast('Marked as refunded'); load(); } catch (e) { toast(e.message, 'err'); }
   };
   return (
     <div className="mt-5">
-      <p className="rounded-xl bg-palm/25 p-4 text-sm"><b>How to refund:</b> open your Paystack Dashboard, go to Transactions, search the reference below, and click Refund. Then come back here and click "Mark refunded".</p>
+      <p className="rounded-xl bg-palm/25 p-4 text-sm"><b>How to refund:</b> open your payment dashboard (the OPay merchant dashboard if you use OPay), find the payment with the reference below, and refund it. Then come back here and click "Mark refunded".</p>
       {items && items.length === 0 && <p className="mt-6 text-mute">No refunds waiting. 🎉</p>}
       <ul className="mt-4 grid gap-3">
         {items?.map((o) => (
@@ -175,6 +175,39 @@ function Applications() {
   );
 }
 
+function Payouts() {
+  const toast = useToast();
+  const [rows, setRows] = useState(null);
+  const load = () => api('/admin/payouts').then(setRows).catch((e) => toast(e.message, 'err'));
+  useEffect(() => { load(); }, []);
+  const paid = async (r) => {
+    if (!window.confirm(`Only click this after you have sent ${naira(r.owed)} to ${r.accountName} (${r.bankName}, ${r.accountNumber}). Continue?`)) return;
+    try { await api('/admin/payouts/mark-paid', { method: 'POST', body: { orderIds: r.orderIds } }); toast('Marked as paid'); load(); } catch (e) { toast(e.message, 'err'); }
+  };
+  return (
+    <div className="mt-5">
+      <p className="rounded-xl bg-palm/25 p-4 text-sm"><b>How to pay sellers:</b> this lists what you owe each seller for orders that were handed over (or missed by the buyer), after your fee. Send the amount by bank transfer, then click "Mark paid" so it leaves this list.</p>
+      {rows && rows.length === 0 && <p className="mt-6 text-mute">Nobody is owed anything right now. 🎉</p>}
+      <ul className="mt-4 grid gap-3">
+        {rows?.map((r) => (
+          <li key={r.sellerId} className={cx(box, 'flex flex-wrap items-center justify-between gap-3')}>
+            <div className="min-w-0">
+              <b>{r.businessName}</b>
+              <p className="text-sm text-mute">{r.accountName} · {r.bankName} · <span className="font-mono text-ink">{r.accountNumber}</span></p>
+              <p className="text-sm text-mute">{r.orderIds.length} order{r.orderIds.length === 1 ? '' : 's'}</p>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="font-display text-2xl font-extrabold text-leaf">{naira(r.owed)}</span>
+              <Button size="sm" variant="outline" onClick={() => navigator.clipboard?.writeText(r.accountNumber).then(() => toast('Account number copied'))}>Copy account</Button>
+              <Button size="sm" onClick={() => paid(r)}>Mark paid</Button>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 export default function Admin() {
   const { user } = useAuth();
   const nav = useNavigate();
@@ -186,11 +219,12 @@ export default function Admin() {
       <h1 className="text-4xl font-extrabold">Admin</h1>
       <p className="mt-1 text-mute">Keep GbaanJo safe and fair.</p>
       <div className="mt-6 flex flex-wrap gap-2">
-        {[['applications', 'Seller applications'], ['overview', 'Overview'], ['refunds', 'Refunds'], ['users', 'Users'], ['listings', 'Listings']].map(([k, t]) => <Chip key={k} on={tab === k} onClick={() => setTab(k)}>{t}</Chip>)}
+        {[['applications', 'Seller applications'], ['overview', 'Overview'], ['refunds', 'Refunds'], ['payouts', 'Seller payouts'], ['users', 'Users'], ['listings', 'Listings']].map(([k, t]) => <Chip key={k} on={tab === k} onClick={() => setTab(k)}>{t}</Chip>)}
       </div>
       {tab === 'applications' && <Applications />}
       {tab === 'overview' && <Overview />}
       {tab === 'refunds' && <Refunds />}
+      {tab === 'payouts' && <Payouts />}
       {tab === 'users' && <Users />}
       {tab === 'listings' && <Listings />}
     </div>
