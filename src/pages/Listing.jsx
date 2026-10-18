@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { api } from '../api';
 import { useAuth } from '../auth';
-import { Art, Countdown, StatusBadge, Verified, naira, pctOff, when } from '../components';
+import { Art, Countdown, StatusBadge, Verified, naira, pctOff, when } from '../Components';
 import { Button, Spinner, useToast } from '../ui';
 
 export default function Listing() {
