@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { api } from "../api";
-import { Art, ART, Card, CardSkeleton, Tag, naira } from "../components";
+import { Art, ART, Card, CardSkeleton, Tag, naira } from "../Components";
 import {
   Button,
   Chip,

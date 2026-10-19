@@ -13,18 +13,18 @@ export default function Hero({ cities = [], onSearch }) {
 
   return (
     <Section className="overflow-hidden bg-leaf bg-[radial-gradient(rgba(244,181,46,.14)_1.5px,transparent_1.5px)] bg-[length:24px_24px] text-white">
-      <div className="grid items-center gap-14 lg:grid-cols-[1.15fr_.85fr]">
+      <div className="grid items-center gap-14 lg:grid-cols-[1.15fr_.80fr]">
         <div>
           <p className="inline-block rounded-full bg-white/10 px-4 py-1.5 text-sm font-medium text-palm">
             Build for kitchens, bakeries and markets
           </p>
-          <h1 className="mt-5 text-4xl font-extrabold leading-[1.08] sm:text-5xl md:text-6xl lg:text-7xl">
+          <h1 className="w-full mt-5 text-4xl font-extrabold leading-[1.08] sm:text-5xl md:text-6xl lg:text-7xl">
             Surprise your taste buds,
-            <br className="hidden sm:block" />
+            {/* <br className="hidden sm:block" /> */}
             <span className="text-palm"> not your wallet.</span>
           </h1>
 
-          <p className="mt-5 max-w-xl text-base text-white/85 sm:mt-6 sm:text-lg md:text-xl">
+          <p className="mt-5 w-full text-base text-white/85 sm:mt-6 sm:text-lg md:text-xl">
             Local kitchens, bakeries and shops list time-limited deals —{" "}
             <strong className="font-bold text-white">
               every deal at least 30% off
@@ -37,7 +37,7 @@ export default function Hero({ cities = [], onSearch }) {
               e.preventDefault();
               onSearch?.("Lagos");
             }}
-            className="mt-8 flex max-w-xl flex-col gap-2 rounded-2xl bg-white p-2 shadow-2xl shadow-black/30 sm:flex-row"
+            className="mt-8 flex  flex-col gap-2 rounded-2xl bg-white p-2 shadow-2xl shadow-black/30 sm:flex-row"w-full
           >
             <div className="flex min-h-12 flex-1 items-center gap-2 rounded-xl px-4 text-ink">
               <span aria-hidden="true">📍</span>
@@ -85,7 +85,7 @@ export default function Hero({ cities = [], onSearch }) {
         </div>
 
         <div
-          className="relative mx-auto hidden h-[10vh] w-full max-w-md lg:block"
+          className="relative mx-auto hidden h-[10vh] w-full max-w-md xl:block"
           aria-hidden="true"
         >
           <MockCard

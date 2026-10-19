@@ -33,7 +33,7 @@ export const Chip = ({ on, className = '', ...p }) => (
   <button type="button" className={cx('cursor-pointer rounded-full px-4 py-2 text-sm font-semibold ring-[1.5px] transition focus-visible:outline-3 focus-visible:outline-palm', on ? 'bg-leaf text-white ring-leaf' : 'bg-white text-ink ring-line hover:ring-leaf', className)} {...p} />
 );
 
-export const Container = ({ className = '', ...p }) => <div className={cx('mx-auto w-full max-w-6xl px-5 sm:px-8', className)} {...p} />;
+export const Container = ({ className = '', ...p }) => <div className={cx('mx-auto w-full max-w-[90%] px-5 sm:px-8', className)} {...p} />;
 
 /* ---------- Scroll reveal ---------- */
 export function Reveal({ children, delay = 0, className = '' }) {

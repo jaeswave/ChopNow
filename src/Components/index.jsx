@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { cx } from '../ui';
+export { money } from "./money";
 
 export const naira = (n) => '₦' + Number(n).toLocaleString('en-NG');
 export const pctOff = (o, p) => Math.round((1 - p / o) * 100);

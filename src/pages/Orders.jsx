@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../api';
 import { useAuth } from '../auth';
-import { Art, Countdown, StatusBadge, mapsUrl, naira, when } from '../components';
+import { Art, Countdown, StatusBadge, mapsUrl, naira, when } from '../Components';
 import { Button, Chip, useToast } from '../ui';
 
 export default function Orders() {
