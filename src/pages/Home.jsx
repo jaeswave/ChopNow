@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import LiveDealsTeaser from "../sections/LiveDealsTeaser";
 import { api } from "../api";
-import { Art, ART, Card, CardSkeleton, Tag, naira } from "../Components";
+import { Art, ART, Card, CardSkeleton, Tag, naira } from "../components";
 import {
   Button,
   Chip,
