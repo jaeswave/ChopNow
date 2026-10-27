@@ -47,3 +47,5 @@ const slug = (c) =>
 export const categoryImage = Object.fromEntries(
   categories.map((c) => [c, `/images/categories/${slug(c)}.webp`]),
 );
+// Used by the "How much could you save?" estimate on the landing page
+export const savings = { avgPurchase: 3500, avgDiscount: 0.45 };

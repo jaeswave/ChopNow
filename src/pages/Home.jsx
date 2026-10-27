@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import LiveDealsTeaser from "../sections/LiveDealsTeaser";
 import { api } from "../api";
 import { Art, ART, Card, CardSkeleton, Tag, naira } from "../Components";
 import {
@@ -14,6 +15,8 @@ import {
 } from "../ui";
 import { Section, Heading } from "../components/Section";
 import Hero from "../sections/Hero";
+import Why from "../sections/Why";
+import Mission from "../sections/Mission";
 
 const BUYER_STEPS = [
   [
@@ -133,224 +136,25 @@ const FAQ = [
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 export default function Home() {
-  const [meta, setMeta] = useState({ categories: [], cities: [] });
-  const [f, setF] = useState({ city: "", category: "", q: "" });
-  const [items, setItems] = useState(null);
-  const [failed, setFailed] = useState(false);
-  const [waking, setWaking] = useState(false);
-  const reqId = useRef(0);
+  const navigate = useNavigate();
   const [tab, setTab] = useState("buyers");
-  const [heroCity, setHeroCity] = useState("");
-  const [meals, setMeals] = useState(12);
-
-  const go = (id) =>
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
-  // Render's free server sleeps when idle and can take up to a minute to wake, so we retry a few times before showing an error
-  const load = async () => {
-    const id = ++reqId.current;
-    const qs = new URLSearchParams(
-      Object.entries(f).filter(([, v]) => v),
-    ).toString();
-    setFailed(false);
-    const wakeTimer = setTimeout(() => {
-      if (reqId.current === id) setWaking(true);
-    }, 5000);
-    for (let i = 0; i < 6; i++) {
-      try {
-        const data = await api("/listings?" + qs);
-        if (reqId.current !== id) return;
-        clearTimeout(wakeTimer);
-        setWaking(false);
-        setItems(data);
-        return;
-      } catch {
-        if (reqId.current !== id) return;
-        await sleep(6000);
-      }
-    }
-    if (reqId.current !== id) return;
-    clearTimeout(wakeTimer);
-    setWaking(false);
-    setFailed(true);
-    setItems([]);
-  };
-
-  useEffect(() => {
-    (async () => {
-      for (let i = 0; i < 6; i++) {
-        try {
-          const m = await api("/listings/meta");
-          setMeta({
-            categories: m.categories || [],
-            cities: m.cities || [],
-            rules: m.rules,
-          });
-          return;
-        } catch {
-          await sleep(6000);
-        }
-      }
-    })();
-  }, []);
-  useEffect(() => {
-    const t = setTimeout(load, 250);
-    return () => clearTimeout(t);
-  }, [f]);
-
   const steps = tab === "buyers" ? BUYER_STEPS : SELLER_STEPS;
-  const filtered = f.city || f.category || f.q;
-  const saved = Math.round(meals * 3500 * 0.45);
 
   return (
     <>
       {/* 1. HERO */}
       {/* 1. HERO */}
       <Hero
-        cities={meta.cities}
-        onSearch={(city) => {
-          setF({ ...f, city });
-          go("deals");
-        }}
+        onSearch={(city) =>
+          navigate("/deals" + (city ? "?city=" + encodeURIComponent(city) : ""))
+        }
       />
-
       {/* 2. WHY */}
-      <Section id="why">
-        <div className="grid items-center gap-14 lg:grid-cols-2">
-          <Reveal>
-            <h2 className="text-4xl font-extrabold leading-[1.08] sm:text-5xl">
-              Good food should end up on a plate, not in the bin.
-            </h2>
-            <p className="mt-5 max-w-lg text-lg text-mute">
-              Every day, kitchens cook a little too much, bakeries bake more
-              than they sell, and market stalls close with produce that will not
-              last till morning. Most of it is thrown away, even though someone
-              nearby would happily buy it for less.
-            </p>
-            <ul className="mt-8 grid gap-4">
-              {[
-                [
-                  "🛍️",
-                  "Buyers eat well for less",
-                  "Meals, bread, produce and groceries at least 30% off, close to you.",
-                ],
-                [
-                  "💰",
-                  "Sellers recover their money",
-                  "Turn tonight's leftovers into cash and meet new customers.",
-                ],
-                [
-                  "🌍",
-                  "Less food goes to waste",
-                  "More of what gets cooked and grown ends up being eaten.",
-                ],
-              ].map(([e, t, d]) => (
-                <li key={t} className="flex gap-4">
-                  <span className="grid size-12 flex-none place-items-center rounded-xl bg-palm/30 text-2xl">
-                    {e}
-                  </span>
-                  <div>
-                    <h3 className="text-lg font-semibold">{t}</h3>
-                    <p className="text-mute">{d}</p>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </Reveal>
-
-          <Reveal delay={150}>
-            <div className="rounded-3xl bg-white p-6 shadow-xl shadow-leaf/10 ring-[1.5px] ring-line sm:p-8">
-              <h3 className="text-2xl font-bold">How much could you save?</h3>
-              <p className="mt-1 text-mute">Slide to see an estimate.</p>
-              <label className="mt-6 block font-semibold">
-                Meals or food buys per month:{" "}
-                <span className="text-pepper">{meals}</span>
-                <input
-                  type="range"
-                  min="4"
-                  max="40"
-                  step="2"
-                  value={meals}
-                  onChange={(e) => setMeals(+e.target.value)}
-                  className="mt-3 w-full cursor-pointer accent-leaf"
-                />
-              </label>
-              <div className="mt-6 rounded-2xl bg-leaf p-6 text-white">
-                <p className="text-white/80">You could save about</p>
-                <p className="font-display text-5xl font-extrabold text-palm">
-                  {naira(saved)}
-                </p>
-                <p className="mt-1 text-sm text-white/70">a month</p>
-              </div>
-              <p className="mt-4 text-xs text-mute">
-                Estimate only. Assumes a ₦3,500 meal bought at about 45% off.
-                Real savings depend on what is listed near you.
-              </p>
-            </div>
-          </Reveal>
-        </div>
-      </Section>
+      <Why />
 
       {/* MISSION */}
-      <Section id="mission" className="bg-leaf text-white">
-        <div className="grid items-center gap-14 lg:grid-cols-2">
-          <Reveal>
-            <h2 className="text-4xl font-extrabold leading-[1.08] sm:text-5xl">
-              Good food deserves to be eaten, not thrown away.
-            </h2>
-            <p className="mt-5 max-w-lg text-lg text-white/85">
-              GbaanJo is a Nigerian marketplace on a mission to make wasting
-              good food a thing of the past. Every day, kitchens, bakeries,
-              supermarkets and market traders are left with food that is
-              perfectly fine but will not sell in time.
-            </p>
-            <p className="mt-4 max-w-lg text-lg text-white/85">
-              We connect them with people nearby who are happy to buy it at a
-              fair price. The food gets eaten, the business recovers its money,
-              and you eat well for less. Every order is a small win against
-              waste.
-            </p>
-            <Button
-              variant="palm"
-              size="lg"
-              className="mt-8"
-              onClick={() => go("deals")}
-            >
-              Join the movement
-            </Button>
-          </Reveal>
-          <Reveal delay={150}>
-            <div className="grid gap-4">
-              {[
-                [
-                  "🍽️",
-                  "Food gets eaten",
-                  "Good meals and groceries go to people, not the bin.",
-                ],
-                [
-                  "💚",
-                  "Businesses recover costs",
-                  "Sellers turn tonight's surplus into money.",
-                ],
-                [
-                  "🤝",
-                  "Communities benefit",
-                  "Neighbours get quality food at a price that works.",
-                ],
-              ].map(([e, t, d]) => (
-                <div key={t} className="flex gap-4 rounded-2xl bg-white/10 p-5">
-                  <span className="grid size-12 flex-none place-items-center rounded-xl bg-palm text-2xl">
-                    {e}
-                  </span>
-                  <div>
-                    <h3 className="text-xl font-semibold">{t}</h3>
-                    <p className="text-white/80">{d}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </Reveal>
-        </div>
-      </Section>
+      {/* <Mission onJoin={() => go("deals")} /> */}
+      <Mission onJoin={() => navigate("/deals")} />
 
       {/* 3. HOW IT WORKS */}
       <Section id="how" className="bg-white">
@@ -443,110 +247,8 @@ export default function Home() {
       </Section>
 
       {/* 4. LIVE DEALS */}
-      <Section id="deals">
-        <div className="w-full">
-          <div className="flex flex-wrap items-end justify-between gap-3">
-            <Heading
-              title="Live now"
-              sub="Real listings from real sellers. Ending soonest first."
-            />
-            {items && (
-              <p className="font-semibold text-mute">
-                {items.length} deal{items.length === 1 ? "" : "s"} live
-                {filtered ? " with these filters" : ""}
-              </p>
-            )}
-          </div>
-
-          <div className="sticky top-16 z-20 -mx-5 mt-6 bg-paper/90 px-5 py-3 backdrop-blur sm:-mx-8 sm:px-8">
-            <div className="flex flex-wrap gap-3">
-              <Select
-                className="sm:w-48"
-                aria-label="City"
-                value={f.city}
-                onChange={(e) => setF({ ...f, city: e.target.value })}
-              >
-                <option value="">All cities</option>
-                {meta.cities.map((c) => (
-                  <option key={c}>{c}</option>
-                ))}
-              </Select>
-              <Input
-                className="min-w-56 flex-1"
-                aria-label="Search"
-                placeholder="Search jollof, bread, tomatoes, fish…"
-                value={f.q}
-                onChange={(e) => setF({ ...f, q: e.target.value })}
-              />
-              {filtered && (
-                <Button
-                  variant="outline"
-                  onClick={() => setF({ city: "", category: "", q: "" })}
-                >
-                  Clear
-                </Button>
-              )}
-            </div>
-            <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
-              {["", ...meta.categories].map((c) => (
-                <Chip
-                  key={c}
-                  on={f.category === c}
-                  onClick={() => setF({ ...f, category: c })}
-                  className="shrink-0"
-                >
-                  {ART[c] ? ART[c][0] + " " : ""}
-                  {c || "Everything"}
-                </Chip>
-              ))}
-            </div>
-          </div>
-
-          {waking && !failed && items === null && (
-            <div className="mt-6 flex items-center gap-3 rounded-2xl bg-palm/25 p-4 font-semibold">
-              <Spinner /> Waking up the server. The first load can take up to a
-              minute…
-            </div>
-          )}
-          {failed && (
-            <div className="mt-8 rounded-2xl bg-white p-10 text-center ring-[1.5px] ring-pepper/40">
-              <div className="text-5xl">😕</div>
-              <p className="mt-3 text-xl font-bold text-pepper">
-                Something went wrong
-              </p>
-              <p className="mx-auto mt-1 max-w-md text-mute">
-                We could not load the deals. The server may still be waking up,
-                which can take up to a minute. Please try again.
-              </p>
-              <Button className="mt-4" onClick={load}>
-                Try again
-              </Button>
-            </div>
-          )}
-          {!failed && items && items.length === 0 && (
-            <div className="mt-8 rounded-2xl bg-white p-10 text-center ring-[1.5px] ring-line">
-              <div className="text-6xl">🍽️</div>
-              <p className="mt-3 text-xl font-bold">
-                Nothing live here right now
-              </p>
-              <p className="mx-auto mt-1 max-w-md text-mute">
-                Try another city or category. Most sellers list in the afternoon
-                and evening, so check back later.
-              </p>
-              <Button as={Link} to="/auth" className="mt-5">
-                Are you a seller? List something
-              </Button>
-            </div>
-          )}
-          <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {!items &&
-              Array.from({ length: 6 }, (_, i) => <CardSkeleton key={i} />)}
-            {items?.map((l) => (
-              <Card key={l.id} l={l} />
-            ))}
-          </div>
-        </div>
-      </Section>
+      {/* 4. LIVE DEALS */}
+      <LiveDealsTeaser />
 
       {/* 5. WHAT YOU CAN FIND */}
       <Section className="bg-white">
@@ -558,10 +260,9 @@ export default function Home() {
           {CATS.map(([c, ex], i) => (
             <Reveal key={c} delay={(i % 4) * 80}>
               <button
-                onClick={() => {
-                  setF({ ...f, category: c });
-                  go("deals");
-                }}
+                onClick={() =>
+                  navigate("/deals?category=" + encodeURIComponent(c))
+                }
                 className="group h-full w-full cursor-pointer overflow-hidden rounded-2xl bg-paper text-left ring-[1.5px] ring-line transition hover:-translate-y-1 hover:ring-leaf"
               >
                 <Art
@@ -705,7 +406,11 @@ export default function Home() {
               surplus into cash.
             </p>
             <div className="mt-6 grid gap-3">
-              <Button variant="palm" size="lg" onClick={() => go("deals")}>
+              <Button
+                variant="palm"
+                size="lg"
+                onClick={() => navigate("/deals")}
+              >
                 See live deals
               </Button>
               <Button as={Link} to="/auth" variant="ghost" size="lg">

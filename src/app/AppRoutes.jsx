@@ -19,6 +19,7 @@ const routes = [
     path: "/verify-email",
     Component: lazy(() => import("../pages/VerifyEmail")),
   },
+  { path: "/deals", Component: lazy(() => import("../pages/Deals")) },
 ];
 
 const Page = ({ children }) => (

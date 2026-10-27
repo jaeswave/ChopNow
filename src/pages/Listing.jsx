@@ -74,7 +74,7 @@ export default function Listing() {
   return (
     <div>
       <Link
-        to="/#deals"
+        to="/deals"
         className="text-sm font-semibold text-mute hover:text-ink"
       >
         ← Back to live deals

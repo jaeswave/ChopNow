@@ -8,8 +8,6 @@ import AppRoutes from "./app/AppRoutes";
 // Optional ribbon for test versions: set VITE_BETA_NOTICE in Vercel to show it, leave it empty to hide it
 const BETA = import.meta.env.VITE_BETA_NOTICE;
 
-
-
 function ScrollToHash() {
   const { hash, pathname } = useLocation();
   useEffect(() => {
@@ -42,7 +40,7 @@ function Brand({ className = "" }) {
 
 const LiveLink = ({ compact = false }) => (
   <Link
-    to="/#deals"
+    to="/deals"
     className={cx(
       "inline-flex items-center gap-2 rounded-full bg-white/10 font-bold text-white ring-1 ring-white/25 transition hover:bg-white/20",
       compact ? "px-3 py-1.5 text-sm" : "px-4 py-2",
@@ -171,7 +169,7 @@ function Footer() {
           <Link className={a} to="/#how">
             How it works
           </Link>
-          <Link className={a} to="/#deals">
+          <Link className={a} to="/deals">
             Live deals
           </Link>
           <Link className={a} to="/#faq">
@@ -207,8 +205,6 @@ function Footer() {
     </footer>
   );
 }
-
-
 
 function VerifyBanner() {
   const { user } = useAuth();
