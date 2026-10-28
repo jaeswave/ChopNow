@@ -37,7 +37,7 @@ export default function Hero({ cities = [], onSearch }) {
               e.preventDefault();
               onSearch?.("Lagos");
             }}
-            className="mt-8 flex  flex-col gap-2 rounded-2xl bg-white p-2 shadow-2xl shadow-black/30 sm:flex-row"
+            className="mt-8 flex  flex-col gap-2 rounded-2xl bg-white p-2 shadow-2xl shadow-black/30 sm:flex-row"w-full
           >
             <div className="flex min-h-12 flex-1 items-center gap-2 rounded-xl px-4 text-ink">
               <span aria-hidden="true">📍</span>
