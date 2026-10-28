@@ -14,6 +14,7 @@ import {
   cx,
 } from "../ui";
 import { Section, Heading } from "../components/Section";
+import { categoryImage } from "../config/market";
 import Hero from "../sections/Hero";
 import Why from "../sections/Why";
 import Mission from "../sections/Mission";
@@ -267,6 +268,7 @@ export default function Home() {
               >
                 <Art
                   c={c}
+                  src={categoryImage[c]}
                   className="transition duration-300 group-hover:scale-105"
                 />
                 <div className="p-4">

@@ -9,7 +9,7 @@ import {
   mapsUrl,
   naira,
   when,
-} from "../Components";
+} from "../components";
 import { Button, Chip, useToast } from "../ui";
 
 export default function Orders() {
