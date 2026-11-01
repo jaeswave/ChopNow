@@ -1,7 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 100" fill="none">
-  <rect width="120" height="100" fill="#E8EDE4"/>
-  <rect x="38" y="20" width="44" height="34" rx="5" stroke="#9AA89F" stroke-width="3"/>
-  <circle cx="50" cy="31" r="4" fill="#9AA89F"/>
-  <path d="M42 50l12-11 9 8 7-6 10 9" stroke="#9AA89F" stroke-width="3" stroke-linejoin="round"/>
-  <text x="60" y="75" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#7C8B82">Photo coming soon</text>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none" stroke="#5A6B61" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><circle cx="60" cy="64" r="34"/><circle cx="60" cy="64" r="22"/><path d="M22 18v26M16 18v14a6 6 0 0 0 12 0V18M98 18c-8 6-10 16-8 26h8z"/></svg>

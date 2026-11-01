@@ -14,6 +14,7 @@ import {
   cx,
 } from "../ui";
 import { Section, Heading } from "../components/Section";
+import { categoryImage } from "../config/market";
 import Hero from "../sections/Hero";
 import Why from "../sections/Why";
 import Mission from "../sections/Mission";
@@ -117,7 +118,7 @@ const FAQ = [
   ],
   [
     "How much does it cost to sell?",
-    "Listing is free. GbaanJo takes a 10% fee on each sale, and we pay the rest to your bank account.",
+    "Listing is free. GbaanJo takes a 10% fee on each sale. After you hand over the food, we pay the rest to your bank account, usually within 1 to 2 working days.",
   ],
   [
     "How do I start selling?",
@@ -267,6 +268,7 @@ export default function Home() {
               >
                 <Art
                   c={c}
+                  src={categoryImage[c]}
                   className="transition duration-300 group-hover:scale-105"
                 />
                 <div className="p-4">

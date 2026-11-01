@@ -10,7 +10,7 @@ import {
   naira,
   pctOff,
   when,
-} from "../Components";
+} from "../components";
 import { Button, Spinner, useToast } from "../ui";
 import { useMeta } from "../hooks/useMeta";
 import { getPaymentProvider } from "../payments";
@@ -27,11 +27,14 @@ export default function Listing() {
 
   const { rules, paymentProvider } = useMeta();
   const fee = rules.BUYER_SERVICE_FEE || 0;
+  // Load this listing. (The old code only asked for meta, so the page never left its loading skeleton.)
   useEffect(() => {
-    api("/listings/meta")
-      .then((m) => setFee(m.rules.BUYER_SERVICE_FEE || 0))
-      .catch(() => {});
-  }, []);
+    setL(null);
+    setErr("");
+    api("/listings/" + id)
+      .then(setL)
+      .catch((e) => setErr(e.message));
+  }, [id]);
 
   if (!l)
     return err ? (

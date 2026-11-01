@@ -20,6 +20,9 @@ const routes = [
     Component: lazy(() => import("../pages/VerifyEmail")),
   },
   { path: "/deals", Component: lazy(() => import("../pages/Deals")) },
+  { path: "/feedback", Component: lazy(() => import("../pages/Feedback")) },
+  { path: "/forgot-password", Component: lazy(() => import("../pages/ForgotPassword")) },
+  { path: "/reset-password", Component: lazy(() => import("../pages/ResetPassword")) },
 ];
 
 const Page = ({ children }) => (

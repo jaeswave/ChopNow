@@ -2,7 +2,9 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../api';
 import { useAuth } from '../auth';
-import { Button, Field, Input, Spinner, cx } from '../ui';
+import { Button, Field, Input, Select, Spinner, cx } from '../ui';
+import { useMeta } from '../hooks/useMeta';
+import { getSavedCity } from '../hooks/useCity';
 
 const ROLES = [['BUYER', '🛍️', 'I want to buy', 'Grab deals near me'], ['SELLER', '🍳', 'I want to sell', 'List my surplus food']];
 
@@ -10,7 +12,10 @@ export default function AuthPage() {
   const { user, login } = useAuth();
   const nav = useNavigate();
   const [mode, setMode] = useState('login');
-  const [f, setF] = useState({ role: 'BUYER', name: '', email: '', phone: '', password: '', businessName: '', rcNumber: '' });
+  const { cities } = useMeta();
+  const live = cities?.[0] || 'Lagos';
+  // Pre-filled from the city question they answered on their first visit. They can still change it here.
+  const [f, setF] = useState({ role: 'BUYER', name: '', email: '', phone: '', password: '', businessName: '', rcNumber: '', city: getSavedCity() === 'Lagos' ? 'Lagos' : '' });
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);
   const [show, setShow] = useState(false);
@@ -22,6 +27,7 @@ export default function AuthPage() {
     e.preventDefault(); setErr(''); setBusy(true);
     try {
       const seller = f.role === 'SELLER';
+      if (mode === 'register' && f.city !== live) { setErr(f.city ? `GbaanJo is only live in ${live} for now. Use the "I am somewhere else" option on the home page to join the waitlist.` : 'Please choose your city.'); setBusy(false); return; }
       const body = mode === 'login' ? { email: f.email, password: f.password } : { ...f, businessName: seller ? f.businessName : undefined, rcNumber: seller ? f.rcNumber : undefined };
       login(await api('/auth/' + mode, { method: 'POST', body }));
     } catch (e2) { setErr(e2.message); setBusy(false); }
@@ -55,6 +61,7 @@ export default function AuthPage() {
                 </button>
               ))}
             </div>
+            <Field label="City" hint={`We are live in ${live} only for now. Please confirm where you will be using GbaanJo.`}><Select required value={f.city} onChange={set('city')}><option value="">Choose your city…</option><option value={live}>{live}</option><option value="OTHER">Somewhere else (not live yet)</option></Select></Field>
             <Field label="Full name"><Input required placeholder="e.g. Chidinma Okafor" value={f.name} onChange={set('name')} /></Field>
             <Field label="Phone number" hint="Nigerian number, e.g. 08012345678"><Input required inputMode="tel" placeholder="08012345678" value={f.phone} onChange={set('phone')} /></Field>
             {f.role === 'SELLER' && (
@@ -74,6 +81,7 @@ export default function AuthPage() {
           </div>
         </Field>
 
+        {mode === 'login' && <Link to="/forgot-password" className="-mt-2 justify-self-start text-sm font-semibold underline underline-offset-4">Forgot your password?</Link>}
         {err && <p role="alert" className="rounded-xl bg-pepper/10 p-3 font-medium text-pepper">{err}</p>}
         <Button size="lg" disabled={busy}>{busy ? <Spinner /> : mode === 'login' ? 'Log in' : 'Create account'}</Button>
         {mode === 'register' && <p className="text-xs text-mute">By creating an account you agree to our <Link to="/terms" className="underline">terms, refund policy and privacy notice</Link>.</p>}

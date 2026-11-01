@@ -31,7 +31,7 @@ export const facts = [
   ["30%+", "off on every deal"],
   ["Secure", "card, transfer and mobile-money payments"],
   ["8", "categories"],
-  ["12+", "cities and growing"],
+  ["Lagos", "live now, more cities soon"],
 ];
 
 export const rules = []; // filled in step F9 (Trust)

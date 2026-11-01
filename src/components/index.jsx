@@ -17,7 +17,9 @@ export const ART = {
 const ART_SIZE = { sm: 'size-16 shrink-0 rounded-xl text-3xl', md: 'h-36 text-6xl', lg: 'h-48 rounded-2xl text-8xl', xl: 'h-64 rounded-3xl text-9xl sm:h-80' };
 export function Art({ c, size = 'md', className = '', src }) {
   const [emoji, bg] = ART[c] || ['🍽️', '#E8EDE4'];
-  if (src) return <img src={src} alt="" loading="lazy" className={cx('object-cover', size === 'sm' ? '' : 'w-full', ART_SIZE[size].replace(/text-\S+/g, ''), className)} />;
+  const [failed, setFailed] = useState(false);
+  // Real photo when we have one. If it is missing or fails to load, fall back to the emoji tile instead of a broken image.
+  if (src && !failed) return <img src={src} alt="" loading="lazy" onError={() => setFailed(true)} className={cx('object-cover', size === 'sm' ? '' : 'w-full', ART_SIZE[size].replace(/text-\S+/g, ''), className)} />;
   return (
     <div className={cx('relative grid place-items-center overflow-hidden', ART_SIZE[size], className)} style={{ background: bg }}>
       <span className="absolute -right-8 -top-8 size-32 rounded-full bg-white/35" />

@@ -4,6 +4,7 @@ import { useAuth } from "./auth";
 import { Button, Container, cx, useToast } from "./ui";
 import { api } from "./api";
 import AppRoutes from "./app/AppRoutes";
+import CityConfirm from "./components/CityConfirm";
 
 // Optional ribbon for test versions: set VITE_BETA_NOTICE in Vercel to show it, leave it empty to hide it
 const BETA = import.meta.env.VITE_BETA_NOTICE;
@@ -178,6 +179,9 @@ function Footer() {
           <Link className={a} to="/terms">
             Terms and refunds
           </Link>
+          <Link className={a} to="/feedback">
+            Send us feedback
+          </Link>
         </div>
         <div className={col}>
           <b className="text-white">Sellers</b>
@@ -241,6 +245,20 @@ function VerifyBanner() {
   );
 }
 
+// A small button on every page while we are testing, so nobody has to hunt for a way to tell us what went wrong
+function FeedbackPill() {
+  const { pathname } = useLocation();
+  if (/^\/(feedback|admin|pay)/.test(pathname)) return null;
+  return (
+    <Link
+      to="/feedback"
+      className="fixed bottom-4 right-4 z-30 rounded-full bg-leaf px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-black/25 ring-1 ring-white/20 transition hover:bg-ink"
+    >
+      💬 Feedback
+    </Link>
+  );
+}
+
 export default function App() {
   const { ready } = useAuth();
   if (!ready)
@@ -263,6 +281,8 @@ export default function App() {
         <AppRoutes />
       </main>
       <Footer />
+      <FeedbackPill />
+      <CityConfirm />
     </>
   );
 }

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../api';
 import { useAuth } from '../auth';
-import { Art, Countdown, StatusBadge, naira, when } from '../Components';
+import { Art, Countdown, StatusBadge, naira, when } from '../components';
 import { Button, Chip, Field, Input, Select, Spinner, Textarea, cx, useToast } from '../ui';
 import Payouts from './Payouts';
 

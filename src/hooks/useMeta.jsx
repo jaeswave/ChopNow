@@ -48,6 +48,7 @@ export function MetaProvider({ children }) {
         ? server.categories
         : fallbackCategories,
       cities: server?.cities || [],
+      comingSoon: server?.comingSoon || [],
       rules: server?.rules || {},
       feePercent: server?.rules?.PLATFORM_FEE_PERCENT ?? fallbackFee,
       paymentProvider: server?.paymentProvider || fallbackProvider,
