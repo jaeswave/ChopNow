@@ -5,6 +5,7 @@ import { useAuth } from '../auth';
 import { Art, Countdown, StatusBadge, naira, when } from '../components';
 import { Button, Chip, Field, Input, Select, Spinner, Textarea, cx, useToast } from '../ui';
 import Payouts from './Payouts';
+import SellerInsights from "../components/SellerInsights";
 
 const pad = (n) => String(n).padStart(2, '0');
 const local = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
@@ -156,38 +157,107 @@ export default function Seller() {
     try { await api(`/listings/${id}/cancel`, { method: 'PATCH' }); toast('Listing cancelled.'); reload(); } catch (e) { toast(e.message, 'err'); }
   };
 
+    const relist = async (id) => {
+      try {
+        await api(`/listings/${id}/duplicate`, { method: "POST", body: {} });
+        toast("Relisted. It is live for the next 3 hours.");
+        reload();
+      } catch (e) {
+        toast(e.message, "err");
+      }
+    };
+
   const awaiting = orders?.filter((o) => o.status === 'RESERVED') || [];
   const earned = orders?.filter((o) => ['RESERVED', 'PICKED_UP', 'EXPIRED'].includes(o.status)).reduce((s, o) => s + o.sellerAmount, 0) || 0;
 
   return (
     <div>
-      <div className="flex flex-wrap items-center gap-3"><h1 className="text-4xl font-extrabold">{user.businessName}</h1><span className="rounded-full bg-leaf/10 px-3 py-1 text-sm font-bold text-leaf">✓ Verified seller</span></div>
-      <p className="mt-1 text-mute">Manage your listings and hand over orders.</p>
+      <div className="flex flex-wrap items-center gap-3">
+        <h1 className="text-4xl font-extrabold">{user.businessName}</h1>
+        <span className="rounded-full bg-leaf/10 px-3 py-1 text-sm font-bold text-leaf">
+          ✓ Verified seller
+        </span>
+      </div>
+      <p className="mt-1 text-mute">
+        Manage your listings and hand over orders.
+      </p>
 
       <div className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-4">
-        <Stat label="Live listings" value={mine ? mine.filter((l) => l.status === 'ACTIVE').length : '–'} />
-        <Stat label="Awaiting pickup" value={orders ? awaiting.length : '–'} tone={awaiting.length ? 'text-pepper' : ''} />
-        <Stat label="Handed over" value={orders ? orders.filter((o) => o.status === 'PICKED_UP').length : '–'} />
-        <Stat label="Earned (after fees)" value={orders ? naira(earned) : '–'} tone="text-leaf" />
+        <Stat
+          label="Live listings"
+          value={mine ? mine.filter((l) => l.status === "ACTIVE").length : "–"}
+        />
+        <Stat
+          label="Awaiting pickup"
+          value={orders ? awaiting.length : "–"}
+          tone={awaiting.length ? "text-pepper" : ""}
+        />
+        <Stat
+          label="Handed over"
+          value={
+            orders ? orders.filter((o) => o.status === "PICKED_UP").length : "–"
+          }
+        />
+        <Stat
+          label="Earned (after fees)"
+          value={orders ? naira(earned) : "–"}
+          tone="text-leaf"
+        />
       </div>
 
       <div className="mt-8 flex flex-wrap gap-2">
-        <Chip on={tab === 'orders'} onClick={() => setTab('orders')}>Orders ({awaiting.length})</Chip>
-        <Chip on={tab === 'listings'} onClick={() => setTab('listings')}>My listings</Chip>
-        <Chip on={tab === 'new'} onClick={() => setTab('new')}>+ New listing</Chip>
-        <Chip on={tab === 'payouts'} onClick={() => setTab('payouts')}>Payouts</Chip>
+        <Chip on={tab === "orders"} onClick={() => setTab("orders")}>
+          Orders ({awaiting.length})
+        </Chip>
+        <Chip on={tab === "listings"} onClick={() => setTab("listings")}>
+          My listings
+        </Chip>
+        <Chip on={tab === "new"} onClick={() => setTab("new")}>
+          + New listing
+        </Chip>
+        <Chip on={tab === "insights"} onClick={() => setTab("insights")}>
+          Insights
+        </Chip>
+        {tab === "insights" && <SellerInsights />}
+        <Chip on={tab === "payouts"} onClick={() => setTab("payouts")}>
+          Payouts
+        </Chip>
       </div>
 
-      {tab === 'orders' && (
+      {tab === "orders" && (
         <div className="mt-5 grid gap-4">
           <Redeem reload={reload} />
-          {orders && orders.length === 0 && <div className={cx(box, 'p-10 text-center')}><div className="text-5xl">📦</div><p className="mt-3 text-xl font-bold">No orders yet</p><p className="mt-1 text-mute">When buyers pay for your food, it shows up here with an order number.</p></div>}
+          {orders && orders.length === 0 && (
+            <div className={cx(box, "p-10 text-center")}>
+              <div className="text-5xl">📦</div>
+              <p className="mt-3 text-xl font-bold">No orders yet</p>
+              <p className="mt-1 text-mute">
+                When buyers pay for your food, it shows up here with an order
+                number.
+              </p>
+            </div>
+          )}
           <ul className="grid gap-3">
             {orders?.map((o) => (
-              <li key={o.id} className={cx(box, 'flex flex-wrap items-center justify-between gap-3')}>
+              <li
+                key={o.id}
+                className={cx(
+                  box,
+                  "flex flex-wrap items-center justify-between gap-3",
+                )}
+              >
                 <div>
-                  <div className="flex flex-wrap items-center gap-2"><b>{o.quantity} × {o.listing.title}</b><StatusBadge s={o.status} /></div>
-                  <p className="text-sm text-mute">Order {o.orderNo} · {o.buyer.name} · you get {naira(o.sellerAmount)} · collect by {when(o.listing.pickupBy)}</p>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <b>
+                      {o.quantity} × {o.listing.title}
+                    </b>
+                    <StatusBadge s={o.status} />
+                  </div>
+                  <p className="text-sm text-mute">
+                    Order {o.orderNo} · {o.buyer.name} · you get{" "}
+                    {naira(o.sellerAmount)} · collect by{" "}
+                    {when(o.listing.pickupBy)}
+                  </p>
                 </div>
               </li>
             ))}
@@ -195,73 +265,256 @@ export default function Seller() {
         </div>
       )}
 
-      {tab === 'listings' && (
+      {tab === "listings" && (
         <div className="mt-5">
-          {mine && mine.length === 0 && <div className={cx(box, 'p-10 text-center')}><div className="text-5xl">🍳</div><p className="mt-3 text-xl font-bold">You haven't listed anything yet</p><Button className="mt-4" onClick={() => setTab('new')}>List your first item</Button></div>}
+          {mine && mine.length === 0 && (
+            <div className={cx(box, "p-10 text-center")}>
+              <div className="text-5xl">🍳</div>
+              <p className="mt-3 text-xl font-bold">
+                You haven't listed anything yet
+              </p>
+              <Button className="mt-4" onClick={() => setTab("new")}>
+                List your first item
+              </Button>
+            </div>
+          )}
           <ul className="grid gap-3">
             {mine?.map((l) => (
-              <li key={l.id} className={cx(box, 'flex flex-wrap items-center gap-4')}>
+              <li
+                key={l.id}
+                className={cx(box, "flex flex-wrap items-center gap-4")}
+              >
                 <Art c={l.category} src={l.imageUrl} size="sm" />
                 <div className="min-w-0 flex-1">
-                  <div className="flex flex-wrap items-center gap-2"><b>{l.title}</b><StatusBadge s={l.status} listing /></div>
-                  <p className="text-sm text-mute">{naira(l.price)} (was {naira(l.originalPrice)}) · {l.quantityLeft}/{l.quantity} left</p>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <b>{l.title}</b>
+                    <StatusBadge s={l.status} listing />
+                  </div>
+                  <p className="text-sm text-mute">
+                    {naira(l.price)} (was {naira(l.originalPrice)}) ·{" "}
+                    {l.quantityLeft}/{l.quantity} left
+                  </p>
                 </div>
-                {l.status === 'ACTIVE' && <div className="flex items-center gap-3"><Countdown to={l.saleEndsAt} /><Button size="sm" variant="link" onClick={() => cancel(l.id)}>Cancel</Button></div>}
+                {l.status === "ACTIVE" && (
+                  <div className="flex items-center gap-3">
+                    <Countdown to={l.saleEndsAt} />
+                    <Button
+                      size="sm"
+                      variant="link"
+                      onClick={() => cancel(l.id)}
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                )}
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => relist(l.id)}
+                >
+                  Relist
+                </Button>
               </li>
             ))}
           </ul>
         </div>
       )}
 
-      {tab === 'payouts' && <Payouts />}
+      {tab === "payouts" && <Payouts />}
 
-      {tab === 'new' && (
-        <form onSubmit={submit} className={cx(box, 'mt-5 grid gap-4 sm:p-7')}>
-          <h2 className="text-2xl font-extrabold">List something before it spoils</h2>
+      {tab === "new" && (
+        <form onSubmit={submit} className={cx(box, "mt-5 grid gap-4 sm:p-7")}>
+          <h2 className="text-2xl font-extrabold">
+            List something before it spoils
+          </h2>
 
           <div>
             <p className="mb-2 text-sm font-semibold">Photo of the food</p>
             <div className="flex flex-wrap items-center gap-4">
-              {f.imageUrl ? <img src={f.imageUrl} alt="" className="size-28 rounded-xl object-cover" /> : <div className="grid size-28 place-items-center rounded-xl bg-paper text-4xl">📷</div>}
+              {f.imageUrl ? (
+                <img
+                  src={f.imageUrl}
+                  alt=""
+                  className="size-28 rounded-xl object-cover"
+                />
+              ) : (
+                <div className="grid size-28 place-items-center rounded-xl bg-paper text-4xl">
+                  📷
+                </div>
+              )}
               <div className="grid gap-2">
                 <label className="inline-flex w-fit cursor-pointer items-center gap-2 rounded-xl bg-white px-4 py-2 text-sm font-bold ring-[1.5px] ring-line hover:ring-leaf">
-                  {uploading ? <Spinner /> : f.imageUrl ? 'Change photo' : 'Upload photo'}
-                  <input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" disabled={uploading} onChange={(e) => upload(e.target.files[0])} />
+                  {uploading ? (
+                    <Spinner />
+                  ) : f.imageUrl ? (
+                    "Change photo"
+                  ) : (
+                    "Upload photo"
+                  )}
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    className="hidden"
+                    disabled={uploading}
+                    onChange={(e) => upload(e.target.files[0])}
+                  />
                 </label>
-                <p className="text-xs text-mute">A clear photo sells faster. JPG, PNG or WebP, under 4 MB.</p>
+                <p className="text-xs text-mute">
+                  A clear photo sells faster. JPG, PNG or WebP, under 4 MB.
+                </p>
               </div>
             </div>
           </div>
 
-          <Field label="What is it?"><Input required placeholder="e.g. Party jollof rice and chicken, 10 packs" value={f.title} onChange={set('title')} /></Field>
-          <Field label="Details" hint="When it was made, how it was stored, allergens"><Textarea value={f.description} onChange={set('description')} /></Field>
+          <Field label="What is it?">
+            <Input
+              required
+              placeholder="e.g. Party jollof rice and chicken, 10 packs"
+              value={f.title}
+              onChange={set("title")}
+            />
+          </Field>
+          <Field
+            label="Details"
+            hint="When it was made, how it was stored, allergens"
+          >
+            <Textarea value={f.description} onChange={set("description")} />
+          </Field>
           <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Category"><Select required value={f.category} onChange={set('category')}><option value="">Choose…</option>{meta.categories.map((c) => <option key={c}>{c}</option>)}</Select></Field>
-            <Field label="City"><Select required value={f.city} onChange={set('city')}><option value="">Choose…</option>{meta.cities.map((c) => <option key={c}>{c}</option>)}</Select></Field>
+            <Field label="Category">
+              <Select required value={f.category} onChange={set("category")}>
+                <option value="">Choose…</option>
+                {meta.categories.map((c) => (
+                  <option key={c}>{c}</option>
+                ))}
+              </Select>
+            </Field>
+            <Field label="City">
+              <Select required value={f.city} onChange={set("city")}>
+                <option value="">Choose…</option>
+                {meta.cities.map((c) => (
+                  <option key={c}>{c}</option>
+                ))}
+              </Select>
+            </Field>
           </div>
-          <Field label="Area" hint="Shown publicly, e.g. Lekki Phase 1"><Input required value={f.area} onChange={set('area')} /></Field>
-          <Field label="Full pickup address" hint="Only shown to buyers after they pay"><Input required value={f.address} onChange={set('address')} /></Field>
+          <Field label="Area" hint="Shown publicly, e.g. Lekki Phase 1">
+            <Input required value={f.area} onChange={set("area")} />
+          </Field>
+          <Field
+            label="Full pickup address"
+            hint="Only shown to buyers after they pay"
+          >
+            <Input required value={f.address} onChange={set("address")} />
+          </Field>
           <div className="grid gap-4 sm:grid-cols-3">
-            <Field label="Normal price (₦)"><Input required type="number" min="100" value={f.originalPrice} onChange={set('originalPrice')} /></Field>
-            <Field label="Your price (₦)"><Input required type="number" min="50" value={f.price} onChange={set('price')} /></Field>
-            <Field label="How many"><Input required type="number" min="1" max="200" value={f.quantity} onChange={set('quantity')} /></Field>
+            <Field label="Normal price (₦)">
+              <Input
+                required
+                type="number"
+                min="100"
+                value={f.originalPrice}
+                onChange={set("originalPrice")}
+              />
+            </Field>
+            <Field label="Your price (₦)">
+              <Input
+                required
+                type="number"
+                min="50"
+                value={f.price}
+                onChange={set("price")}
+              />
+            </Field>
+            <Field label="How many">
+              <Input
+                required
+                type="number"
+                min="1"
+                max="200"
+                value={f.quantity}
+                onChange={set("quantity")}
+              />
+            </Field>
           </div>
-          {disc !== null && <p className={cx('w-fit rounded-full px-4 py-1.5 text-sm font-bold', disc >= 30 ? 'bg-leaf/10 text-leaf' : 'bg-pepper/10 text-pepper')}>{disc >= 30 ? `${disc}% off. Great deal!` : `${disc}% off. Needs at least 30% off.`}</p>}
+          {disc !== null && (
+            <p
+              className={cx(
+                "w-fit rounded-full px-4 py-1.5 text-sm font-bold",
+                disc >= 30
+                  ? "bg-leaf/10 text-leaf"
+                  : "bg-pepper/10 text-pepper",
+              )}
+            >
+              {disc >= 30
+                ? `${disc}% off. Great deal!`
+                : `${disc}% off. Needs at least 30% off.`}
+            </p>
+          )}
           <div>
-            <p className="mb-2 text-sm font-semibold">Quick timing: sale ends in</p>
-            <div className="flex flex-wrap gap-2">{[1, 3, 6, 12, 24].map((h) => <Chip key={h} onClick={() => preset(h)}>{h}h</Chip>)}</div>
+            <p className="mb-2 text-sm font-semibold">
+              Quick timing: sale ends in
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {[1, 3, 6, 12, 24].map((h) => (
+                <Chip key={h} onClick={() => preset(h)}>
+                  {h}h
+                </Chip>
+              ))}
+            </div>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Sale ends" hint="Last time buyers can order"><Input required type="datetime-local" value={f.saleEndsAt} onChange={set('saleEndsAt')} /></Field>
-            <Field label="Pickup deadline" hint="Buyers must collect by this time"><Input required type="datetime-local" value={f.pickupBy} onChange={set('pickupBy')} /></Field>
+            <Field label="Sale ends" hint="Last time buyers can order">
+              <Input
+                required
+                type="datetime-local"
+                value={f.saleEndsAt}
+                onChange={set("saleEndsAt")}
+              />
+            </Field>
+            <Field
+              label="Pickup deadline"
+              hint="Buyers must collect by this time"
+            >
+              <Input
+                required
+                type="datetime-local"
+                value={f.pickupBy}
+                onChange={set("pickupBy")}
+              />
+            </Field>
           </div>
-          {err && <p role="alert" className="rounded-xl bg-pepper/10 p-3 font-medium text-pepper">{err}</p>}
-          {f.price > 0 && (() => {
-            const r = meta.rules || {}; const unit = Number(f.price);
-            const fee = Math.min(unit, Math.max(r.MIN_FEE || 50, Math.round((unit * (r.PLATFORM_FEE_PERCENT || 10)) / 100)));
-            return <p className="rounded-xl bg-paper p-3 text-sm">GbaanJo's fee is <b>{r.PLATFORM_FEE_PERCENT || 10}%</b> per sale (at least {naira(r.MIN_FEE || 50)}). On each unit you receive about <b>{naira(unit - fee)}</b>, paid to your bank account.</p>;
-          })()}
-          <Button size="lg" disabled={busy || uploading}>{busy ? <Spinner /> : 'Publish listing'}</Button>
+          {err && (
+            <p
+              role="alert"
+              className="rounded-xl bg-pepper/10 p-3 font-medium text-pepper"
+            >
+              {err}
+            </p>
+          )}
+          {f.price > 0 &&
+            (() => {
+              const r = meta.rules || {};
+              const unit = Number(f.price);
+              const fee = Math.min(
+                unit,
+                Math.max(
+                  r.MIN_FEE || 50,
+                  Math.round((unit * (r.PLATFORM_FEE_PERCENT || 10)) / 100),
+                ),
+              );
+              return (
+                <p className="rounded-xl bg-paper p-3 text-sm">
+                  GbaanJo's fee is <b>{r.PLATFORM_FEE_PERCENT || 10}%</b> per
+                  sale (at least {naira(r.MIN_FEE || 50)}). On each unit you
+                  receive about <b>{naira(unit - fee)}</b>, paid to your bank
+                  account.
+                </p>
+              );
+            })()}
+          <Button size="lg" disabled={busy || uploading}>
+            {busy ? <Spinner /> : "Publish listing"}
+          </Button>
         </form>
       )}
     </div>

@@ -1,5 +1,6 @@
 const BASE = (import.meta.env.VITE_API_URL || 'http://localhost:3000').replace(/\/+$/, '');
 
+
 export async function api(path, { method = 'GET', body } = {}) {
   const token = localStorage.getItem('token');
   const ctl = new AbortController();
@@ -20,4 +21,16 @@ export async function api(path, { method = 'GET', body } = {}) {
   if (!res.ok) throw new Error(Array.isArray(data?.message) ? data.message.join('. ') : data?.message || 'Something went wrong');
   if (data === null) throw new Error('The server sent an unexpected reply. Check that VITE_API_URL points to your backend.');
   return data;
+}
+
+// Saves a file from the server (for example the sales spreadsheet). It sends the login token, which a plain link cannot do.
+export async function download(path, filename) {
+  const token = localStorage.getItem('token');
+  const res = await fetch(BASE + path, { headers: token ? { Authorization: 'Bearer ' + token } : {} });
+  if (!res.ok) throw new Error('Could not download the file. Please try again.');
+  const url = URL.createObjectURL(await res.blob());
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
 }
