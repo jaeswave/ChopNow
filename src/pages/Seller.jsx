@@ -10,6 +10,7 @@ import SetupChecklist from './seller/SetupChecklist';
 import SetupBlocker from './seller/SetupBlocker';
 import useResendVerification from './seller/useResendVerification';
 import { clearDraft, loadDraft, restoreForm, saveDraft } from './seller/draft';
+import { isMissingPayoutError } from './seller/errors';
 
 const pad = (n) => String(n).padStart(2, '0');
 const local = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
@@ -176,7 +177,13 @@ export default function Seller() {
       clearDraft(user.id);
       setF({ ...blankForm(), category: f.category, city: f.city, area: f.area, address: f.address });
       await reload(); setTab('listings');
-    } catch (e2) { setErr(e2.message); }
+    } catch (e2) {
+      if (isMissingPayoutError(e2.message)) {
+        // Show the same friendly card as before the form. The draft is kept.
+        setHasPayout(false);
+        requestAnimationFrame(() => document.getElementById('blocker-title')?.scrollIntoView?.({ block: 'center' }));
+      } else setErr(e2.message);
+    }
     setBusy(false);
   };
   const cancel = async (id) => {
