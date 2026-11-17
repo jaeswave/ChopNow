@@ -11,6 +11,7 @@ import SetupBlocker from './seller/SetupBlocker';
 import useResendVerification from './seller/useResendVerification';
 import { clearDraft, loadDraft, restoreForm, saveDraft } from './seller/draft';
 import { isMissingPayoutError } from './seller/errors';
+import ApplicationTimeline from './seller/ApplicationTimeline';
 
 const pad = (n) => String(n).padStart(2, '0');
 const local = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
@@ -51,6 +52,7 @@ function Application({ user }) {
         {rejected && <p className="mt-2 rounded-xl bg-pepper/10 p-3 font-medium text-pepper">{user.rejectionReason || 'Please check your details and resubmit.'}</p>}
         {!user.emailVerified && <p className="mt-4 rounded-xl bg-palm/25 p-3 text-sm font-semibold">Please also verify your email using the link we sent you. We cannot approve you until you do.</p>}
       </div>
+      <ApplicationTimeline user={user} />
       {rejected && (
         <form onSubmit={resubmit} className={cx(box, 'mt-4 grid gap-4')}>
           <Field label="Business name"><Input required value={name} onChange={(e) => setName(e.target.value)} /></Field>
