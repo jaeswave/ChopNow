@@ -6,6 +6,8 @@ import { Art, Countdown, StatusBadge, naira, when } from '../components';
 import { Button, Chip, Field, Input, Select, Spinner, Textarea, cx, useToast } from '../ui';
 import Payouts from './Payouts';
 import SellerInsights from "../components/SellerInsights";
+import SetupChecklist from './seller/SetupChecklist';
+import useResendVerification from './seller/useResendVerification';
 
 const pad = (n) => String(n).padStart(2, '0');
 const local = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
@@ -97,7 +99,7 @@ function Redeem({ reload }) {
 }
 
 export default function Seller() {
-  const { user } = useAuth();
+  const { user, refresh } = useAuth();
   const nav = useNavigate();
   const toast = useToast();
   const [meta, setMeta] = useState({ categories: [], cities: [] });
@@ -106,6 +108,10 @@ export default function Seller() {
   const [params, setParams] = useSearchParams();
   const tab = TABS.includes(params.get('tab')) ? params.get('tab') : DEFAULT_TAB;
   const setTab = (t) => setParams(t === DEFAULT_TAB ? {} : { tab: t });
+  const [hasPayout, setHasPayout] = useState(null); // null until /payouts/me answers, and stays null if it fails
+  const [payoutChecked, setPayoutChecked] = useState(false);
+  const emailVerified = !!user?.emailVerified;
+  const verification = useResendVerification();
   const [f, setF] = useState(blank);
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);
@@ -119,7 +125,16 @@ export default function Seller() {
     if (user.role !== 'SELLER') return nav('/');
     if (!approved) return;
     api('/listings/meta').then((m) => setMeta({ categories: m.categories || [], cities: m.cities || [], rules: m.rules })).catch(() => {}); reload();
+    api('/payouts/me').then((p) => setHasPayout(!!p.hasPayout)).catch(() => {}).finally(() => setPayoutChecked(true));
   }, [user?.id, user?.role, approved]); // not [user]: refreshing the same user must not reload everything
+
+  // Not verified yet? They will click the link in another tab, so check again when they come back to this one.
+  useEffect(() => {
+    if (!user || user.emailVerified) return;
+    const onFocus = () => refresh();
+    window.addEventListener('focus', onFocus);
+    return () => window.removeEventListener('focus', onFocus);
+  }, [user, refresh]);
 
   if (!user || user.role !== 'SELLER') return null;
   if (!approved) return <Application user={user} />;
@@ -176,6 +191,17 @@ export default function Seller() {
   const awaiting = orders?.filter((o) => o.status === 'RESERVED') || [];
   const earned = orders?.filter((o) => ['RESERVED', 'PICKED_UP', 'EXPIRED'].includes(o.status)).reduce((s, o) => s + o.sellerAmount, 0) || 0;
 
+  // Only shown once we know every answer, so it never shows a wrong tick
+  const setupSteps = [
+    { label: 'Verify your email', hint: 'Open the link we emailed you.', done: emailVerified,
+      action: { label: 'Resend email', onClick: verification.resend, busy: verification.busy } },
+    { label: 'Add your payout account', hint: 'Tell us which bank account to pay your earnings into.', done: hasPayout === true,
+      action: { label: 'Add payout account', onClick: () => setTab('payouts') } },
+    { label: 'Publish your first listing', hint: 'List food you want to sell today.', done: !!mine?.length,
+      action: { label: 'New listing', onClick: () => setTab('new') } },
+  ];
+  const showSetup = payoutChecked && hasPayout !== null && mine !== null && setupSteps.some((s) => !s.done);
+
   return (
     <div>
       <div className="flex flex-wrap items-center gap-3">
@@ -187,6 +213,8 @@ export default function Seller() {
       <p className="mt-1 text-mute">
         Manage your listings and hand over orders.
       </p>
+
+      {showSetup && <SetupChecklist steps={setupSteps} />}
 
       <div className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-4">
         <Stat
