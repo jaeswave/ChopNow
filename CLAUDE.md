@@ -62,6 +62,14 @@ src/
 - **Order statuses:** PENDING_PAYMENT, RESERVED, PICKED_UP, EXPIRED, CANCELLED. **Listing statuses:** ACTIVE, SOLD_OUT, EXPIRED.
 - Countdowns are for display only. The server decides what has expired.
 
+## API conventions
+- Every call goes through `api()` in `src/api.js`. It sends JSON and the Bearer token, and throws an `Error` with the server's `message` (a list of messages is joined into one sentence).
+- **Paging (optional, server side only for now):** the admin list endpoints and the seller lists (`/orders/seller`, `/listings/mine/all`) accept optional `page` and `pageSize` query parameters.
+  - Without them, the server returns a plain array, as before. Every screen currently relies on this.
+  - With them, it returns `{ items, total, page, pageSize }`.
+  - **No screen uses paging yet.** When one does, handle the object shape on that screen only, and check the exact endpoint list against the server contract in the task prompt.
+- Removed endpoints: `/payouts/banks` and `/payouts/resolve` no longer exist. Payout details are entered by hand.
+
 ## Hard rules
 1. **Payments come last.** Do not change checkout or payment behaviour (`src/payments/*`, `pages/PayCallback.jsx`, or the buy button logic in `pages/Listing.jsx`) unless the task explicitly asks for it.
 2. **Never print, log, commit or paste secrets** (.env files, keys, tokens). Keep `.env` in `.gitignore`.
