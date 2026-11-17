@@ -9,11 +9,12 @@ import SellerInsights from "../components/SellerInsights";
 import SetupChecklist from './seller/SetupChecklist';
 import SetupBlocker from './seller/SetupBlocker';
 import useResendVerification from './seller/useResendVerification';
+import { clearDraft, loadDraft, restoreForm, saveDraft } from './seller/draft';
 
 const pad = (n) => String(n).padStart(2, '0');
 const local = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 const inHours = (h) => local(new Date(Date.now() + h * 36e5));
-const blank = { title: '', description: '', imageUrl: '', category: '', city: '', area: '', address: '', originalPrice: '', price: '', quantity: '', saleEndsAt: inHours(3), pickupBy: inHours(5) };
+const blankForm = () => ({ title: '', description: '', imageUrl: '', category: '', city: '', area: '', address: '', originalPrice: '', price: '', quantity: '', saleEndsAt: inHours(3), pickupBy: inHours(5) });
 const box = 'rounded-2xl bg-white p-5 ring-[1.5px] ring-line';
 
 // The open tab lives in the URL (?tab=payouts), so links and emails can open a tab and Back works
@@ -114,11 +115,13 @@ export default function Seller() {
   const [payoutJustSaved, setPayoutJustSaved] = useState(false);
   const emailVerified = !!user?.emailVerified;
   const verification = useResendVerification();
-  const [f, setF] = useState(blank);
+  const [f, setF] = useState(() => restoreForm(loadDraft(user?.id), blankForm()));
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
+  // Every edit is also saved as a draft, so nothing is lost if the seller leaves the form for a moment
+  const change = (patch) => setF((p) => { const next = { ...p, ...patch }; saveDraft(user?.id, next); return next; });
+  const set = (k) => (e) => change({ [k]: e.target.value });
   const approved = user?.approvalStatus === 'APPROVED';
 
   const reload = () => Promise.all([api('/listings/mine/all').then(setMine), api('/orders/seller').then(setOrders)]).catch((e) => toast(e.message, 'err'));
@@ -141,7 +144,7 @@ export default function Seller() {
   if (!user || user.role !== 'SELLER') return null;
   if (!approved) return <Application user={user} />;
 
-  const preset = (h) => { const end = Date.now() + h * 36e5; setF({ ...f, saleEndsAt: local(new Date(end)), pickupBy: local(new Date(end + 2 * 36e5)) }); };
+  const preset = (h) => { const end = Date.now() + h * 36e5; change({ saleEndsAt: local(new Date(end)), pickupBy: local(new Date(end + 2 * 36e5)) }); };
   const disc = f.originalPrice && f.price ? Math.round((1 - f.price / f.originalPrice) * 100) : null;
 
   // Photos go straight to Cloudinary. Our server only signs the request.
@@ -157,7 +160,7 @@ export default function Seller() {
       const res = await fetch(`https://api.cloudinary.com/v1_1/${s.cloudName}/image/upload`, { method: 'POST', body: fd });
       const d = await res.json();
       if (!res.ok) throw new Error(d.error?.message || 'Upload failed');
-      setF((p) => ({ ...p, imageUrl: d.secure_url }));
+      change({ imageUrl: d.secure_url });
     } catch (e) { toast(e.message, 'err'); }
     setUploading(false);
   };
@@ -170,7 +173,8 @@ export default function Seller() {
         saleEndsAt: new Date(f.saleEndsAt).toISOString(), pickupBy: new Date(f.pickupBy).toISOString(),
       } });
       toast('Your listing is live!');
-      setF({ ...blank, category: f.category, city: f.city, area: f.area, address: f.address, saleEndsAt: inHours(3), pickupBy: inHours(5) });
+      clearDraft(user.id);
+      setF({ ...blankForm(), category: f.category, city: f.city, area: f.area, address: f.address });
       await reload(); setTab('listings');
     } catch (e2) { setErr(e2.message); }
     setBusy(false);
@@ -398,7 +402,7 @@ export default function Seller() {
         <SetupBlocker
           icon="🏦"
           title="One quick step first: tell us where to send your money"
-          text="We pay your earnings into your bank account, so we need it before your food can go live."
+          text="We pay your earnings into your bank account, so we need it before your food can go live. Anything you already typed in the form is kept."
         >
           <Button className="min-h-11" onClick={() => setTab("payouts")}>
             Add payout account
