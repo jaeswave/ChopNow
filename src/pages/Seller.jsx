@@ -7,6 +7,7 @@ import { Button, Chip, Field, Input, Select, Spinner, Textarea, cx, useToast } f
 import Payouts from './Payouts';
 import SellerInsights from "../components/SellerInsights";
 import SetupChecklist from './seller/SetupChecklist';
+import SetupBlocker from './seller/SetupBlocker';
 import useResendVerification from './seller/useResendVerification';
 
 const pad = (n) => String(n).padStart(2, '0');
@@ -110,6 +111,7 @@ export default function Seller() {
   const setTab = (t) => setParams(t === DEFAULT_TAB ? {} : { tab: t });
   const [hasPayout, setHasPayout] = useState(null); // null until /payouts/me answers, and stays null if it fails
   const [payoutChecked, setPayoutChecked] = useState(false);
+  const [payoutJustSaved, setPayoutJustSaved] = useState(false);
   const emailVerified = !!user?.emailVerified;
   const verification = useResendVerification();
   const [f, setF] = useState(blank);
@@ -201,6 +203,9 @@ export default function Seller() {
       action: { label: 'New listing', onClick: () => setTab('new') } },
   ];
   const showSetup = payoutChecked && hasPayout !== null && mine !== null && setupSteps.some((s) => !s.done);
+
+  // What stops the seller from listing right now. If /payouts/me failed we show the form and let the server decide.
+  const blocker = !emailVerified ? 'email' : !payoutChecked ? 'loading' : hasPayout === false ? 'payout' : null;
 
   return (
     <div>
@@ -355,9 +360,53 @@ export default function Seller() {
 
       {tab === "insights" && <SellerInsights />}
 
-      {tab === "payouts" && <Payouts onSaved={() => setHasPayout(true)} />}
+      {tab === "payouts" && payoutJustSaved && (
+        <div role="status" className={cx(box, "mt-5 flex flex-wrap items-center justify-between gap-3 bg-leaf/5 ring-leaf")}>
+          <p className="font-semibold text-leaf">✓ Payout account saved. You can publish listings now.</p>
+          <Button className="min-h-11" onClick={() => setTab("new")}>
+            Continue to your listing
+          </Button>
+        </div>
+      )}
 
-      {tab === "new" && (
+      {tab === "payouts" && (
+        <Payouts
+          onSaved={() => {
+            setHasPayout(true);
+            setPayoutJustSaved(true);
+          }}
+        />
+      )}
+
+      {tab === "new" && blocker === "loading" && (
+        <div className="mt-5 h-40 animate-pulse rounded-2xl bg-line/70" />
+      )}
+
+      {tab === "new" && blocker === "email" && (
+        <SetupBlocker
+          icon="✉️"
+          title="One quick step first: verify your email"
+          text="We emailed you a link. Open it, then come back to this page to list your food."
+        >
+          <Button className="min-h-11" disabled={verification.busy} onClick={verification.resend}>
+            {verification.busy ? <Spinner /> : "Resend email"}
+          </Button>
+        </SetupBlocker>
+      )}
+
+      {tab === "new" && blocker === "payout" && (
+        <SetupBlocker
+          icon="🏦"
+          title="One quick step first: tell us where to send your money"
+          text="We pay your earnings into your bank account, so we need it before your food can go live."
+        >
+          <Button className="min-h-11" onClick={() => setTab("payouts")}>
+            Add payout account
+          </Button>
+        </SetupBlocker>
+      )}
+
+      {tab === "new" && !blocker && (
         <form onSubmit={submit} className={cx(box, "mt-5 grid gap-4 sm:p-7")}>
           <h2 className="text-2xl font-extrabold">
             List something before it spoils
