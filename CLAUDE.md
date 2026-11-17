@@ -20,7 +20,7 @@ This is the **WEBSITE** repo (React). The **server** is a separate repo looked a
 - `npm run build`: must finish with no errors before any task counts as done
 - `npm run preview`: serve the built `dist/`
 - `npm test`: Vitest + React Testing Library (jsdom), run once. `npm run test:watch` keeps it running.
-  - Tests sit next to the code as `*.test.js(x)`. Shared setup is in `src/test/setup.js`. Tests run with `TZ=Africa/Lagos` (set in `vite.config.js`).
+  - Tests sit next to the code as `*.test.js(x)`. Shared setup is in `src/test/setup.js`. Tests run with `TZ=Africa/Lagos` (set in `vite.config.js`). To test another phone time zone, use `vi.stubEnv('TZ', 'Asia/Tokyo')`; it is undone after each test.
   - When you mock `useAuth`, return one **stable** object. A new object on every render re-runs `useEffect([user])` forever, and the test hangs.
 - `npm run lint`: ESLint 9 (flat config in `eslint.config.js`) with React and React Hooks rules. It must show 0 errors.
   - ESLint stays on 9 because `eslint-plugin-react` does not support ESLint 10 yet.
@@ -46,6 +46,8 @@ src/
     index.jsx         naira, money, pctOff, when, mapsUrl, Art (photo or emoji fallback), Tag, Countdown (one shared clock),
                       StatusBadge, Card (listing card), CardSkeleton, Verified
     money.js          money(n): Intl format with whole naira (maximumFractionDigits 0)
+    time.js           Lagos time for everything: when, dateLagos, dateTimeLagos, yearLagos, and toLagosInput /
+                      fromLagosInput / lagosInputInHours for <input type="datetime-local"> (read as UTC+1)
     ProductImage/, Section/, CityConfirm.jsx, SellerInsights.jsx
   config/market.js    Things that change per market (currency, locale, categories, fallbacks). The server's /listings/meta wins.
   config/seed.js      Demo image paths
@@ -92,12 +94,11 @@ src/
 
 ## Product rules
 - **Mobile first.** Most users are on modest Android phones with prepaid data: small pages, compressed images (WebP), lazy loading, touch targets of at least 44px, input text of at least 16px (so iOS does not zoom).
-- **Plain, friendly English.** No jargon. Money in whole naira (use `money` / `naira`). **Show times in Africa/Lagos.**
+- **Plain, friendly English.** No jargon. Money in whole naira (use `money` / `naira`). **Show times in Africa/Lagos.** Always use `components/time.js`. Never call `toLocale*String`, `getHours` and friends, or `new Date(inputValue)` on a datetime-local value directly.
 - **Lagos only for now.** Never invent statistics, testimonials or claims. If data is missing, hide the element or show an honest empty state.
 - **Accessibility:** labels on inputs (use `Field`), visible focus (the kit uses `focus-visible:outline-palm`), good contrast, aria attributes on custom controls.
 
 ## Known gaps (found while writing this file; not fixed yet)
-- `when()` in `components/index.jsx` formats dates without `timeZone: 'Africa/Lagos'`, so it shows the device's local time.
 - The default `Button size="sm"` (`py-2 text-sm`) and `Chip` may be shorter than 44px.
 - Home page claims are written into the code: `config/market.js` `facts` ("Secure: card, transfer and mobile-money payments", "8 categories", "30%+ off on every deal"). They are not checked against the server. **Do not change them yet.** They will be rewritten in the landing page task.
 - Stripe and Flutterwave backup providers (`src/payments/stripe.js`, `flutterwave.js`) are still in the code. Leave them alone for now (payments come last).
