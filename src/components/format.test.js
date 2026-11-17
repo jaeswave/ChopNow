@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { money, naira, pctOff, when } from './index';
 
 describe('money', () => {
@@ -38,7 +38,10 @@ describe('when', () => {
   it('rolls over to the next Lagos day just after 23:00 UTC', () => {
     expect(when(new Date('2026-11-16T23:30:00Z'))).toMatch(/Tue.*00:30/);
   });
-  // Tests run with TZ=Africa/Lagos (see vite.config.js). when() does not yet force
-  // Africa/Lagos itself, so a phone set to another time zone shows its own time.
-  it.todo('shows Lagos time even when the device is in another time zone');
+  it('shows Lagos time even when the phone is set to another time zone', () => {
+    vi.stubEnv('TZ', 'America/Los_Angeles');
+    expect(new Date('2026-11-16T13:05:00Z').getHours()).toBe(5); // the phone's own clock
+    expect(when('2026-11-16T13:05:00Z')).toMatch(/Mon.*14:05/); // what we show
+    vi.unstubAllEnvs();
+  });
 });

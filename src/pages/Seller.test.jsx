@@ -239,6 +239,33 @@ describe('New listing tab', () => {
   });
 });
 
+describe('New listing times', () => {
+  it('reads the times the seller types as Lagos time, even on a phone set to New York', async () => {
+    vi.stubEnv('TZ', 'America/New_York');
+    expect(new Date('2026-11-20T17:00:00Z').getHours()).toBe(12); // the phone's clock really is New York
+    setup({ hasPayout: true });
+    renderAt('/seller?tab=new');
+    fireEvent.change(await screen.findByLabelText(/Sale ends/), { target: { value: '2026-11-20T18:00' } });
+    fireEvent.change(screen.getByLabelText(/Pickup deadline/), { target: { value: '2026-11-20T20:30' } });
+    fireEvent.submit(screen.getByRole('button', { name: 'Publish listing' }).closest('form'));
+    await screen.findByText('Your listing is live!');
+    const [, opts] = api.mock.calls.find(([path, o]) => path === '/listings' && o?.method === 'POST');
+    expect(opts.body.saleEndsAt).toBe('2026-11-20T17:00:00.000Z'); // 18:00 Lagos
+    expect(opts.body.pickupBy).toBe('2026-11-20T19:30:00.000Z'); // 20:30 Lagos
+  });
+
+  it('fills the default times in Lagos time', async () => {
+    vi.stubEnv('TZ', 'Asia/Tokyo');
+    setup({ hasPayout: true });
+    renderAt('/seller?tab=new');
+    const value = (await screen.findByLabelText(/Sale ends/)).value;
+    // About 3 hours from now on a Lagos clock (allow a minute for the test itself)
+    const lagosIn3h = new Date(Date.now() + 3 * 36e5 + 36e5).toISOString().slice(0, 16);
+    const diff = Math.abs(Date.parse(value + 'Z') - Date.parse(lagosIn3h + 'Z'));
+    expect(diff).toBeLessThanOrEqual(60_000);
+  });
+});
+
 describe('New listing draft', () => {
   it('keeps what the seller typed when they leave and come back', async () => {
     setup({ hasPayout: true });
