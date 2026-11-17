@@ -5,7 +5,7 @@ export { money } from "./money";
 
 export const naira = (n) => '₦' + Number(n).toLocaleString('en-NG');
 export const pctOff = (o, p) => Math.round((1 - p / o) * 100);
-export const when = (d) => new Date(d).toLocaleString('en-NG', { weekday: 'short', hour: 'numeric', minute: '2-digit' });
+export { when, dateLagos, dateTimeLagos } from './time'; // dates and times are always shown in Lagos time
 export const mapsUrl = (q) => 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(q);
 
 /* Emoji + colour per category, so listings look good even without photos. */

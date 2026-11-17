@@ -5,6 +5,7 @@ import { Button, Container, cx, useToast } from "./ui";
 import { api } from "./api";
 import AppRoutes from "./app/AppRoutes";
 import CityConfirm from "./components/CityConfirm";
+import { yearLagos } from "./components/time";
 
 // Optional ribbon for test versions: set VITE_BETA_NOTICE in Vercel to show it, leave it empty to hide it
 const BETA = import.meta.env.VITE_BETA_NOTICE;
@@ -204,7 +205,7 @@ function Footer() {
         </div>
       </Container>
       <div className="mt-12 border-t border-white/10 py-5 text-center text-xs text-white/60">
-        © {new Date().getFullYear()} GbaanJo. Made in Nigeria.
+        © {yearLagos()} GbaanJo. Made in Nigeria.
       </div>
     </footer>
   );

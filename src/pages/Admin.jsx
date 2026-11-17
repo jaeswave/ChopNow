@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../api';
 import { useAuth } from '../auth';
-import { StatusBadge, naira } from '../components';
+import { StatusBadge, dateLagos, dateTimeLagos, naira } from '../components';
 import { Button, Chip, Input, cx, useToast } from '../ui';
 
 const box = 'rounded-2xl bg-white p-5 ring-[1.5px] ring-line';
@@ -89,7 +89,7 @@ function Users() {
                 {u.suspended && <Pill tone="bg-pepper/10 text-pepper">Suspended</Pill>}
               </div>
               <p className="text-sm text-mute">{u.name} · {u.email} · {u.phone} · {u.city}</p>
-              <p className="text-sm text-mute">No-shows: {u.noShows} · Joined {new Date(u.createdAt).toLocaleDateString('en-NG')}{u.role === 'SELLER' ? ` · Payout: ${u.accountName ? `${u.accountName} (${u.bankName})` : 'not set up'}` : ''}</p>
+              <p className="text-sm text-mute">No-shows: {u.noShows} · Joined {dateLagos(u.createdAt)}{u.role === 'SELLER' ? ` · Payout: ${u.accountName ? `${u.accountName} (${u.bankName})` : 'not set up'}` : ''}</p>
             </div>
             <div className="flex flex-wrap gap-2">
               {u.role === 'SELLER' && <Button size="sm" variant="outline" onClick={() => act(`/admin/users/${u.id}/verify`, { value: !u.verified }, u.verified ? 'Verification removed' : 'Seller verified')}>{u.verified ? 'Unverify' : 'Verify'}</Button>}
@@ -159,7 +159,7 @@ function Applications() {
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2"><b>{u.businessName}</b>{u.emailVerifiedAt ? <Pill tone="bg-leaf/10 text-leaf">Email verified</Pill> : <Pill tone="bg-pepper/10 text-pepper">Email not verified</Pill>}</div>
               <p className="text-sm text-mute">CAC number: <span className="font-mono text-ink">{u.rcNumber}</span></p>
-              <p className="text-sm text-mute">{u.name} · {u.email} · {u.phone} · applied {new Date(u.createdAt).toLocaleDateString('en-NG')}</p>
+              <p className="text-sm text-mute">{u.name} · {u.email} · {u.phone} · applied {dateLagos(u.createdAt)}</p>
               {u.rejectionReason && <p className="text-sm text-pepper">Rejected: {u.rejectionReason}</p>}
             </div>
             <div className="flex flex-wrap gap-2">
@@ -226,7 +226,7 @@ function Feedback() {
             <div className="flex flex-wrap items-center gap-2">
               <Pill tone={kind[f.category]?.[1]}>{kind[f.category]?.[0]} {f.category}</Pill>
               {f.rating && <span title={`${f.rating} out of 5`}>{'⭐'.repeat(f.rating)}</span>}
-              <span className="text-sm text-mute">{new Date(f.createdAt).toLocaleString('en-NG')}</span>
+              <span className="text-sm text-mute">{dateTimeLagos(f.createdAt)}</span>
             </div>
             <p className="whitespace-pre-wrap">{f.message}</p>
             <p className="text-sm text-mute">{f.user ? `${f.user.name} (${f.user.role}) · ${f.user.email}` : [f.name, f.email].filter(Boolean).join(' · ') || 'Anonymous'}{f.page ? ` · from ${f.page}` : ''}</p>
