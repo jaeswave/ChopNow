@@ -22,7 +22,9 @@ This is the **WEBSITE** repo (React). The **server** is a separate repo looked a
 - `npm test`: Vitest + React Testing Library (jsdom), run once. `npm run test:watch` keeps it running.
   - Tests sit next to the code as `*.test.js(x)`. Shared setup is in `src/test/setup.js`. Tests run with `TZ=Africa/Lagos` (set in `vite.config.js`).
   - When you mock `useAuth`, return one **stable** object. A new object on every render re-runs `useEffect([user])` forever, and the test hangs.
-- There is no linter yet.
+- `npm run lint`: ESLint 9 (flat config in `eslint.config.js`) with React and React Hooks rules. It must show 0 errors.
+  - ESLint stays on 9 because `eslint-plugin-react` does not support ESLint 10 yet.
+  - `react-hooks/exhaustive-deps` warnings are known. Do not "fix" them by adding dependencies blindly, because that can cause refetch loops. Fix them one at a time, with a test.
 
 ## Environment
 - `.env` is gitignored (along with `node_modules` and `dist`). **Never read, print, log, commit or paste it.** Use `.env.example` as the reference:
@@ -78,7 +80,7 @@ src/
 - The default `Button size="sm"` (`py-2 text-sm`) and `Chip` may be shorter than 44px.
 - Home page claims are written into the code: `config/market.js` `facts` ("Secure: card, transfer and mobile-money payments", "8 categories", "30%+ off on every deal"). They are not checked against the server. **Do not change them yet.** They will be rewritten in the landing page task.
 - Stripe and Flutterwave backup providers (`src/payments/stripe.js`, `flutterwave.js`) are still in the code. Leave them alone for now (payments come last).
-- No linting yet.
+- 15 `react-hooks/exhaustive-deps` lint warnings (Admin, Orders, Seller, Payouts, AuthPage, VerifyEmail, useListings).
 
 ## How to report after each task
 1. What changed (files)

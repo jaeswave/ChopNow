@@ -1,5 +1,3 @@
-import { Container } from '../ui';
-
 const H = ({ children }) => <h2 className="mt-8 text-2xl font-extrabold">{children}</h2>;
 const P = ({ children }) => <p className="mt-2 text-mute">{children}</p>;
 

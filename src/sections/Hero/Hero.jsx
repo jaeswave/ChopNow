@@ -8,7 +8,9 @@ import dealOne from "./assets/deal-1.webp";
 import dealTwo from "./assets/deal-2.webp";
 
 // cities: list for the dropdown. onSearch(city): called when the visitor presses "Find deals near me".
+// eslint-disable-next-line no-unused-vars -- cities, city and setCity feed the multi-city dropdown parked in a comment below
 export default function Hero({ cities = [], onSearch }) {
+  // eslint-disable-next-line no-unused-vars
   const [city, setCity] = useState("");
 
   return (

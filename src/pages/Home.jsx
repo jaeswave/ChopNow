@@ -1,18 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import LiveDealsTeaser from "../sections/LiveDealsTeaser";
-import { api } from "../api";
-import { Art, ART, Card, CardSkeleton, Tag, naira } from "../components";
-import {
-  Button,
-  Chip,
-  Container,
-  Input,
-  Reveal,
-  Select,
-  Spinner,
-  cx,
-} from "../ui";
+import { Art } from "../components";
+import { Button, Chip, Reveal } from "../ui";
 import { Section, Heading } from "../components/Section";
 import { categoryImage } from "../config/market";
 import Hero from "../sections/Hero";
@@ -133,8 +123,6 @@ const FAQ = [
     "Yes. After you pay, you get a pickup code. Send it to anyone you trust and they can collect the food by showing it. Only share it with people you trust, because whoever shows the code gets the food.",
   ],
 ];
-
-const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 export default function Home() {
   const navigate = useNavigate();

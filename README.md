@@ -11,6 +11,7 @@ The website for GbaanJo, a Lagos marketplace where food businesses sell surplus 
 Note: `/api/geo` (the city hint) only works on Vercel. Locally, the site simply asks which city you are in.
 
 ## Check before every commit
+- `npm run lint`: must show 0 errors (warnings are allowed for now).
 - `npm test`: runs the automated tests once (`npm run test:watch` keeps them running while you work).
 - `npm run build`: must finish with no errors.
 
