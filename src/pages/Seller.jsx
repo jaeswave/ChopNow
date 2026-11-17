@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { api } from '../api';
 import { useAuth } from '../auth';
 import { Art, Countdown, StatusBadge, naira, when } from '../components';
@@ -12,6 +12,10 @@ const local = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDat
 const inHours = (h) => local(new Date(Date.now() + h * 36e5));
 const blank = { title: '', description: '', imageUrl: '', category: '', city: '', area: '', address: '', originalPrice: '', price: '', quantity: '', saleEndsAt: inHours(3), pickupBy: inHours(5) };
 const box = 'rounded-2xl bg-white p-5 ring-[1.5px] ring-line';
+
+// The open tab lives in the URL (?tab=payouts), so links and emails can open a tab and Back works
+const TABS = ['orders', 'listings', 'new', 'insights', 'payouts'];
+const DEFAULT_TAB = 'orders';
 
 const Stat = ({ label, value, tone = '' }) => (
   <div className={cx(box, 'p-4')}><p className="text-sm text-mute">{label}</p><p className={cx('font-display text-3xl font-extrabold', tone)}>{value}</p></div>
@@ -99,7 +103,9 @@ export default function Seller() {
   const [meta, setMeta] = useState({ categories: [], cities: [] });
   const [mine, setMine] = useState(null);
   const [orders, setOrders] = useState(null);
-  const [tab, setTab] = useState('orders');
+  const [params, setParams] = useSearchParams();
+  const tab = TABS.includes(params.get('tab')) ? params.get('tab') : DEFAULT_TAB;
+  const setTab = (t) => setParams(t === DEFAULT_TAB ? {} : { tab: t });
   const [f, setF] = useState(blank);
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);
@@ -113,7 +119,7 @@ export default function Seller() {
     if (user.role !== 'SELLER') return nav('/');
     if (!approved) return;
     api('/listings/meta').then((m) => setMeta({ categories: m.categories || [], cities: m.cities || [], rules: m.rules })).catch(() => {}); reload();
-  }, [user]);
+  }, [user?.id, user?.role, approved]); // not [user]: refreshing the same user must not reload everything
 
   if (!user || user.role !== 'SELLER') return null;
   if (!approved) return <Application user={user} />;
