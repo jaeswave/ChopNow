@@ -218,7 +218,6 @@ export default function Seller() {
         <Chip on={tab === "insights"} onClick={() => setTab("insights")}>
           Insights
         </Chip>
-        {tab === "insights" && <SellerInsights />}
         <Chip on={tab === "payouts"} onClick={() => setTab("payouts")}>
           Payouts
         </Chip>
@@ -319,6 +318,8 @@ export default function Seller() {
           </ul>
         </div>
       )}
+
+      {tab === "insights" && <SellerInsights />}
 
       {tab === "payouts" && <Payouts />}
 
