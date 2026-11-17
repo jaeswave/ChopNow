@@ -40,6 +40,47 @@ describe('api()', () => {
     await expect(api('/auth/me')).rejects.toThrow('Please log in again');
   });
 
+  it('attaches the HTTP status and the stable error code from the body', async () => {
+    fetchMock.mockResolvedValue(json(400, {
+      message: 'Set up your payout account first (My shop, then Payouts) so you can get paid.',
+      error: 'Bad Request', statusCode: 400, code: 'PAYOUT_REQUIRED',
+    }));
+    const err = await api('/listings', { method: 'POST', body: {} }).catch((e) => e);
+    expect(err).toBeInstanceOf(Error);
+    expect(err.status).toBe(400);
+    expect(err.code).toBe('PAYOUT_REQUIRED');
+    expect(err.message).toMatch(/payout account/);
+  });
+
+  it('attaches EMAIL_NOT_VERIFIED with its 403 status', async () => {
+    fetchMock.mockResolvedValue(json(403, { message: 'Please verify your email first.', error: 'Forbidden', statusCode: 403, code: 'EMAIL_NOT_VERIFIED' }));
+    const err = await api('/orders', { method: 'POST', body: {} }).catch((e) => e);
+    expect(err.status).toBe(403);
+    expect(err.code).toBe('EMAIL_NOT_VERIFIED');
+  });
+
+  it('leaves code undefined when the server sends none, but still sets status', async () => {
+    fetchMock.mockResolvedValue(json(401, { statusCode: 401, message: 'Please log in' }));
+    const err = await api('/auth/me').catch((e) => e);
+    expect(err.status).toBe(401);
+    expect(err.code).toBeUndefined();
+  });
+
+  it('sets status without a code when the error body is not JSON', async () => {
+    fetchMock.mockResolvedValue(new Response('Bad gateway', { status: 502, headers: { 'Content-Type': 'text/html' } }));
+    const err = await api('/listings').catch((e) => e);
+    expect(err.message).toBe('Something went wrong');
+    expect(err.status).toBe(502);
+    expect(err.code).toBeUndefined();
+  });
+
+  it('has no status or code when the server cannot be reached', async () => {
+    fetchMock.mockRejectedValue(new TypeError('Failed to fetch'));
+    const err = await api('/listings').catch((e) => e);
+    expect(err.status).toBeUndefined();
+    expect(err.code).toBeUndefined();
+  });
+
   it('joins a list of validation messages into one sentence', async () => {
     fetchMock.mockResolvedValue(json(400, { message: ['price must be a number', 'title is required'] }));
     await expect(api('/listings', { method: 'POST', body: {} })).rejects.toThrow(
