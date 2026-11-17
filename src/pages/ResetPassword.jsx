@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { api } from '../api';
-import { Button, Field, Input, Spinner } from '../ui';
+import { Button, Field, Input, Spinner, cx, tapText } from '../ui';
 
 export default function ResetPassword() {
   const [sp] = useSearchParams();
@@ -38,12 +38,12 @@ export default function ResetPassword() {
           <Field label="New password" hint="At least 8 characters">
             <div className="relative">
               <Input required minLength={8} maxLength={72} type={show ? 'text' : 'password'} autoComplete="new-password" className="pr-16" value={password} onChange={(e) => setPassword(e.target.value)} />
-              <button type="button" onClick={() => setShow(!show)} className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-sm font-bold text-leaf">{show ? 'Hide' : 'Show'}</button>
+              <button type="button" onClick={() => setShow(!show)} className={cx(tapText, "absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer justify-center text-sm font-bold text-leaf")}>{show ? 'Hide' : 'Show'}</button>
             </div>
           </Field>
           {err && <p role="alert" className="rounded-xl bg-pepper/10 p-3 font-medium text-pepper">{err}</p>}
           <Button size="lg" disabled={busy}>{busy ? <Spinner /> : 'Save new password'}</Button>
-          {err && <Link to="/forgot-password" className="text-center text-sm font-semibold underline underline-offset-4">Get a new link</Link>}
+          {err && <Link to="/forgot-password" className={cx(tapText, "justify-center text-center text-sm font-semibold underline underline-offset-4")}>Get a new link</Link>}
         </form>
       )}
     </div>

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../api';
-import { Button, Field, Input, Spinner } from '../ui';
+import { Button, Field, Input, Spinner, cx, tapText } from '../ui';
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState('');
@@ -30,7 +30,7 @@ export default function ForgotPassword() {
           <Field label="Email"><Input required type="email" autoComplete="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} /></Field>
           {err && <p role="alert" className="rounded-xl bg-pepper/10 p-3 font-medium text-pepper">{err}</p>}
           <Button size="lg" disabled={busy}>{busy ? <Spinner /> : 'Send me the link'}</Button>
-          <Link to="/auth" className="text-center text-sm font-semibold underline underline-offset-4">Back to log in</Link>
+          <Link to="/auth" className={cx(tapText, "justify-center text-center text-sm font-semibold underline underline-offset-4")}>Back to log in</Link>
         </form>
       )}
     </div>

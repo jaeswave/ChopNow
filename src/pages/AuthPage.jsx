@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../api';
 import { useAuth } from '../auth';
-import { Button, Field, Input, Select, Spinner, cx } from '../ui';
+import { Button, Field, Input, Select, Spinner, cx, tapText } from '../ui';
 import { useMeta } from '../hooks/useMeta';
 import { getSavedCity } from '../hooks/useCity';
 
@@ -77,15 +77,15 @@ export default function AuthPage() {
         <Field label="Password">
           <div className="relative">
             <Input required type={show ? 'text' : 'password'} autoComplete={mode === 'login' ? 'current-password' : 'new-password'} placeholder="At least 8 characters" className="pr-16" value={f.password} onChange={set('password')} />
-            <button type="button" onClick={() => setShow(!show)} className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-sm font-bold text-leaf">{show ? 'Hide' : 'Show'}</button>
+            <button type="button" onClick={() => setShow(!show)} className={cx(tapText, "absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer justify-center text-sm font-bold text-leaf")}>{show ? 'Hide' : 'Show'}</button>
           </div>
         </Field>
 
-        {mode === 'login' && <Link to="/forgot-password" className="-mt-2 justify-self-start text-sm font-semibold underline underline-offset-4">Forgot your password?</Link>}
+        {mode === 'login' && <Link to="/forgot-password" className={cx(tapText, "-mt-2 justify-self-start text-sm font-semibold underline underline-offset-4")}>Forgot your password?</Link>}
         {err && <p role="alert" className="rounded-xl bg-pepper/10 p-3 font-medium text-pepper">{err}</p>}
         <Button size="lg" disabled={busy}>{busy ? <Spinner /> : mode === 'login' ? 'Log in' : 'Create account'}</Button>
         {mode === 'register' && <p className="text-xs text-mute">By creating an account you agree to our <Link to="/terms" className="underline">terms, refund policy and privacy notice</Link>.</p>}
-        <button type="button" className="cursor-pointer text-sm font-semibold underline underline-offset-4" onClick={() => { setMode(mode === 'login' ? 'register' : 'login'); setErr(''); }}>
+        <button type="button" className={cx(tapText, "cursor-pointer justify-center text-sm font-semibold underline underline-offset-4")} onClick={() => { setMode(mode === 'login' ? 'register' : 'login'); setErr(''); }}>
           {mode === 'login' ? 'New here? Create an account' : 'Already have an account? Log in'}
         </button>
       </form>

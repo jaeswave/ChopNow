@@ -11,7 +11,7 @@ import {
   pctOff,
   when,
 } from "../components";
-import { Button, Spinner, useToast } from "../ui";
+import { Button, Spinner, cx, tapText, useToast } from "../ui";
 import { useMeta } from "../hooks/useMeta";
 import { getPaymentProvider } from "../payments";
 
@@ -78,7 +78,7 @@ export default function Listing() {
     <div>
       <Link
         to="/deals"
-        className="text-sm font-semibold text-mute hover:text-ink"
+        className={cx(tapText, "text-sm font-semibold text-mute hover:text-ink")}
       >
         ← Back to live deals
       </Link>
@@ -177,7 +177,7 @@ export default function Listing() {
                       aria-label="Fewer"
                       disabled={qty <= 1}
                       onClick={() => setQty(qty - 1)}
-                      className="size-10 cursor-pointer rounded-full text-xl ring-[1.5px] ring-line hover:ring-leaf disabled:opacity-40"
+                      className="size-11 cursor-pointer rounded-full text-xl ring-[1.5px] ring-line hover:ring-leaf disabled:opacity-40"
                     >
                       −
                     </button>
@@ -188,7 +188,7 @@ export default function Listing() {
                       aria-label="More"
                       disabled={qty >= max}
                       onClick={() => setQty(qty + 1)}
-                      className="size-10 cursor-pointer rounded-full text-xl ring-[1.5px] ring-line hover:ring-leaf disabled:opacity-40"
+                      className="size-11 cursor-pointer rounded-full text-xl ring-[1.5px] ring-line hover:ring-leaf disabled:opacity-40"
                     >
                       +
                     </button>

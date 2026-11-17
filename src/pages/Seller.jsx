@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { api } from '../api';
 import { useAuth } from '../auth';
 import { Art, Countdown, StatusBadge, naira, when } from '../components';
-import { Button, Chip, Field, Input, Select, Spinner, Textarea, cx, useToast } from '../ui';
+import { Button, Chip, Field, Input, Select, Spinner, Textarea, cx, tap, useToast } from '../ui';
 import Payouts from './Payouts';
 import SellerInsights from "../components/SellerInsights";
 import SetupChecklist from './seller/SetupChecklist';
@@ -380,7 +380,7 @@ export default function Seller() {
       {tab === "payouts" && payoutJustSaved && (
         <div role="status" className={cx(box, "mt-5 flex flex-wrap items-center justify-between gap-3 bg-leaf/5 ring-leaf")}>
           <p className="font-semibold text-leaf">✓ Payout account saved. You can publish listings now.</p>
-          <Button className="min-h-11" onClick={() => setTab("new")}>
+          <Button onClick={() => setTab("new")}>
             Continue to your listing
           </Button>
         </div>
@@ -405,7 +405,7 @@ export default function Seller() {
           title="One quick step first: verify your email"
           text="We emailed you a link. Open it, then come back to this page to list your food."
         >
-          <Button className="min-h-11" disabled={verification.busy} onClick={verification.resend}>
+          <Button disabled={verification.busy} onClick={verification.resend}>
             {verification.busy ? <Spinner /> : "Resend email"}
           </Button>
         </SetupBlocker>
@@ -417,7 +417,7 @@ export default function Seller() {
           title="One quick step first: tell us where to send your money"
           text="We pay your earnings into your bank account, so we need it before your food can go live. Anything you already typed in the form is kept."
         >
-          <Button className="min-h-11" onClick={() => setTab("payouts")}>
+          <Button onClick={() => setTab("payouts")}>
             Add payout account
           </Button>
         </SetupBlocker>
@@ -444,7 +444,7 @@ export default function Seller() {
                 </div>
               )}
               <div className="grid gap-2">
-                <label className="inline-flex w-fit cursor-pointer items-center gap-2 rounded-xl bg-white px-4 py-2 text-sm font-bold ring-[1.5px] ring-line hover:ring-leaf">
+                <label className={cx(tap, "inline-flex w-fit cursor-pointer items-center gap-2 rounded-xl bg-white px-4 py-2 text-sm font-bold ring-[1.5px] ring-line focus-within:outline-3 focus-within:outline-palm hover:ring-leaf")}>
                   {uploading ? (
                     <Spinner />
                   ) : f.imageUrl ? (

@@ -42,7 +42,7 @@ export default function Feedback() {
       </div>
       <div className="flex flex-wrap gap-2">{KINDS.map(([k, e, t]) => <Chip key={k} type="button" on={kind === k} onClick={() => setKind(k)}>{e} {t}</Chip>)}</div>
       <Field label="How was your experience? (optional)">
-        <div className="flex gap-1" role="radiogroup" aria-label="Rating">
+        <div className="flex gap-2" role="radiogroup" aria-label="Rating">
           {[1, 2, 3, 4, 5].map((n) => (
             <button key={n} type="button" role="radio" aria-checked={rating === n} aria-label={`${n} out of 5`} onClick={() => setRating(rating === n ? 0 : n)} className={cx('size-11 cursor-pointer rounded-xl text-2xl transition', n <= rating ? 'bg-palm/40' : 'bg-paper grayscale hover:grayscale-0')}>⭐</button>
           ))}

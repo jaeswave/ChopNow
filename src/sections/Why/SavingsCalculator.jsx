@@ -22,7 +22,7 @@ export default function SavingsCalculator() {
           step="2"
           value={purchases}
           onChange={(e) => setPurchases(+e.target.value)}
-          className="mt-3 w-full cursor-pointer accent-leaf"
+          className="mt-3 w-full cursor-pointer accent-leaf touch:h-11"
         />
       </label>
       <div className="mt-6 rounded-2xl bg-leaf p-6 text-white">

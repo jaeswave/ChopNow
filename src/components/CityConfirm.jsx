@@ -4,7 +4,7 @@ import { api } from '../api';
 import { useAuth } from '../auth';
 import { useMeta } from '../hooks/useMeta';
 import { getSavedCity, guessCityFromGPS, guessCityFromIP, saveCity } from '../hooks/useCity';
-import { Button, Field, Input, Select, Spinner, useToast } from '../ui';
+import { Button, Field, Input, Select, Spinner, cx, tapText, useToast } from '../ui';
 
 // Asks every new visitor (once per device) which city they are in. We make a guess from their location to save them a tap,
 // but we never decide for them. Anyone outside the cities we are live in can leave an email for the waitlist.
@@ -64,7 +64,7 @@ export default function CityConfirm() {
             <div className="mt-5 grid gap-2">
               <Button size="lg" onClick={confirm}>Yes, I am in {live}</Button>
               <Button size="lg" variant="outline" disabled={busy} onClick={useGps}>{busy ? <Spinner /> : 'Check using my phone location'}</Button>
-              <button className="mt-1 cursor-pointer text-sm font-semibold underline underline-offset-4" onClick={() => setStep('elsewhere')}>I am somewhere else</button>
+              <button className={cx(tapText, "mt-1 cursor-pointer text-sm font-semibold underline underline-offset-4")} onClick={() => setStep('elsewhere')}>I am somewhere else</button>
             </div>
           </>
         )}
@@ -76,7 +76,7 @@ export default function CityConfirm() {
             <Field label="Your city"><Select value={other} onChange={(e) => setOther(e.target.value)}><option value="">Choose…</option>{(comingSoon || []).map((c) => <option key={c}>{c}</option>)}</Select></Field>
             <Field label="Email"><Input required type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} /></Field>
             <Button size="lg" disabled={busy}>{busy ? <Spinner /> : 'Tell me when you arrive'}</Button>
-            <button type="button" className="cursor-pointer text-sm font-semibold underline underline-offset-4" onClick={() => setStep('ask')}>Actually, I am in {live}</button>
+            <button type="button" className={cx(tapText, "cursor-pointer text-sm font-semibold underline underline-offset-4")} onClick={() => setStep('ask')}>Actually, I am in {live}</button>
           </form>
         )}
         {step === 'thanks' && (

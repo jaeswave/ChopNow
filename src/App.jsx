@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "./auth";
-import { Button, Container, cx, useToast } from "./ui";
+import { Button, Container, cx, tap, tapText, useToast } from "./ui";
 import { api } from "./api";
 import AppRoutes from "./app/AppRoutes";
 import CityConfirm from "./components/CityConfirm";
@@ -32,6 +32,7 @@ function Brand({ className = "" }) {
       to="/"
       className={cx(
         "font-display text-2xl font-extrabold text-white",
+        tapText,
         className,
       )}
     >
@@ -45,6 +46,7 @@ const LiveLink = ({ compact = false }) => (
     to="/deals"
     className={cx(
       "inline-flex items-center gap-2 rounded-full bg-white/10 font-bold text-white ring-1 ring-white/25 transition hover:bg-white/20",
+      tap,
       compact ? "px-3 py-1.5 text-sm" : "px-4 py-2",
     )}
   >
@@ -123,7 +125,7 @@ function Navbar() {
         <div className="flex items-center gap-2 md:hidden">
           <LiveLink compact />
           <button
-            className="grid size-10 cursor-pointer place-items-center rounded-lg text-2xl hover:bg-white/10"
+            className="grid size-11 cursor-pointer place-items-center rounded-lg text-2xl hover:bg-white/10"
             aria-label="Menu"
             aria-expanded={open}
             onClick={() => setOpen(!open)}
@@ -134,7 +136,7 @@ function Navbar() {
       </Container>
       {open && (
         <nav
-          className="grid gap-1 border-t border-white/10 px-5 pb-5 pt-3 md:hidden"
+          className="grid gap-2 border-t border-white/10 px-5 pb-5 pt-3 md:hidden"
           aria-label="Mobile"
         >
           {links.map(([to, t]) => (
@@ -155,7 +157,7 @@ function Navbar() {
 
 function Footer() {
   const col = "grid content-start gap-2";
-  const a = "text-[#cfe0d6] transition hover:text-palm";
+  const a = cx(tapText, "text-[#cfe0d6] transition hover:text-palm");
   return (
     <footer className="bg-leaf pt-14 text-sm text-[#cfe0d6]">
       <Container className="grid gap-10 md:grid-cols-[1.4fr_1fr_1fr_1.2fr]">
@@ -237,7 +239,7 @@ function VerifyBanner() {
         <button
           disabled={busy}
           onClick={resend}
-          className="cursor-pointer underline"
+          className={cx(tapText, "cursor-pointer underline")}
         >
           Resend email
         </button>
@@ -253,7 +255,7 @@ function FeedbackPill() {
   return (
     <Link
       to="/feedback"
-      className="fixed bottom-4 right-4 z-30 rounded-full bg-leaf px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-black/25 ring-1 ring-white/20 transition hover:bg-ink"
+      className={cx(tapText, "fixed bottom-4 right-4 z-30 rounded-full bg-leaf px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-black/25 ring-1 ring-white/20 transition hover:bg-ink")}
     >
       💬 Feedback
     </Link>
