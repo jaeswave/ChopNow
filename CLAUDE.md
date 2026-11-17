@@ -52,12 +52,15 @@ src/
   hooks/              useMeta (server meta with retries), useListings (listings with retries and a "waking" state), useCity
   pages/              Home, Deals, Listing, AuthPage, Seller, Orders, Payouts, Admin, PayCallback, Legal, Feedback,
                       VerifyEmail, ForgotPassword, ResetPassword
+  pages/seller/       Pieces of the Seller page: SetupChecklist, SetupBlocker, ApplicationTimeline,
+                      useResendVerification, draft.js (new-listing draft in sessionStorage), errors.js
   payments/           hosted.js (startHostedCheckout, verifyPayment), opay.js, with stripe.js and flutterwave.js kept as fallbacks
   sections/           Landing-page sections (Hero, LiveDealsTeaser, Mission, Why), each with a *.data.js file
 ```
 
 ### Main flows
 - **Buy:** Listing → `startHostedCheckout` → `POST /orders` → redirect to `authorizationUrl` → `/pay/callback` → `GET /orders/verify/:ref`. The browser never sends an amount.
+- **Seller setup:** `/seller?tab=orders|listings|new|insights|payouts` (no `tab` means orders, and Back works). The approval email links to `?tab=payouts`. Until the email is verified, a payout account exists and a first listing is published, a "Finish setting up" card shows. "+ New listing" shows a blocker card instead of the form while the email or payout account is missing. The form draft is kept in sessionStorage (`gj_listing_draft_<userId>`) and cleared after publishing.
 - **Pickup:** the buyer sees `pickupCode` in Orders and can share it on WhatsApp. The seller types it in Seller → `POST /orders/lookup` → `POST /orders/:id/complete`.
 - **Order statuses:** PENDING_PAYMENT, RESERVED, PICKED_UP, EXPIRED, CANCELLED. **Listing statuses:** ACTIVE, SOLD_OUT, EXPIRED.
 - Countdowns are for display only. The server decides what has expired.
@@ -68,7 +71,8 @@ src/
   - Without them, the server returns a plain array, as before. Every screen currently relies on this.
   - With them, it returns `{ items, total, page, pageSize }`.
   - **No screen uses paging yet.** When one does, handle the object shape on that screen only, and check the exact endpoint list against the server contract in the task prompt.
-- Removed endpoints: `/payouts/banks` and `/payouts/resolve` no longer exist. Payout details are entered by hand.
+- Removed endpoints: `/payouts/banks` and `/payouts/resolve` no longer exist, and the website no longer calls `/payouts/mode`. Payout details are entered by hand.
+- Errors have no machine-readable code; `api()` only exposes the message. `pages/seller/errors.js` recognises the "missing payout account" refusal by its wording (`/payout account/i`). If the server changes that message, update it there and in its test.
 
 ## Hard rules
 1. **Payments come last.** Do not change checkout or payment behaviour (`src/payments/*`, `pages/PayCallback.jsx`, or the buy button logic in `pages/Listing.jsx`) unless the task explicitly asks for it.
