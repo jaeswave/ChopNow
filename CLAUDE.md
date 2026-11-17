@@ -19,7 +19,10 @@ This is the **WEBSITE** repo (React). The **server** is a separate repo looked a
 - `npm run dev`: local dev server
 - `npm run build`: must finish with no errors before any task counts as done
 - `npm run preview`: serve the built `dist/`
-- **There is no test runner and no linter yet.** Do not say tests passed. Say "no tests exist", and list what you checked by hand.
+- `npm test`: Vitest + React Testing Library (jsdom), run once. `npm run test:watch` keeps it running.
+  - Tests sit next to the code as `*.test.js(x)`. Shared setup is in `src/test/setup.js`. Tests run with `TZ=Africa/Lagos` (set in `vite.config.js`).
+  - When you mock `useAuth`, return one **stable** object. A new object on every render re-runs `useEffect([user])` forever, and the test hangs.
+- There is no linter yet.
 
 ## Environment
 - `.env` is gitignored (along with `node_modules` and `dist`). **Never read, print, log, commit or paste it.** Use `.env.example` as the reference:
@@ -75,7 +78,7 @@ src/
 - The default `Button size="sm"` (`py-2 text-sm`) and `Chip` may be shorter than 44px.
 - Home page claims are written into the code: `config/market.js` `facts` ("Secure: card, transfer and mobile-money payments", "8 categories", "30%+ off on every deal"). They are not checked against the server. **Do not change them yet.** They will be rewritten in the landing page task.
 - Stripe and Flutterwave backup providers (`src/payments/stripe.js`, `flutterwave.js`) are still in the code. Leave them alone for now (payments come last).
-- No automated tests or linting.
+- No linting yet.
 
 ## How to report after each task
 1. What changed (files)
