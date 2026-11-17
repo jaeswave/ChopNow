@@ -11,12 +11,11 @@ import SetupBlocker from './seller/SetupBlocker';
 import useResendVerification from './seller/useResendVerification';
 import { clearDraft, loadDraft, restoreForm, saveDraft } from './seller/draft';
 import { setupBlockFromError } from './seller/errors';
+import { fromLagosInput, lagosInputInHours, toLagosInput } from '../components/time';
 import ApplicationTimeline from './seller/ApplicationTimeline';
 
-const pad = (n) => String(n).padStart(2, '0');
-const local = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-const inHours = (h) => local(new Date(Date.now() + h * 36e5));
-const blankForm = () => ({ title: '', description: '', imageUrl: '', category: '', city: '', area: '', address: '', originalPrice: '', price: '', quantity: '', saleEndsAt: inHours(3), pickupBy: inHours(5) });
+// The sale and pickup inputs are in Lagos time, whatever the phone's time zone (see components/time.js)
+const blankForm = () => ({ title: '', description: '', imageUrl: '', category: '', city: '', area: '', address: '', originalPrice: '', price: '', quantity: '', saleEndsAt: lagosInputInHours(3), pickupBy: lagosInputInHours(5) });
 const box = 'rounded-2xl bg-white p-5 ring-[1.5px] ring-line';
 
 // The open tab lives in the URL (?tab=payouts), so links and emails can open a tab and Back works
@@ -151,7 +150,7 @@ export default function Seller() {
   if (!user || user.role !== 'SELLER') return null;
   if (!approved) return <Application user={user} />;
 
-  const preset = (h) => { const end = Date.now() + h * 36e5; change({ saleEndsAt: local(new Date(end)), pickupBy: local(new Date(end + 2 * 36e5)) }); };
+  const preset = (h) => { const end = Date.now() + h * 36e5; change({ saleEndsAt: toLagosInput(end), pickupBy: toLagosInput(end + 2 * 36e5) }); };
   const disc = f.originalPrice && f.price ? Math.round((1 - f.price / f.originalPrice) * 100) : null;
 
   // Photos go straight to Cloudinary. Our server only signs the request.
@@ -177,7 +176,7 @@ export default function Seller() {
     try {
       await api('/listings', { method: 'POST', body: {
         ...f, imageUrl: f.imageUrl || undefined, originalPrice: Number(f.originalPrice), price: Number(f.price), quantity: Number(f.quantity),
-        saleEndsAt: new Date(f.saleEndsAt).toISOString(), pickupBy: new Date(f.pickupBy).toISOString(),
+        saleEndsAt: fromLagosInput(f.saleEndsAt).toISOString(), pickupBy: fromLagosInput(f.pickupBy).toISOString(),
       } });
       toast('Your listing is live!');
       clearDraft(user.id);
@@ -566,7 +565,7 @@ export default function Seller() {
             </div>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Sale ends" hint="Last time buyers can order">
+            <Field label="Sale ends (Lagos time)" hint="Last time buyers can order">
               <Input
                 required
                 type="datetime-local"
@@ -575,7 +574,7 @@ export default function Seller() {
               />
             </Field>
             <Field
-              label="Pickup deadline"
+              label="Pickup deadline (Lagos time)"
               hint="Buyers must collect by this time"
             >
               <Input

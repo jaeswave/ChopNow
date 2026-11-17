@@ -1,3 +1,5 @@
+import { fromLagosInput } from '../../components/time';
+
 // Keeps a half-filled "New listing" form for this browser tab, so a detour (for example to add a
 // payout account, or a page refresh) loses nothing. sessionStorage is cleared when the tab is closed.
 const key = (userId) => `gj_listing_draft_${userId}`;
@@ -33,7 +35,7 @@ export function restoreForm(draft, fresh) {
   if (!draft || typeof draft !== 'object') return fresh;
   const form = { ...fresh };
   for (const k of Object.keys(fresh)) if (typeof draft[k] === 'string') form[k] = draft[k];
-  if (!(new Date(form.saleEndsAt).getTime() > Date.now())) {
+  if (!(fromLagosInput(form.saleEndsAt).getTime() > Date.now())) {
     form.saleEndsAt = fresh.saleEndsAt;
     form.pickupBy = fresh.pickupBy;
   }
