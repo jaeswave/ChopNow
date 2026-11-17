@@ -72,7 +72,16 @@ src/
   - With them, it returns `{ items, total, page, pageSize }`.
   - **No screen uses paging yet.** When one does, handle the object shape on that screen only, and check the exact endpoint list against the server contract in the task prompt.
 - Removed endpoints: `/payouts/banks` and `/payouts/resolve` no longer exist, and the website no longer calls `/payouts/mode`. Payout details are entered by hand.
-- Errors have no machine-readable code; `api()` only exposes the message. `pages/seller/errors.js` recognises the "missing payout account" refusal by its wording (`/payout account/i`). If the server changes that message, update it there and in its test.
+- **Error codes.** An error body is `{ message, error, statusCode, code? }`. `api()` throws an `Error` with `err.message`, `err.status` (HTTP status) and `err.code` (only when the server sends one). **Branch on `err.code`, never on the wording of `err.message`.**
+
+  | `code` | Status | When |
+  |---|---|---|
+  | `PAYOUT_REQUIRED` | 400 | `POST /listings` (also duplicate) by a seller with no payout account |
+  | `EMAIL_NOT_VERIFIED` | 403 | `POST /listings` (also duplicate) or `POST /orders` before the email is verified |
+
+  The server repo's CLAUDE.md is the source of truth for this table. Copy new codes here when the server adds them.
+  - Seller listing flow: `pages/seller/errors.js` `setupBlockFromError(err)` maps these codes to the payout or email setup card.
+  - It still has a wording fallback (`/payout account/i` when there is no code) for older servers. It can be removed once every deployed server sends codes.
 
 ## Hard rules
 1. **Payments come last.** Do not change checkout or payment behaviour (`src/payments/*`, `pages/PayCallback.jsx`, or the buy button logic in `pages/Listing.jsx`) unless the task explicitly asks for it.
