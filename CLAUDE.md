@@ -41,7 +41,7 @@ src/
   api.js              api(path, {method, body}): JSON fetch with the Bearer token from localStorage 'token',
                       a 90s timeout and friendly error messages. download(): authenticated file download.
   auth.jsx            useAuth(): { user, ready, login, logout, refresh }. user.role is BUYER | SELLER | ADMIN.
-  ui.jsx              Shared kit: cx, Button, Input, Select, Textarea, Field (label wrapper), Chip, Container, Reveal, Toast/useToast
+  ui.jsx              Shared kit: cx, tap, tapText, Button, Input, Select, Textarea, Field (label wrapper), Chip, Container, Reveal, Toast/useToast
   components/
     index.jsx         naira, money, pctOff, when, mapsUrl, Art (photo or emoji fallback), Tag, Countdown (one shared clock),
                       StatusBadge, Card (listing card), CardSkeleton, Verified
@@ -94,12 +94,14 @@ src/
 
 ## Product rules
 - **Mobile first.** Most users are on modest Android phones with prepaid data: small pages, compressed images (WebP), lazy loading, touch targets of at least 44px, input text of at least 16px (so iOS does not zoom).
+  - Tap targets: `Button` and `Chip` are already at least 44 x 44px on phones (under 768px) and touch screens, via the `touch:` variant in `src/styles.css`, and desktop sizes are unchanged. For a hand-made link or button, add `tap` (or `tapText` for plain text links) from `src/ui.jsx`. Keep at least 8px (`gap-2`) between neighbouring targets. Links inside a sentence are exempt.
+  - `Input`, `Select` and `Textarea` default to 16px text. Label every input with `Field` or `aria-label`. Never hide a file input with `hidden`; use `sr-only` so the keyboard can reach it.
 - **Plain, friendly English.** No jargon. Money in whole naira (use `money` / `naira`). **Show times in Africa/Lagos.** Always use `components/time.js`. Never call `toLocale*String`, `getHours` and friends, or `new Date(inputValue)` on a datetime-local value directly.
 - **Lagos only for now.** Never invent statistics, testimonials or claims. If data is missing, hide the element or show an honest empty state.
 - **Accessibility:** labels on inputs (use `Field`), visible focus (the kit uses `focus-visible:outline-palm`), good contrast, aria attributes on custom controls.
 
 ## Known gaps (found while writing this file; not fixed yet)
-- The default `Button size="sm"` (`py-2 text-sm`) and `Chip` may be shorter than 44px.
+- At 320px wide (smaller than our 360px target) the home page scrolls sideways a little, and the date-and-time inputs clip the end of the time. Landing page task.
 - Home page claims are written into the code: `config/market.js` `facts` ("Secure: card, transfer and mobile-money payments", "8 categories", "30%+ off on every deal"). They are not checked against the server. **Do not change them yet.** They will be rewritten in the landing page task.
 - Stripe and Flutterwave backup providers (`src/payments/stripe.js`, `flutterwave.js`) are still in the code. Leave them alone for now (payments come last).
 - 15 `react-hooks/exhaustive-deps` lint warnings (Admin, Orders, Seller, Payouts, AuthPage, VerifyEmail, useListings).
