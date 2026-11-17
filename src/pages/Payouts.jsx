@@ -4,7 +4,8 @@ import { Button, Field, Input, Spinner, useToast } from '../ui';
 
 const box = 'rounded-2xl bg-white p-5 ring-[1.5px] ring-line sm:p-7';
 
-export default function Payouts() {
+// onSaved(): called after the payout account is saved, so the page around it can update straight away
+export default function Payouts({ onSaved }) {
   const toast = useToast();
   const [me, setMe] = useState(null);
   const [bankName, setBankName] = useState('');
@@ -23,6 +24,7 @@ export default function Payouts() {
       await api('/payouts/setup', { method: 'POST', body: { bankName, accountName: acctName, accountNumber: acct, password } });
       toast('Payout account saved. You can now publish listings.');
       setPassword(''); setAcct(''); setBankName(''); setAcctName(''); setEditing(false); load();
+      onSaved?.();
     } catch (e2) { toast(e2.message, 'err'); }
     setBusy(false);
   };

@@ -355,7 +355,7 @@ export default function Seller() {
 
       {tab === "insights" && <SellerInsights />}
 
-      {tab === "payouts" && <Payouts />}
+      {tab === "payouts" && <Payouts onSaved={() => setHasPayout(true)} />}
 
       {tab === "new" && (
         <form onSubmit={submit} className={cx(box, "mt-5 grid gap-4 sm:p-7")}>
