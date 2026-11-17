@@ -87,7 +87,7 @@ function Redeem({ reload }) {
       <h2 className="text-xl font-extrabold">Customer at your door?</h2>
       <p className="text-sm text-mute">Ask for the 6-digit pickup code. It works for whoever the buyer sent to collect.</p>
       <form onSubmit={find} className="mt-3 flex flex-wrap gap-2">
-        <Input className="w-44 text-lg tracking-[.3em]" inputMode="numeric" maxLength={6} placeholder="000000" value={code} onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))} />
+        <Input aria-label="Pickup code" className="w-44 text-lg tracking-[.3em]" inputMode="numeric" maxLength={6} placeholder="000000" value={code} onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))} />
         <Button disabled={busy || code.length !== 6}>{busy && !found ? <Spinner /> : 'Find order'}</Button>
       </form>
       {found && (
@@ -455,7 +455,7 @@ export default function Seller() {
                   <input
                     type="file"
                     accept="image/jpeg,image/png,image/webp"
-                    className="hidden"
+                    className="sr-only"
                     disabled={uploading}
                     onChange={(e) => upload(e.target.files[0])}
                   />

@@ -125,7 +125,7 @@ function Navbar() {
         <div className="flex items-center gap-2 md:hidden">
           <LiveLink compact />
           <button
-            className="grid size-11 cursor-pointer place-items-center rounded-lg text-2xl hover:bg-white/10"
+            className="grid size-11 shrink-0 cursor-pointer place-items-center rounded-lg text-2xl hover:bg-white/10"
             aria-label="Menu"
             aria-expanded={open}
             onClick={() => setOpen(!open)}

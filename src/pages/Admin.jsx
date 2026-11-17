@@ -76,7 +76,7 @@ function Users() {
     <div className="mt-5">
       <div className="flex flex-wrap gap-3">
         <div className="flex gap-2">{[['', 'Everyone'], ['SELLER', 'Sellers'], ['BUYER', 'Buyers']].map(([v, t]) => <Chip key={v} on={role === v} onClick={() => setRole(v)}>{t}</Chip>)}</div>
-        <Input className="min-w-56 flex-1" placeholder="Search name, email or business…" value={q} onChange={(e) => setQ(e.target.value)} />
+        <Input aria-label="Search users" className="min-w-56 flex-1" placeholder="Search name, email or business…" value={q} onChange={(e) => setQ(e.target.value)} />
       </div>
       {users && users.length === 0 && <p className="mt-6 text-mute">No users found.</p>}
       <ul className="mt-4 grid gap-3">
