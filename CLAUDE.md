@@ -60,7 +60,7 @@ src/
 ## Hard rules
 1. **Payments come last.** Do not change checkout or payment behaviour (`src/payments/*`, `pages/PayCallback.jsx`, or the buy button logic in `pages/Listing.jsx`) unless the task explicitly asks for it.
 2. **Never print, log, commit or paste secrets** (.env files, keys, tokens). Keep `.env` in `.gitignore`.
-3. **One branch per task**, named `feature/<short-name>`. Commit in small steps. **Never push to main.** Before saying a task is done, run install and build (and tests once they exist), and report the results honestly, including anything you could not verify.
+3. **Work directly on main in small commits.** If a task says "Branch: something", ignore that line. Before every commit: install, build, and run tests and lint if they exist. **Never commit code that fails the build. Do NOT push until I say push.** After each task, give me local test steps (`npm run dev`) and wait. Report results honestly, including anything you could not verify.
 4. **Do not rewrite what works.** Reuse `src/ui.jsx` and `src/components`. Keep changes small and readable.
 5. **The server API contract in each prompt is fixed.** Do not invent endpoints or rename fields. If something is missing or wrong, stop and ask.
 
