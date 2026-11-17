@@ -10,7 +10,7 @@ import SetupChecklist from './seller/SetupChecklist';
 import SetupBlocker from './seller/SetupBlocker';
 import useResendVerification from './seller/useResendVerification';
 import { clearDraft, loadDraft, restoreForm, saveDraft } from './seller/draft';
-import { isMissingPayoutError } from './seller/errors';
+import { setupBlockFromError } from './seller/errors';
 import ApplicationTimeline from './seller/ApplicationTimeline';
 
 const pad = (n) => String(n).padStart(2, '0');
@@ -116,7 +116,11 @@ export default function Seller() {
   const [hasPayout, setHasPayout] = useState(null); // null until /payouts/me answers, and stays null if it fails
   const [payoutChecked, setPayoutChecked] = useState(false);
   const [payoutJustSaved, setPayoutJustSaved] = useState(false);
-  const emailVerified = !!user?.emailVerified;
+  // Set when the server refuses a listing with EMAIL_NOT_VERIFIED while our copy of the user still says verified.
+  // Cleared whenever the user is reloaded, so the server's answer wins.
+  const [emailBlocked, setEmailBlocked] = useState(false);
+  useEffect(() => setEmailBlocked(false), [user]);
+  const emailVerified = !!user?.emailVerified && !emailBlocked;
   const verification = useResendVerification();
   const [f, setF] = useState(() => restoreForm(loadDraft(user?.id), blankForm()));
   const [err, setErr] = useState('');
@@ -180,11 +184,12 @@ export default function Seller() {
       setF({ ...blankForm(), category: f.category, city: f.city, area: f.area, address: f.address });
       await reload(); setTab('listings');
     } catch (e2) {
-      if (isMissingPayoutError(e2.message)) {
-        // Show the same friendly card as before the form. The draft is kept.
-        setHasPayout(false);
-        requestAnimationFrame(() => document.getElementById('blocker-title')?.scrollIntoView?.({ block: 'center' }));
-      } else setErr(e2.message);
+      // A missing setup step shows the same friendly card as before the form. The draft is kept.
+      const block = setupBlockFromError(e2);
+      if (block === 'payout') setHasPayout(false);
+      if (block === 'email') { setEmailBlocked(true); refresh(); }
+      if (block) requestAnimationFrame(() => document.getElementById('blocker-title')?.scrollIntoView?.({ block: 'center' }));
+      else setErr(e2.message);
     }
     setBusy(false);
   };

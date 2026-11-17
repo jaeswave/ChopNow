@@ -22,6 +22,7 @@ vi.mock('../api', () => ({
 }));
 
 const PAYOUT_ERROR = 'Set up your payout account first (My shop, then Payouts) so you can get paid.';
+const coded = (code, message) => Object.assign(new Error(message), { code });
 const DRAFT_KEY = 'gj_listing_draft_7';
 const LISTING = { id: 1, title: 'Agege bread', category: 'Bakery', status: 'ACTIVE', price: 700, originalPrice: 1200, quantity: 5, quantityLeft: 5, saleEndsAt: new Date(Date.now() + 36e5).toISOString() };
 
@@ -200,7 +201,27 @@ describe('New listing tab', () => {
     expect(screen.queryByRole('button', { name: 'Publish listing' })).not.toBeInTheDocument();
   });
 
-  it('shows the payout card, not a raw error, if the server refuses for missing payout details', async () => {
+  it('shows the payout card, not a raw error, when the server answers PAYOUT_REQUIRED', async () => {
+    setup({ hasPayout: true });
+    mock.replies['POST /listings'] = () => Promise.reject(coded('PAYOUT_REQUIRED', 'Reworded by the server'));
+    renderAt('/seller?tab=new');
+    fireEvent.submit((await screen.findByRole('button', { name: 'Publish listing' })).closest('form'));
+    expect(await payoutCard()).toBeInTheDocument();
+    expect(screen.queryByText('Reworded by the server')).not.toBeInTheDocument();
+  });
+
+  it('shows the email card and reloads the user when the server answers EMAIL_NOT_VERIFIED', async () => {
+    setup({ hasPayout: true }); // our copy of the user still says verified
+    mock.replies['POST /listings'] = () => Promise.reject(coded('EMAIL_NOT_VERIFIED', 'Please verify your email first.'));
+    renderAt('/seller?tab=new');
+    fireEvent.submit((await screen.findByRole('button', { name: 'Publish listing' })).closest('form'));
+    const c = await screen.findByRole('region', { name: /verify your email/ });
+    expect(within(c).getByRole('button', { name: 'Resend email' })).toBeInTheDocument();
+    expect(mock.auth.refresh).toHaveBeenCalled();
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
+
+  it('falls back to the wording when the server sends no code', async () => {
     setup({ hasPayout: true });
     mock.replies['POST /listings'] = () => Promise.reject(new Error(PAYOUT_ERROR));
     renderAt('/seller?tab=new');
@@ -235,7 +256,7 @@ describe('New listing draft', () => {
   it('keeps the draft through the payout detour', async () => {
     setup({ hasPayout: true });
     const user = userEvent.setup();
-    mock.replies['POST /listings'] = () => Promise.reject(new Error(PAYOUT_ERROR));
+    mock.replies['POST /listings'] = () => Promise.reject(coded('PAYOUT_REQUIRED', PAYOUT_ERROR));
     renderAt('/seller?tab=new');
     await user.type(await screen.findByLabelText(/What is it/), 'Fresh fish');
     mock.replies['GET /payouts/me'] = { hasPayout: false }; // the payout account went missing on the server
