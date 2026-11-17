@@ -2,8 +2,14 @@ import { createContext, useContext, useEffect, useRef, useState } from 'react';
 
 export const cx = (...a) => a.filter(Boolean).join(' ');
 
+/* ---------- Tap targets ---------- */
+// At least 44 x 44px on phones and touch screens (the `touch` variant in styles.css). Desktop sizes stay the same.
+export const tap = 'touch:min-h-11 touch:min-w-11';
+// The same for plain text links and text buttons, with the text centred in the taller box
+export const tapText = cx(tap, 'touch:inline-flex touch:items-center');
+
 /* ---------- Button ---------- */
-const btnBase = 'inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl font-bold transition duration-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-palm disabled:cursor-not-allowed disabled:opacity-60 motion-safe:active:scale-[.98]';
+const btnBase = tap + ' inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl font-bold transition duration-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-palm disabled:cursor-not-allowed disabled:opacity-60 motion-safe:active:scale-[.98]';
 const variants = {
   primary: 'bg-pepper text-white shadow-lg shadow-pepper/25 hover:brightness-110',
   palm: 'bg-palm text-[#2a1d00] shadow-lg shadow-palm/30 hover:brightness-105',
@@ -18,11 +24,14 @@ export function Button({ as: As = 'button', variant = 'primary', size = 'md', cl
 }
 
 /* ---------- Form fields ---------- */
-const field = 'rounded-xl border-[1.5px] border-line bg-white px-4 py-3 text-ink outline-none transition placeholder:text-mute/70 focus:border-leaf focus:ring-4 focus:ring-palm/40';
+const field = 'min-w-0 rounded-xl border-[1.5px] border-line bg-white px-4 py-3 text-ink outline-none transition placeholder:text-mute/70 focus:border-leaf focus:ring-4 focus:ring-palm/40';
 const width = (c) => (/\bw-/.test(c) ? '' : 'w-full');
-export const Input = ({ className = '', ...p }) => <input className={cx(field, width(className), className)} {...p} />;
-export const Select = ({ className = '', children, ...p }) => <select className={cx(field, width(className), 'cursor-pointer', className)} {...p}>{children}</select>;
-export const Textarea = ({ className = '', ...p }) => <textarea className={cx(field, width(className), 'min-h-24', className)} {...p} />;
+// 16px text unless the caller sets a size. Inputs inside a Field would otherwise inherit its 14px label text,
+// and iPhones zoom the page when you tap an input under 16px.
+const textSize = (c) => (/\btext-(xs|sm|base|lg|[2-9]?xl)\b/.test(c) ? '' : 'text-base');
+export const Input = ({ className = '', ...p }) => <input className={cx(field, width(className), textSize(className), className)} {...p} />;
+export const Select = ({ className = '', children, ...p }) => <select className={cx(field, width(className), textSize(className), 'cursor-pointer', className)} {...p}>{children}</select>;
+export const Textarea = ({ className = '', ...p }) => <textarea className={cx(field, width(className), textSize(className), 'min-h-24', className)} {...p} />;
 export const Field = ({ label, hint, children, className = '' }) => (
   <label className={cx('grid gap-1.5 text-sm font-semibold', className)}>
     {label}{children}{hint && <span className="font-normal text-mute">{hint}</span>}
@@ -30,7 +39,7 @@ export const Field = ({ label, hint, children, className = '' }) => (
 );
 
 export const Chip = ({ on, className = '', ...p }) => (
-  <button type="button" className={cx('cursor-pointer rounded-full px-4 py-2 text-sm font-semibold ring-[1.5px] transition focus-visible:outline-3 focus-visible:outline-palm', on ? 'bg-leaf text-white ring-leaf' : 'bg-white text-ink ring-line hover:ring-leaf', className)} {...p} />
+  <button type="button" className={cx(tap, 'inline-flex cursor-pointer items-center justify-center rounded-full px-4 py-2 text-sm font-semibold ring-[1.5px] transition focus-visible:outline-3 focus-visible:outline-palm', on ? 'bg-leaf text-white ring-leaf' : 'bg-white text-ink ring-line hover:ring-leaf', className)} {...p} />
 );
 
 export const Container = ({ className = '', ...p }) => <div className={cx('mx-auto w-full max-w-[90%] px-5 sm:px-8', className)} {...p} />;

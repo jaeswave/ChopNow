@@ -41,7 +41,7 @@ export default function SetupChecklist({ steps }) {
               {!s.done && <p className="text-sm text-mute">{s.hint}</p>}
             </div>
             {!s.done && s.action && (
-              <Button size="sm" variant="leaf" className="min-h-11" disabled={s.action.busy} onClick={s.action.onClick}>
+              <Button size="sm" variant="leaf" disabled={s.action.busy} onClick={s.action.onClick}>
                 {s.action.busy ? <Spinner /> : s.action.label}
               </Button>
             )}

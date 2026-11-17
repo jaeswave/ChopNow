@@ -1,5 +1,12 @@
 @import "tailwindcss";
 
+/* touch: phones (under 768px wide) and any touch screen. Used for 44px tap targets; desktop sizes stay as they are. */
+@custom-variant touch {
+  @media (width < 48rem), (pointer: coarse) {
+    @slot;
+  }
+}
+
 /* Global tokens only. Every component carries its own Tailwind classes. */
 @theme {
   --color-leaf: #0E3B2C;
