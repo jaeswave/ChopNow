@@ -6,7 +6,7 @@ import { api } from "./api";
 import AppRoutes from "./app/AppRoutes";
 import CityConfirm from "./components/CityConfirm";
 import InstallCard from "./components/Install";
-import TabBar from "./components/TabBar";
+import TabBar, { useKeyboardOpen } from "./components/TabBar";
 import { yearLagos } from "./components/time";
 
 // Optional ribbon for test versions: set VITE_BETA_NOTICE in Vercel to show it, leave it empty to hide it
@@ -117,7 +117,7 @@ function Navbar() {
   return (
     <header
       className={cx(
-        "sticky top-0 z-40 bg-leaf text-white transition-shadow",
+        "sticky top-0 z-40 bg-leaf pt-[env(safe-area-inset-top)] text-white transition-shadow",
         scrolled && "shadow-lg shadow-black/20",
       )}
     >
@@ -175,11 +175,13 @@ function Navbar() {
 
 function Footer() {
   const { user } = useAuth();
+  const { pathname } = useLocation();
   const [accountTo, accountLabel] = accountLink(user);
   const col = "grid content-start gap-2";
   const a = cx(tapText, "text-[#cfe0d6] transition hover:text-palm");
   return (
-    <footer className="bg-leaf pt-12 text-sm text-[#cfe0d6]">
+    // On phones the app screens use the tab bar instead; only the landing page keeps the footer there
+    <footer className={cx("bg-leaf pt-12 text-sm text-[#cfe0d6]", pathname !== "/" && "hidden md:block")}>
       <Container className="grid gap-8 sm:grid-cols-2 md:grid-cols-[1.4fr_1fr_1fr_1.2fr] md:gap-10">
         <div className="sm:col-span-2 md:col-span-1">
           <Brand />
@@ -259,15 +261,24 @@ function VerifyBanner() {
 }
 
 // A small button on every page while we are testing, so nobody has to hunt for a way to tell us what went wrong
+// Phones: a small round button just above the tab bar (hidden while typing). Wider screens: a labelled pill.
 function FeedbackPill() {
   const { pathname } = useLocation();
-  if (/^\/(feedback|admin|pay)/.test(pathname)) return null;
+  const keyboard = useKeyboardOpen();
+  if (/^\/(feedback|admin|pay)/.test(pathname) || keyboard) return null;
   return (
     <Link
       to="/feedback"
-      className={cx(tapText, "fixed bottom-4 right-4 z-30 rounded-full bg-leaf px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-black/25 ring-1 ring-white/20 transition hover:bg-ink")}
+      aria-label="Send us feedback"
+      className={cx(
+        tap,
+        "fixed right-3 z-30 grid size-12 place-items-center rounded-full bg-leaf text-lg text-white shadow-lg shadow-black/25 ring-1 ring-white/20 transition hover:bg-ink",
+        "bottom-[calc(var(--tabbar-h)+env(safe-area-inset-bottom)+0.75rem)]",
+        "md:bottom-4 md:right-4 md:flex md:size-auto md:gap-2 md:px-4 md:py-2.5 md:text-sm md:font-bold",
+      )}
     >
-      💬 Feedback
+      <span aria-hidden="true">💬</span>
+      <span className="hidden md:inline">Feedback</span>
     </Link>
   );
 }

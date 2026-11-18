@@ -29,8 +29,9 @@ const routes = [
   { path: "/reset-password", Component: lazy(() => import("../pages/ResetPassword")) },
 ];
 
+// A short fade when a page opens (skipped when the phone asks for reduced motion)
 const Page = ({ children }) => (
-  <Container className="min-h-[70vh] py-10">{children}</Container>
+  <Container className="min-h-[70vh] py-10 motion-safe:animate-fade-in">{children}</Container>
 );
 // Full screen height, so the footer stays out of sight until the page arrives (otherwise it jumps down)
 const Loading = () => (
@@ -57,7 +58,7 @@ export default function AppRoutes() {
   return (
     <Suspense fallback={<Loading />}>
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<div className="motion-safe:animate-fade-in"><Home /></div>} />
         {routes.map(({ path, Component }) => (
           <Route
             key={path}

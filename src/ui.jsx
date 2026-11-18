@@ -72,7 +72,7 @@ export function ToastProvider({ children }) {
   return (
     <ToastCtx.Provider value={show}>
       {children}
-      {t && <div role="status" className={cx('fixed bottom-5 left-1/2 z-50 w-[calc(100%-2rem)] max-w-md -translate-x-1/2 rounded-xl px-5 py-3.5 text-center font-semibold shadow-2xl', t.type === 'err' ? 'bg-pepper text-white' : 'bg-leaf text-white')}>{t.msg}</div>}
+      {t && <div role="status" className={cx('fixed bottom-[calc(var(--tabbar-h)+env(safe-area-inset-bottom)+1.25rem)] left-1/2 z-50 w-[calc(100%-2rem)] max-w-md -translate-x-1/2 rounded-xl px-5 py-3.5 text-center font-semibold shadow-2xl', t.type === 'err' ? 'bg-pepper text-white' : 'bg-leaf text-white')}>{t.msg}</div>}
     </ToastCtx.Provider>
   );
 }
