@@ -2,9 +2,11 @@ import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { api } from '../api';
 import { Button } from '../ui';
+import usePageMeta from '../hooks/usePageMeta';
 
 // The payment page sends the buyer back here. We ask our own server (which asks the gateway) whether the payment really went through.
 export default function PayCallback() {
+  usePageMeta('Checking your payment');
   const [sp] = useSearchParams();
   const ref = sp.get('reference') || sp.get('trxref');
   const [state, setState] = useState('checking');

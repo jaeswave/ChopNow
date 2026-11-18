@@ -3,8 +3,10 @@ import { ART, Card, CardSkeleton } from "../../components";
 import { Button, Chip, Input, Select, Spinner } from "../../ui";
 import { useMeta } from "../../hooks/useMeta";
 import useListings from "../../hooks/useListings";
+import usePageMeta from '../../hooks/usePageMeta';
 
 export default function Deals() {
+  usePageMeta('Live deals in Lagos', 'Food deals live now from Lagos kitchens, bakeries and shops. Reserve, pay online and collect with a 6-digit code.');
   const { cities, categories } = useMeta();
   const [params, setParams] = useSearchParams();
   // The filters live in the address (/deals?city=Lagos&category=Bakery) so a link or a refresh keeps them

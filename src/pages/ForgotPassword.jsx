@@ -2,8 +2,10 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../api';
 import { Button, Field, Input, Spinner, cx, tapText } from '../ui';
+import usePageMeta from '../hooks/usePageMeta';
 
 export default function ForgotPassword() {
+  usePageMeta('Forgot your password?');
   const [email, setEmail] = useState('');
   const [busy, setBusy] = useState(false);
   const [sent, setSent] = useState(false);

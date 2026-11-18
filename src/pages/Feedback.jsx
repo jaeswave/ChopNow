@@ -3,11 +3,13 @@ import { Link } from 'react-router-dom';
 import { api } from '../api';
 import { useAuth } from '../auth';
 import { Button, Chip, Field, Input, Spinner, Textarea, cx } from '../ui';
+import usePageMeta from '../hooks/usePageMeta';
 
 const KINDS = [['BUG', '🐞', 'Something broke'], ['IDEA', '💡', 'I have an idea'], ['PRAISE', '💚', 'I liked something'], ['GENERAL', '💬', 'Something else']];
 
 // Feedback for the pilot. Works for visitors too, so testers who have not signed up can still tell us what they think.
 export default function Feedback() {
+  usePageMeta('Send us feedback', 'Tell the GbaanJo team what went wrong, what you liked or what we should build next.');
   const { user } = useAuth();
   const [kind, setKind] = useState('GENERAL');
   const [rating, setRating] = useState(0);

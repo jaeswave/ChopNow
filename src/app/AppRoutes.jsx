@@ -1,7 +1,8 @@
 import { lazy, Suspense } from "react";
 import { Link, Route, Routes } from "react-router-dom";
 import { Button, Container } from "../ui";
-import Home from "../pages/Home"; // the landing page stays in the main bundle, everything else loads when visited
+import Home from "../pages/Home";
+import usePageMeta from "../hooks/usePageMeta"; // the landing page stays in the main bundle, everything else loads when visited
 
 // Every routed page. To add a page: create it, then add one line here.
 const routes = [
@@ -36,16 +37,19 @@ const Loading = () => (
   </div>
 );
 
-const NotFound = () => (
-  <div className="grid place-items-center gap-3 py-24 text-center">
-    <div className="text-7xl">🍽️</div>
-    <h1 className="text-4xl font-extrabold">This plate is empty</h1>
-    <p className="text-mute">We couldn't find that page.</p>
-    <Button as={Link} to="/" className="mt-2">
-      Back to live deals
-    </Button>
-  </div>
-);
+function NotFound() {
+  usePageMeta("Page not found");
+  return (
+    <div className="grid place-items-center gap-3 py-24 text-center">
+      <div className="text-7xl">🍽️</div>
+      <h1 className="text-4xl font-extrabold">This plate is empty</h1>
+      <p className="text-mute">We couldn't find that page.</p>
+      <Button as={Link} to="/" className="mt-2">
+        Back to live deals
+      </Button>
+    </div>
+  );
+}
 
 export default function AppRoutes() {
   return (

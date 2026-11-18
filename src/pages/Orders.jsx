@@ -11,8 +11,10 @@ import {
   when,
 } from "../components";
 import { Button, Chip, useToast } from "../ui";
+import usePageMeta from '../hooks/usePageMeta';
 
 export default function Orders() {
+  usePageMeta('My orders');
   const { user } = useAuth();
   const nav = useNavigate();
   const toast = useToast();

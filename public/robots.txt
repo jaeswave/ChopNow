@@ -1,0 +1,12 @@
+# GbaanJo website. Public pages are listed in the sitemap.
+User-agent: *
+Allow: /
+Disallow: /seller
+Disallow: /orders
+Disallow: /admin
+Disallow: /pay/
+Disallow: /verify-email
+Disallow: /reset-password
+Disallow: /forgot-password
+
+Sitemap: https://www.gbaanjo.com/sitemap.xml

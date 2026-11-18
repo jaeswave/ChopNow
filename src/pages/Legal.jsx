@@ -1,7 +1,10 @@
+import usePageMeta from '../hooks/usePageMeta';
+
 const H = ({ children }) => <h2 className="mt-8 text-2xl font-extrabold">{children}</h2>;
 const P = ({ children }) => <p className="mt-2 text-mute">{children}</p>;
 
 export default function Legal() {
+  usePageMeta('Terms, refunds and privacy', 'How buying, refunds, selling and your information work on GbaanJo.');
   return (
     <div className="mx-auto max-w-3xl">
       <p className="rounded-xl bg-pepper/10 p-4 text-sm font-semibold text-pepper">DRAFT. Have a Nigerian lawyer review and edit this page before you launch.</p>

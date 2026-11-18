@@ -4,6 +4,7 @@ import { api } from '../api';
 import { useAuth } from '../auth';
 import { StatusBadge, dateLagos, dateTimeLagos, naira } from '../components';
 import { Button, Chip, Input, cx, useToast } from '../ui';
+import usePageMeta from '../hooks/usePageMeta';
 
 const box = 'rounded-2xl bg-white p-5 ring-[1.5px] ring-line';
 const Stat = ({ label, value, tone = '' }) => (
@@ -242,6 +243,7 @@ function Feedback() {
 }
 
 export default function Admin() {
+  usePageMeta('Admin');
   const { user } = useAuth();
   const nav = useNavigate();
   const [tab, setTab] = useState('applications');

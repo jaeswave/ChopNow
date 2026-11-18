@@ -4,6 +4,7 @@ import Steps from '../components/Steps';
 import { sellerFaq } from './sellerFaq';
 import { useMeta, useRules } from '../hooks/useMeta';
 import { Button, Chip } from '../ui';
+import usePageMeta from '../hooks/usePageMeta';
 
 // Every number here comes from the server's rules (GET /listings/meta), with fallbacks in config/market.js.
 function buyerContent(r, money) {
@@ -54,6 +55,7 @@ export default function HowItWorks() {
   const { money, categories } = useMeta();
   const r = useRules();
   const c = path === 'buyers' ? buyerContent(r, money) : sellerContent(r, money, categories);
+  usePageMeta('How it works', `How to buy food deals at least ${r.minDiscount}% off in Lagos and collect with a 6-digit code, or sell your surplus food as a registered business.`);
 
   return (
     <div className="mx-auto max-w-3xl">

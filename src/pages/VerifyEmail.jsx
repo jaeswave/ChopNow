@@ -3,8 +3,10 @@ import { Link, useSearchParams } from "react-router-dom";
 import { api } from "../api";
 import { useAuth } from "../auth";
 import { Button, useToast } from "../ui";
+import usePageMeta from '../hooks/usePageMeta';
 
 export default function VerifyEmail() {
+  usePageMeta('Verify your email');
   const [sp] = useSearchParams();
   const token = sp.get("token");
   const { user, refresh } = useAuth();

@@ -14,6 +14,7 @@ import {
 import { Button, Spinner, cx, tapText, useToast } from "../ui";
 import { useMeta } from "../hooks/useMeta";
 import { getPaymentProvider } from "../payments";
+import usePageMeta from '../hooks/usePageMeta';
 
 export default function Listing() {
   const { id } = useParams();
@@ -21,6 +22,7 @@ export default function Listing() {
   const nav = useNavigate();
   const toast = useToast();
   const [l, setL] = useState(null);
+  usePageMeta(l?.title || 'Deal', l ? `${l.title} from ${l.seller?.businessName || 'a Lagos business'}, ${l.area}. Reserve and collect with a 6-digit code.` : undefined);
   const [qty, setQty] = useState(1);
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);

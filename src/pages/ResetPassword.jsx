@@ -2,8 +2,10 @@ import { useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { api } from '../api';
 import { Button, Field, Input, Spinner, cx, tapText } from '../ui';
+import usePageMeta from '../hooks/usePageMeta';
 
 export default function ResetPassword() {
+  usePageMeta('Choose a new password');
   const [sp] = useSearchParams();
   const token = sp.get('token');
   const [password, setPassword] = useState('');

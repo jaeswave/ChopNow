@@ -13,6 +13,7 @@ import { clearDraft, loadDraft, restoreForm, saveDraft } from './seller/draft';
 import { setupBlockFromError } from './seller/errors';
 import { fromLagosInput, lagosInputInHours, toLagosInput } from '../components/time';
 import ApplicationTimeline from './seller/ApplicationTimeline';
+import usePageMeta from '../hooks/usePageMeta';
 
 // The sale and pickup inputs are in Lagos time, whatever the phone's time zone (see components/time.js)
 const blankForm = () => ({ title: '', description: '', imageUrl: '', category: '', city: '', area: '', address: '', originalPrice: '', price: '', quantity: '', saleEndsAt: lagosInputInHours(3), pickupBy: lagosInputInHours(5) });
@@ -103,6 +104,7 @@ function Redeem({ reload }) {
 }
 
 export default function Seller() {
+  usePageMeta('My shop');
   const { user, refresh } = useAuth();
   const nav = useNavigate();
   const toast = useToast();

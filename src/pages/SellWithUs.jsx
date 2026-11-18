@@ -6,6 +6,7 @@ import { monthlyRecovered } from '../components/fees';
 import { useMeta, useRules } from '../hooks/useMeta';
 import { Button, Field, Input } from '../ui';
 import { sellerFaq } from './sellerFaq';
+import usePageMeta from '../hooks/usePageMeta';
 
 const APPLY = '/auth?mode=register&role=SELLER';
 const box = 'rounded-2xl bg-white p-5 ring-[1.5px] ring-line sm:p-8';
@@ -43,6 +44,7 @@ function Calculator({ r, money }) {
 export default function SellWithUs() {
   const { money, categories } = useMeta();
   const r = useRules();
+  usePageMeta('Sell your surplus food', `Lagos bakeries, restaurants, supermarkets, hotels and food vendors: sell unsold food at least ${r.minDiscount}% off. Free to list, ${r.feePercent}% fee only when you sell.`);
 
   return (
     <div className="mx-auto grid max-w-3xl gap-8">

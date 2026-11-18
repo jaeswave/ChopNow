@@ -5,6 +5,7 @@ import { useAuth } from '../auth';
 import { Button, Field, Input, Select, Spinner, cx, tapText } from '../ui';
 import { useMeta } from '../hooks/useMeta';
 import { getSavedCity } from '../hooks/useCity';
+import usePageMeta from '../hooks/usePageMeta';
 
 const ROLES = [['BUYER', '🛍️', 'I want to buy', 'Grab deals near me'], ['SELLER', '🍳', 'I want to sell', 'List my surplus food']];
 
@@ -14,6 +15,7 @@ export default function AuthPage() {
   // Links can open sign-up directly, e.g. /auth?mode=register&role=SELLER from 'Apply as a seller'
   const [params] = useSearchParams();
   const [mode, setMode] = useState(params.get('mode') === 'register' ? 'register' : 'login');
+  usePageMeta(mode === 'login' ? 'Log in' : 'Create your account', 'Log in or create a free GbaanJo account to buy food deals in Lagos or sell your surplus food.');
   const { cities } = useMeta();
   const live = cities?.[0] || 'Lagos';
   // Pre-filled from the city question they answered on their first visit. They can still change it here.
