@@ -19,7 +19,7 @@ function buyerContent(r, money) {
     notes: [
       ['Cannot collect yourself?', 'Send your code to someone you trust. Whoever shows the code collects the food, so only share it with people you trust.'],
       ['While you pay', `The food is held for ${r.holdMinutes} minutes. If payment is not finished in that time, it goes back on sale for someone else.`],
-      ['Refunds', `Cancel from My orders while the sale is still open and you get a full refund. If the seller cancels or we remove a listing, you are refunded in full. If you do not collect before the pickup deadline, the order counts as a no-show and is not refunded. Refunds go back to your original payment method within 1 to 3 working days.`],
+      ['Refunds', `Cancel from My orders while the sale is still open and you get a full refund. If the seller cancels or we remove a listing, you are refunded in full. If you do not collect before the pickup deadline, the order counts as a no-show and is not refunded. Refunds go back to your original payment method.`],
     ],
     faq: [
       ['What does it cost?', `You pay the deal price shown on the listing${r.buyerFee > 0 ? `, plus a ${money(r.buyerFee)} service fee per order` : ''}. You see the total before you pay.`],

@@ -109,6 +109,7 @@ src/
 - **Accessibility:** labels on inputs (use `Field`), visible focus (the kit uses `focus-visible:outline-palm`), good contrast, aria attributes on custom controls.
 
 ## Known gaps (found while writing this file; not fixed yet)
+- Refund and payout timing are not decided yet. **Do not add any refund or payout timing wording** until the owner sets the payout schedule. Older text still says refunds take "1 to 3 working days" in `pages/Legal.jsx` (section 3) and `pages/Orders.jsx` ("Refund in progress"); leave it until the owner decides.
 - Stripe and Flutterwave backup providers (`src/payments/stripe.js`, `flutterwave.js`) are still in the code. Leave them alone for now (payments come last).
 - 15 `react-hooks/exhaustive-deps` lint warnings (Admin, Orders, Seller, Payouts, AuthPage, VerifyEmail, useListings).
 
