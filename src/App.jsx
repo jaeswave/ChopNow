@@ -6,6 +6,7 @@ import { api } from "./api";
 import AppRoutes from "./app/AppRoutes";
 import CityConfirm from "./components/CityConfirm";
 import InstallCard from "./components/Install";
+import TabBar from "./components/TabBar";
 import { yearLagos } from "./components/time";
 
 // Optional ribbon for test versions: set VITE_BETA_NOTICE in Vercel to show it, leave it empty to hide it
@@ -77,10 +78,8 @@ const MAIN_LINKS = [
   ["/how-it-works", "How it works"],
   ["/sell-with-us", "Sell with us"],
 ];
-// Where "My account" goes for each kind of user. Logged out: "Log in".
-const ACCOUNT_HOME = { SELLER: "/seller", BUYER: "/orders", ADMIN: "/admin" };
-const accountLink = (user) =>
-  user ? [ACCOUNT_HOME[user.role] || "/", "My account"] : ["/auth", "Log in"];
+// "My account" opens the Account page. Logged out: "Log in".
+const accountLink = (user) => (user ? ["/account", "My account"] : ["/auth", "Log in"]);
 
 function Navbar() {
   const { user, logout } = useAuth();
@@ -299,6 +298,7 @@ export default function App() {
       <FeedbackPill />
       <CityConfirm />
       <InstallCard />
+      <TabBar />
     </>
   );
 }

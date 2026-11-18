@@ -25,6 +25,11 @@
 
 /* Height of the phone tab bar (set where the bar is shown); other fixed things sit above it */
 :root { --tabbar-h: 0px; }
+@media (width < 48rem) {
+  :root { --tabbar-h: 4rem; }
+  /* Room for the tab bar, so it never covers the end of a page */
+  body { padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom)); }
+}
 
 html { scroll-behavior: smooth; }
 body { background: var(--color-paper); color: var(--color-ink); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
