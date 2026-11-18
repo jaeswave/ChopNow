@@ -10,6 +10,18 @@ import { yearLagos } from "./components/time";
 // Optional ribbon for test versions: set VITE_BETA_NOTICE in Vercel to show it, leave it empty to hide it
 const BETA = import.meta.env.VITE_BETA_NOTICE;
 
+// Old links like /#how and /#sell (from before these became their own pages) still work
+const LEGACY_HASHES = { "#how": "/how-it-works", "#faq": "/how-it-works", "#sell": "/sell-with-us" };
+function LegacyHashRedirect() {
+  const { pathname, hash } = useLocation();
+  const nav = useNavigate();
+  const to = pathname === "/" && LEGACY_HASHES[hash];
+  useEffect(() => {
+    if (to) nav(to, { replace: true });
+  }, [to, nav]);
+  return null;
+}
+
 function ScrollToHash() {
   const { hash, pathname } = useLocation();
   useEffect(() => {
@@ -76,9 +88,8 @@ function Navbar() {
   }, [pathname]);
 
   const links = [
-    ["/#how", "How it works"],
-    ["/#sell", "Sell with us"],
-    ["/#faq", "FAQ"],
+    ["/how-it-works", "How it works"],
+    ["/sell-with-us", "Sell with us"],
     ...(user?.role === "SELLER" ? [["/seller", "My shop"]] : []),
     ...(user?.role === "BUYER" ? [["/orders", "My orders"]] : []),
     ...(user?.role === "ADMIN" ? [["/admin", "Admin"]] : []),
@@ -170,14 +181,11 @@ function Footer() {
         </div>
         <div className={col}>
           <b className="text-white">Buyers</b>
-          <Link className={a} to="/#how">
+          <Link className={a} to="/how-it-works">
             How it works
           </Link>
           <Link className={a} to="/deals">
             Live deals
-          </Link>
-          <Link className={a} to="/#faq">
-            FAQ
           </Link>
           <Link className={a} to="/terms">
             Terms and refunds
@@ -188,7 +196,7 @@ function Footer() {
         </div>
         <div className={col}>
           <b className="text-white">Sellers</b>
-          <Link className={a} to="/#sell">
+          <Link className={a} to="/sell-with-us">
             Why sell here
           </Link>
           <Link className={a} to="/auth">
@@ -272,6 +280,7 @@ export default function App() {
     );
   return (
     <>
+      <LegacyHashRedirect />
       <ScrollToHash />
       {BETA && (
         <div className="bg-ink px-4 py-1.5 text-center text-xs font-semibold text-white">
