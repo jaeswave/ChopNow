@@ -4,6 +4,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { MetaProvider } from '../hooks/useMeta';
 import { DEFAULT_NUMBERS, TEST_META } from '../test/testMeta';
 import Home from './Home';
+import { HERO_ALT } from '../sections/Hero';
 
 const server = vi.hoisted(() => ({ stats: null, listings: [] }));
 vi.mock('../api', () => ({
@@ -54,10 +55,53 @@ describe('Landing page stats strip', () => {
   });
 });
 
+describe('Landing page hero', () => {
+  const hero = () => screen.getByRole('heading', { level: 1 }).closest('section');
+
+  it('has the big headline', () => {
+    renderHome({ stats: null });
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Surprise your taste buds. Pay less.');
+  });
+
+  it('shows the discount from the server rules (37%), never a typed-in 30', async () => {
+    renderHome({ stats: null });
+    expect(await within(hero()).findByText(/at least 37% off/, { selector: 'strong' })).toBeInTheDocument();
+    expect(hero()).toHaveTextContent('Great food from Lagos kitchens, at least 37% off, ready to collect near you.');
+    expect(within(hero()).getByText('37%+ off')).toBeInTheDocument(); // the sticker on the picture
+    expect(hero().textContent).not.toMatch(/30%/);
+  });
+
+  it('never says "food waste"', () => {
+    renderHome({ stats: null });
+    expect(hero().textContent).not.toMatch(/food waste/i);
+  });
+
+  it('has the main picture: alt text, a fixed size and not lazy-loaded', () => {
+    renderHome({ stats: null });
+    const img = within(hero()).getByRole('img', { name: HERO_ALT });
+    expect(HERO_ALT.length).toBeGreaterThan(20);
+    expect(img).toHaveAttribute('width', '800');
+    expect(img).toHaveAttribute('height', '600');
+    expect(img).toHaveAttribute('loading', 'eager');
+    expect(img).toHaveAttribute('fetchpriority', 'high');
+    expect(img.getAttribute('srcset')).toMatch(/480w.*800w/);
+    // a modern format first, with a fallback
+    const source = img.closest('picture').querySelector('source');
+    expect(source).toHaveAttribute('type', 'image/avif');
+    expect(img.getAttribute('src')).toMatch(/\.webp$/);
+  });
+
+  it('keeps the category chips and the Live deals button', () => {
+    renderHome({ stats: null });
+    expect(within(hero()).getByRole('link', { name: 'See live deals' })).toHaveAttribute('href', '/deals');
+    expect(within(hero()).getByRole('navigation', { name: 'Categories' })).toBeInTheDocument();
+  });
+});
+
 describe('Landing page', () => {
   it('reads its numbers and categories from the server', async () => {
     renderHome({ stats: { liveListings: 1, mealsRescued: 0, businesses: 0 } });
-    expect(await screen.findByRole('heading', { level: 1, name: /at least 37% off/ })).toBeInTheDocument();
+    expect(await screen.findByText(/at least 37% off/, { selector: 'strong' })).toBeInTheDocument();
     expect(screen.getByText('Browse 3 categories')).toBeInTheDocument();
     const cats = within(screen.getByRole('navigation', { name: 'Categories' })).getAllByRole('link');
     expect(cats.map((a) => a.getAttribute('href'))).toEqual(['/deals?category=Bakery', '/deals?category=Groceries', '/deals?category=Zobo%20and%20drinks']);
