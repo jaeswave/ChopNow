@@ -66,7 +66,7 @@ src/
                       useResendVerification, draft.js (new-listing draft in sessionStorage), errors.js
   payments/           hosted.js (startHostedCheckout, verifyPayment), opay.js, with stripe.js and flutterwave.js kept as fallbacks
   sections/           Landing page, top to bottom: Hero, StatsStrip (GET /public/stats), EndingSoon, HomeInfo
-                      (MiniExplainer, TrustStrip, BusinessTeaser). Keep the landing page about two phone screens long.
+                      (MiniExplainer, TrustStrip, BusinessTeaser). Keep the landing page about two phone screens long. Hero: "Surprise your taste buds. Pay less." with the jollof picture (src/assets/hero, AVIF + WebP, made by `npm run hero` from scripts/source/hero-jollof.webp); picture on the right from md up, below the chips on phones.
 public/                manifest.webmanifest, sw.js (service worker), offline.html, icons/ (made by `npm run icons` from scripts/make-icons.mjs)
 ```
 
@@ -111,12 +111,13 @@ public/                manifest.webmanifest, sw.js (service worker), offline.htm
 - **Plain, friendly English.** No jargon. Money in whole naira (use `money` / `naira`). **Show times in Africa/Lagos.** Always use `components/time.js`. Never call `toLocale*String`, `getHours` and friends, or `new Date(inputValue)` on a datetime-local value directly.
 - **Lagos only for now.** Never invent statistics, testimonials or claims. If data is missing, hide the element or show an honest empty state.
 - **No numbers in copy.** Discounts, fees, hold times, limits and the category count come from `useRules()` / `useMeta()` (server rules, with fallbacks in `config/market.js`). The tests render pages with unusual rules (`src/test/testMeta.js`) and fail if a default number appears.
+- **Hero wording:** never use the words "food waste" in the hero. The discount comes from `useRules().minDiscount`.
 - **Every page sets its title** with `usePageMeta(title, description)`. Public pages are listed in `public/sitemap.xml` (site address `https://www.gbaanjo.com`); private ones are disallowed in `public/robots.txt`.
 - **Accessibility:** labels on inputs (use `Field`), visible focus (the kit uses `focus-visible:outline-palm`), good contrast, aria attributes on custom controls.
 
 ## Known gaps (found while writing this file; not fixed yet)
 - Not yet tested on real phones: the Android install prompt, the installed app opening full screen, the iPhone home-screen icon, and offline mode were checked only in desktop Chrome/Edge imitating phones.
-- Google Fonts (loaded from fonts.googleapis.com) block the first paint on slow connections. Self-hosting the two fonts would help performance.
+- Google Fonts (loaded from fonts.googleapis.com) block the first paint on slow connections. Self-hosting the two fonts would help performance. When Google Fonts is unreachable, the page waits on that stylesheet before it finishes loading.
 - Refund and payout timing are not decided yet. **Do not add any refund or payout timing wording** until the owner sets the payout schedule. Older text still says refunds take "1 to 3 working days" in `pages/Legal.jsx` (section 3) and `pages/Orders.jsx` ("Refund in progress"); leave it until the owner decides.
 - Stripe and Flutterwave backup providers (`src/payments/stripe.js`, `flutterwave.js`) are still in the code. Leave them alone for now (payments come last).
 - 15 `react-hooks/exhaustive-deps` lint warnings (Admin, Orders, Seller, Payouts, AuthPage, VerifyEmail, useListings).
