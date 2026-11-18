@@ -2,7 +2,10 @@
 
 const KEY = 'gj_city';
 export const getSavedCity = () => { try { return localStorage.getItem(KEY); } catch { return null; } };
-export const saveCity = (c) => { try { localStorage.setItem(KEY, c); } catch { /* private mode: we will just ask again next time */ } };
+export const saveCity = (c) => {
+  try { localStorage.setItem(KEY, c); } catch { /* private mode: we will just ask again next time */ }
+  window.dispatchEvent(new Event('gj:city-saved')); // e.g. the install card waits for this
+};
 
 // Lagos State, roughly (a box around it). Used only with the phone's GPS.
 const LAGOS = { minLat: 6.37, maxLat: 6.7, minLng: 2.7, maxLng: 4.35 };

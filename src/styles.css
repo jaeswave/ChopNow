@@ -23,6 +23,9 @@
   @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
 }
 
+/* Height of the phone tab bar (set where the bar is shown); other fixed things sit above it */
+:root { --tabbar-h: 0px; }
+
 html { scroll-behavior: smooth; }
 body { background: var(--color-paper); color: var(--color-ink); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
 h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.02em; }
