@@ -36,7 +36,7 @@ export function Art({ c, size = 'md', className = '', src, eager = false }) {
 const TAG = {
   palm: 'bg-palm text-[#2a1d00] before:ring-[#2a1d00]',
   hot: 'bg-pepper text-white before:ring-white',
-  over: 'bg-line text-mute before:ring-mute',
+  over: 'bg-line text-ink before:ring-ink', // dark text: grey on grey was below 4.5:1 contrast
 };
 export function Tag({ tone = 'palm', children, className = '' }) {
   return (
