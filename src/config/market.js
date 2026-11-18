@@ -19,17 +19,6 @@ export const rules = {
   MAX_NO_SHOWS: 3,
 };
 
-// Hero pills and similar
-export const foods = [
-  "Rice bowls",
-  "Fresh bread",
-  "Pastries",
-  "Fresh produce",
-  "Fresh fish",
-  "Dairy drinks",
-  "Snacks & small chops",
-];
-
 // Fallback list. The server's list wins when it answers. These names must match the backend (src/common.ts CATEGORIES).
 export const categories = [
   "Cooked meals",
@@ -42,15 +31,6 @@ export const categories = [
   "Groceries",
 ];
 
-export const facts = [
-  ["30%+", "off on every deal"],
-  ["Secure", "card, transfer and mobile-money payments"],
-  ["8", "categories"],
-  ["Lagos", "live now, more cities soon"],
-];
-
-export const faq = []; // filled in step F10 (FAQ)
-
 // One picture per category. Put your own images in public/images/categories/ using the file names listed in the step notes.
 const slug = (c) =>
   c
@@ -61,5 +41,3 @@ const slug = (c) =>
 export const categoryImage = Object.fromEntries(
   categories.map((c) => [c, `/images/categories/${slug(c)}.webp`]),
 );
-// Used by the "How much could you save?" estimate on the landing page
-export const savings = { avgPurchase: 3500, avgDiscount: 0.45 };
