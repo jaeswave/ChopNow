@@ -48,21 +48,27 @@ src/
     money.js          money(n): Intl format with whole naira (maximumFractionDigits 0)
     time.js           Lagos time for everything: when, dateLagos, dateTimeLagos, yearLagos, and toLagosInput /
                       fromLagosInput / lagosInputInHours for <input type="datetime-local"> (read as UTC+1)
-    ProductImage/, Section/, CityConfirm.jsx, SellerInsights.jsx
-  config/market.js    Things that change per market (currency, locale, categories, fallbacks). The server's /listings/meta wins.
+    fees.js           platformFee() (same formula as the server's feeFor) and monthlyRecovered() for the seller estimate
+    cloudinary.js     cloudinaryUrl(url, width): f_auto,q_auto,w_<width> for Cloudinary photos (Art uses it)
+    Steps.jsx, Faq.jsx  numbered steps and tap-to-open questions, used by the info pages
+    ProductImage/, Section/ (no longer used by any page), CityConfirm.jsx, SellerInsights.jsx
+  config/market.js    Things that change per market (currency, locale, categories, fallback business `rules`). The server's /listings/meta wins.
   config/seed.js      Demo image paths
-  hooks/              useMeta (server meta with retries), useListings (listings with retries and a "waking" state), useCity
-  pages/              Home, Deals, Listing, AuthPage, Seller, Orders, Payouts, Admin, PayCallback, Legal, Feedback,
+  hooks/              useMeta (server meta with retries) and useRules() (rule numbers ready to show: minDiscount %, feePercent,
+                      minFee, buyerFee, holdMinutes, ...), useListings, useCity, usePageMeta(title, description)
+  pages/              Home, HowItWorks, SellWithUs (+ sellerFaq.js), Deals, Listing, AuthPage, Seller, Orders, Payouts, Admin, PayCallback, Legal, Feedback,
                       VerifyEmail, ForgotPassword, ResetPassword
   pages/seller/       Pieces of the Seller page: SetupChecklist, SetupBlocker, ApplicationTimeline,
                       useResendVerification, draft.js (new-listing draft in sessionStorage), errors.js
   payments/           hosted.js (startHostedCheckout, verifyPayment), opay.js, with stripe.js and flutterwave.js kept as fallbacks
-  sections/           Landing-page sections (Hero, LiveDealsTeaser, Mission, Why), each with a *.data.js file
+  sections/           Landing page, top to bottom: Hero, StatsStrip (GET /public/stats), EndingSoon, HomeInfo
+                      (MiniExplainer, TrustStrip, BusinessTeaser). Keep the landing page about two phone screens long.
 ```
 
 ### Main flows
 - **Buy:** Listing → `startHostedCheckout` → `POST /orders` → redirect to `authorizationUrl` → `/pay/callback` → `GET /orders/verify/:ref`. The browser never sends an amount.
 - **Seller setup:** `/seller?tab=orders|listings|new|insights|payouts` (no `tab` means orders, and Back works). The approval email links to `?tab=payouts`. Until the email is verified, a payout account exists and a first listing is published, a "Finish setting up" card shows. "+ New listing" shows a blocker card instead of the form while the email or payout account is missing. The form draft is kept in sessionStorage (`gj_listing_draft_<userId>`) and cleared after publishing.
+- **Info pages:** `/how-it-works` (buyer and seller paths, `?for=sellers`) and `/sell-with-us` (with an earnings estimate). Old links `/#how`, `/#faq` and `/#sell` redirect there (`LegacyHashRedirect` in App.jsx). "Apply as a seller" links to `/auth?mode=register&role=SELLER`.
 - **Pickup:** the buyer sees `pickupCode` in Orders and can share it on WhatsApp. The seller types it in Seller → `POST /orders/lookup` → `POST /orders/:id/complete`.
 - **Order statuses:** PENDING_PAYMENT, RESERVED, PICKED_UP, EXPIRED, CANCELLED. **Listing statuses:** ACTIVE, SOLD_OUT, EXPIRED.
 - Countdowns are for display only. The server decides what has expired.
@@ -98,11 +104,11 @@ src/
   - `Input`, `Select` and `Textarea` default to 16px text. Label every input with `Field` or `aria-label`. Never hide a file input with `hidden`; use `sr-only` so the keyboard can reach it.
 - **Plain, friendly English.** No jargon. Money in whole naira (use `money` / `naira`). **Show times in Africa/Lagos.** Always use `components/time.js`. Never call `toLocale*String`, `getHours` and friends, or `new Date(inputValue)` on a datetime-local value directly.
 - **Lagos only for now.** Never invent statistics, testimonials or claims. If data is missing, hide the element or show an honest empty state.
+- **No numbers in copy.** Discounts, fees, hold times, limits and the category count come from `useRules()` / `useMeta()` (server rules, with fallbacks in `config/market.js`). The tests render pages with unusual rules (`src/test/testMeta.js`) and fail if a default number appears.
+- **Every page sets its title** with `usePageMeta(title, description)`. Public pages are listed in `public/sitemap.xml` (site address `https://www.gbaanjo.com`); private ones are disallowed in `public/robots.txt`.
 - **Accessibility:** labels on inputs (use `Field`), visible focus (the kit uses `focus-visible:outline-palm`), good contrast, aria attributes on custom controls.
 
 ## Known gaps (found while writing this file; not fixed yet)
-- At 320px wide (smaller than our 360px target) the home page scrolls sideways a little, and the date-and-time inputs clip the end of the time. Landing page task.
-- Home page claims are written into the code: `config/market.js` `facts` ("Secure: card, transfer and mobile-money payments", "8 categories", "30%+ off on every deal"). They are not checked against the server. **Do not change them yet.** They will be rewritten in the landing page task.
 - Stripe and Flutterwave backup providers (`src/payments/stripe.js`, `flutterwave.js`) are still in the code. Leave them alone for now (payments come last).
 - 15 `react-hooks/exhaustive-deps` lint warnings (Admin, Orders, Seller, Payouts, AuthPage, VerifyEmail, useListings).
 
