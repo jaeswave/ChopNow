@@ -1,0 +1,18 @@
+{
+  "id": "/",
+  "name": "GbaanJo",
+  "short_name": "GbaanJo",
+  "description": "Good food from Lagos kitchens, bakeries and shops at last-call prices. Pay online and collect with a 6-digit code.",
+  "lang": "en-NG",
+  "start_url": "/?source=app",
+  "scope": "/",
+  "display": "standalone",
+  "theme_color": "#0E3B2C",
+  "background_color": "#0E3B2C",
+  "categories": ["food", "shopping"],
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

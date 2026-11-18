@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#0E3B2C"/>
+  <circle cx="256" cy="256" r="215.04" fill="#1C5A44"/>
+  <text x="256" y="256" dy="0.35em" text-anchor="middle" font-family="Arial Black, Arial, Helvetica, sans-serif" font-weight="900" font-size="174.08" letter-spacing="-5.12">
+    <tspan fill="#FFFFFF">G</tspan><tspan fill="#F4B52E">J</tspan>
+  </text>
+</svg>
