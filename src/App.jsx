@@ -43,7 +43,7 @@ function Brand({ className = "" }) {
     <Link
       to="/"
       className={cx(
-        "font-display text-2xl font-extrabold text-white",
+        "font-display text-xl font-extrabold text-white min-[380px]:text-2xl",
         tapText,
         className,
       )}
@@ -57,7 +57,7 @@ const LiveLink = ({ compact = false }) => (
   <Link
     to="/deals"
     className={cx(
-      "inline-flex items-center gap-2 rounded-full bg-white/10 font-bold text-white ring-1 ring-white/25 transition hover:bg-white/20",
+      "inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-full bg-white/10 font-bold text-white ring-1 ring-white/25 transition hover:bg-white/20",
       tap,
       compact ? "px-3 py-1.5 text-sm" : "px-4 py-2",
     )}
