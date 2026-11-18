@@ -12,6 +12,7 @@ import useResendVerification from './seller/useResendVerification';
 import { clearDraft, loadDraft, restoreForm, saveDraft } from './seller/draft';
 import { setupBlockFromError } from './seller/errors';
 import { fromLagosInput, lagosInputInHours, toLagosInput } from '../components/time';
+import { cloudinaryUrl } from '../components/cloudinary';
 import ApplicationTimeline from './seller/ApplicationTimeline';
 import usePageMeta from '../hooks/usePageMeta';
 
@@ -436,8 +437,9 @@ export default function Seller() {
             <div className="flex flex-wrap items-center gap-4">
               {f.imageUrl ? (
                 <img
-                  src={f.imageUrl}
+                  src={cloudinaryUrl(f.imageUrl, 240)}
                   alt=""
+                  decoding="async"
                   className="size-28 rounded-xl object-cover"
                 />
               ) : (

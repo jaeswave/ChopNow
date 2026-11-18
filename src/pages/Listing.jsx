@@ -87,7 +87,7 @@ export default function Listing() {
       <div className="mt-4 grid items-start gap-8 lg:grid-cols-[1.25fr_.75fr]">
         <article className="grid gap-5">
           <div className="relative">
-            <Art c={l.category} src={l.imageUrl} size="xl" />
+            <Art c={l.category} src={l.imageUrl} size="xl" eager />
             <div className="absolute left-4 top-4">
               <Countdown to={l.saleEndsAt} />
             </div>
