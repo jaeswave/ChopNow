@@ -7,6 +7,7 @@ import {
   feePercent as fallbackFee,
   locale as fallbackLocale,
   paymentProvider as fallbackProvider,
+  rules as fallbackRules,
 } from "../config/market";
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -49,7 +50,8 @@ export function MetaProvider({ children }) {
         : fallbackCategories,
       cities: server?.cities || [],
       comingSoon: server?.comingSoon || [],
-      rules: server?.rules || {},
+      rules: server?.rules || {}, // the server's rules only (checkout relies on this staying empty until they load)
+      ruleValues: { ...fallbackRules, ...server?.rules }, // with fallbacks, for copy and calculators
       feePercent: server?.rules?.PLATFORM_FEE_PERCENT ?? fallbackFee,
       paymentProvider: server?.paymentProvider || fallbackProvider,
       currency,
@@ -62,3 +64,22 @@ export function MetaProvider({ children }) {
 }
 
 export const useMeta = () => useContext(Ctx);
+
+// The business rules as ready-to-show numbers. Pages use these instead of writing numbers into their copy.
+// minDiscount is a whole percent (the server sends MIN_DISCOUNT as a fraction, e.g. 0.3).
+export function rulesView(r) {
+  const pct = (v) => Math.round(v <= 1 ? v * 100 : v);
+  return {
+    minDiscount: pct(r.MIN_DISCOUNT),
+    feePercent: r.PLATFORM_FEE_PERCENT,
+    minFee: r.MIN_FEE,
+    buyerFee: r.BUYER_SERVICE_FEE,
+    holdMinutes: r.HOLD_MINUTES,
+    maxPerOrder: r.MAX_PER_ORDER,
+    minSaleMinutes: r.MIN_SALE_MINUTES,
+    maxSaleHours: r.MAX_SALE_HOURS,
+    maxPickupHours: r.MAX_PICKUP_HOURS,
+    maxNoShows: r.MAX_NO_SHOWS,
+  };
+}
+export const useRules = () => rulesView(useMeta().ruleValues);

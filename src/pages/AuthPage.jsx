@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { api } from '../api';
 import { useAuth } from '../auth';
 import { Button, Field, Input, Select, Spinner, cx, tapText } from '../ui';
@@ -11,11 +11,13 @@ const ROLES = [['BUYER', '🛍️', 'I want to buy', 'Grab deals near me'], ['SE
 export default function AuthPage() {
   const { user, login } = useAuth();
   const nav = useNavigate();
-  const [mode, setMode] = useState('login');
+  // Links can open sign-up directly, e.g. /auth?mode=register&role=SELLER from 'Apply as a seller'
+  const [params] = useSearchParams();
+  const [mode, setMode] = useState(params.get('mode') === 'register' ? 'register' : 'login');
   const { cities } = useMeta();
   const live = cities?.[0] || 'Lagos';
   // Pre-filled from the city question they answered on their first visit. They can still change it here.
-  const [f, setF] = useState({ role: 'BUYER', name: '', email: '', phone: '', password: '', businessName: '', rcNumber: '', city: getSavedCity() === 'Lagos' ? 'Lagos' : '' });
+  const [f, setF] = useState({ role: params.get('role') === 'SELLER' ? 'SELLER' : 'BUYER', name: '', email: '', phone: '', password: '', businessName: '', rcNumber: '', city: getSavedCity() === 'Lagos' ? 'Lagos' : '' });
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);
   const [show, setShow] = useState(false);
