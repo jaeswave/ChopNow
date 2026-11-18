@@ -15,7 +15,8 @@ export default function EndingSoon() {
           <h2 id="soon-title" className="text-xl font-extrabold sm:text-3xl">Ending soon</h2>
           <Link to="/deals" className={cx(tapText, 'font-semibold text-leaf underline underline-offset-4')}>See all deals</Link>
         </div>
-        <ul className="-mx-5 mt-3 flex snap-x gap-4 overflow-x-auto px-5 pb-2 sm:-mx-8 sm:px-8">
+        {/* min-h: the same height as a real card, so nothing jumps when the deals arrive */}
+        <ul className="-mx-5 mt-3 flex min-h-[21.5rem] snap-x gap-4 overflow-x-auto px-5 pb-2 sm:-mx-8 sm:px-8">
           {(items || [0, 1]).map((l, i) => (
             <li key={l?.id ?? i} className="flex w-64 shrink-0 snap-start">
               {items ? <Card l={l} /> : <div className="w-full"><CardSkeleton /></div>}

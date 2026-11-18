@@ -31,8 +31,9 @@ const routes = [
 const Page = ({ children }) => (
   <Container className="min-h-[70vh] py-10">{children}</Container>
 );
+// Full screen height, so the footer stays out of sight until the page arrives (otherwise it jumps down)
 const Loading = () => (
-  <div className="grid min-h-[50vh] place-items-center">
+  <div className="grid min-h-screen place-items-center">
     <span className="inline-block size-8 animate-spin rounded-full border-4 border-line border-t-leaf" />
   </div>
 );
