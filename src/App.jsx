@@ -12,7 +12,7 @@ const BETA = import.meta.env.VITE_BETA_NOTICE;
 
 // Old links like /#how and /#sell (from before these became their own pages) still work
 const LEGACY_HASHES = { "#how": "/how-it-works", "#faq": "/how-it-works", "#sell": "/sell-with-us" };
-function LegacyHashRedirect() {
+export function LegacyHashRedirect() {
   const { pathname, hash } = useLocation();
   const nav = useNavigate();
   const to = pathname === "/" && LEGACY_HASHES[hash];
