@@ -35,12 +35,14 @@ This is the **WEBSITE** repo (React). The **server** is a separate repo looked a
 ## Code map
 ```
 src/
-  main.jsx            Providers: BrowserRouter > AuthProvider > ToastProvider > MetaProvider > App
-  App.jsx             Layout: beta ribbon, Navbar, VerifyBanner, routes, Footer, FeedbackPill, CityConfirm
+  main.jsx            setupPwa(), then providers: BrowserRouter > AuthProvider > ToastProvider > MetaProvider > App
+  App.jsx             Layout: beta ribbon, Navbar, VerifyBanner, routes, Footer (phones: landing page only), FeedbackPill, CityConfirm, InstallCard, TabBar
   app/AppRoutes.jsx   All routes. Home is eager and every other page is lazy(). To add a page, add one line to `routes`.
+  pwa.js              App head tags, viewport-fit=cover, install prompt (canPromptInstall, promptInstall, onInstallChange), isStandalone/isIOS/isPhone
+  registerSW.js       Registers public/sw.js in production builds only
   api.js              api(path, {method, body}): JSON fetch with the Bearer token from localStorage 'token',
                       a 90s timeout and friendly error messages. download(): authenticated file download.
-  auth.jsx            useAuth(): { user, ready, login, logout, refresh }. user.role is BUYER | SELLER | ADMIN.
+  auth.jsx            useAuth(): { user, ready, waking, login, logout, refresh }. user.role is BUYER | SELLER | ADMIN. Start-up check of /auth/me ends the login only on 401/403; other failures are retried (RETRY_DELAYS_MS) while `waking` is true.
   ui.jsx              Shared kit: cx, tap, tapText, Button, Input, Select, Textarea, Field (label wrapper), Chip, Container, Reveal, Toast/useToast
   components/
     index.jsx         naira, money, pctOff, when, mapsUrl, Art (photo or emoji fallback), Tag, Countdown (one shared clock),
@@ -51,24 +53,28 @@ src/
     fees.js           platformFee() (same formula as the server's feeFor) and monthlyRecovered() for the seller estimate
     cloudinary.js     cloudinaryUrl(url, width): f_auto,q_auto,w_<width> for Cloudinary photos (Art uses it)
     Steps.jsx, Faq.jsx  numbered steps and tap-to-open questions, used by the info pages
+    TabBar.jsx        Phone tab bar: tabsFor(user), hidden on /pay/* and /verify-email and while typing (useKeyboardOpen)
+    Install.jsx       InstallCard (phones, after the city question, at most every 14 days) and InstallRow (Account page)
     ProductImage/, Section/ (no longer used by any page), CityConfirm.jsx, SellerInsights.jsx
   config/market.js    Things that change per market (currency, locale, categories, fallback business `rules`). The server's /listings/meta wins.
   config/seed.js      Demo image paths
   hooks/              useMeta (server meta with retries) and useRules() (rule numbers ready to show: minDiscount %, feePercent,
                       minFee, buyerFee, holdMinutes, ...), useListings, useCity, usePageMeta(title, description)
-  pages/              Home, HowItWorks, SellWithUs (+ sellerFaq.js), Deals, Listing, AuthPage, Seller, Orders, Payouts, Admin, PayCallback, Legal, Feedback,
+  pages/              Home, HowItWorks, Account, SellWithUs (+ sellerFaq.js), Deals, Listing, AuthPage, Seller, Orders, Payouts, Admin, PayCallback, Legal, Feedback,
                       VerifyEmail, ForgotPassword, ResetPassword
   pages/seller/       Pieces of the Seller page: SetupChecklist, SetupBlocker, ApplicationTimeline,
                       useResendVerification, draft.js (new-listing draft in sessionStorage), errors.js
   payments/           hosted.js (startHostedCheckout, verifyPayment), opay.js, with stripe.js and flutterwave.js kept as fallbacks
   sections/           Landing page, top to bottom: Hero, StatsStrip (GET /public/stats), EndingSoon, HomeInfo
                       (MiniExplainer, TrustStrip, BusinessTeaser). Keep the landing page about two phone screens long.
+public/                manifest.webmanifest, sw.js (service worker), offline.html, icons/ (made by `npm run icons` from scripts/make-icons.mjs)
 ```
 
 ### Main flows
 - **Buy:** Listing → `startHostedCheckout` → `POST /orders` → redirect to `authorizationUrl` → `/pay/callback` → `GET /orders/verify/:ref`. The browser never sends an amount.
 - **Seller setup:** `/seller?tab=orders|listings|new|insights|payouts` (no `tab` means orders, and Back works). The approval email links to `?tab=payouts`. Until the email is verified, a payout account exists and a first listing is published, a "Finish setting up" card shows. "+ New listing" shows a blocker card instead of the form while the email or payout account is missing. The form draft is kept in sessionStorage (`gj_listing_draft_<userId>`) and cleared after publishing.
 - **Info pages:** `/how-it-works` (buyer and seller paths, `?for=sellers`) and `/sell-with-us` (with an earnings estimate). Old links `/#how`, `/#faq` and `/#sell` redirect there (`LegacyHashRedirect` in App.jsx). "Apply as a seller" links to `/auth?mode=register&role=SELLER`.
+- **Installable app:** `/manifest.webmanifest` (standalone, start_url `/?source=app`). `public/sw.js` keeps hashed `/assets`, icons, the manifest and Google Fonts, and shows `/offline.html` when a page cannot load. It must **never** handle the API, other origins (Cloudinary, OPay, Resend), `/api/*`, non-GET requests or requests with an Authorization header; `src/sw.test.js` checks this. Bump `VERSION` in sw.js when you change what it caches. On phones, fixed things sit above the tab bar with `bottom-[calc(var(--tabbar-h)+env(safe-area-inset-bottom)+...)]`.
 - **Pickup:** the buyer sees `pickupCode` in Orders and can share it on WhatsApp. The seller types it in Seller → `POST /orders/lookup` → `POST /orders/:id/complete`.
 - **Order statuses:** PENDING_PAYMENT, RESERVED, PICKED_UP, EXPIRED, CANCELLED. **Listing statuses:** ACTIVE, SOLD_OUT, EXPIRED.
 - Countdowns are for display only. The server decides what has expired.
@@ -109,6 +115,8 @@ src/
 - **Accessibility:** labels on inputs (use `Field`), visible focus (the kit uses `focus-visible:outline-palm`), good contrast, aria attributes on custom controls.
 
 ## Known gaps (found while writing this file; not fixed yet)
+- Not yet tested on real phones: the Android install prompt, the installed app opening full screen, the iPhone home-screen icon, and offline mode were checked only in desktop Chrome/Edge imitating phones.
+- Google Fonts (loaded from fonts.googleapis.com) block the first paint on slow connections. Self-hosting the two fonts would help performance.
 - Refund and payout timing are not decided yet. **Do not add any refund or payout timing wording** until the owner sets the payout schedule. Older text still says refunds take "1 to 3 working days" in `pages/Legal.jsx` (section 3) and `pages/Orders.jsx` ("Refund in progress"); leave it until the owner decides.
 - Stripe and Flutterwave backup providers (`src/payments/stripe.js`, `flutterwave.js`) are still in the code. Leave them alone for now (payments come last).
 - 15 `react-hooks/exhaustive-deps` lint warnings (Admin, Orders, Seller, Payouts, AuthPage, VerifyEmail, useListings).
