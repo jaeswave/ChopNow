@@ -21,6 +21,7 @@ const routes = [
   },
   { path: "/deals", Component: lazy(() => import("../pages/Deals")) },
   { path: "/how-it-works", Component: lazy(() => import("../pages/HowItWorks")) },
+  { path: "/sell-with-us", Component: lazy(() => import("../pages/SellWithUs")) },
   { path: "/feedback", Component: lazy(() => import("../pages/Feedback")) },
   { path: "/forgot-password", Component: lazy(() => import("../pages/ForgotPassword")) },
   { path: "/reset-password", Component: lazy(() => import("../pages/ResetPassword")) },
