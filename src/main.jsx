@@ -5,6 +5,9 @@ import { AuthProvider } from "./auth";
 import { ToastProvider } from "./ui";
 import "./styles.css";
 import { MetaProvider } from "./hooks/useMeta";
+import { registerServiceWorker } from "./registerSW";
+
+registerServiceWorker();
 
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
