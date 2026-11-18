@@ -22,7 +22,7 @@ export function Art({ c, size = 'md', className = '', src, eager = false }) {
   const [failed, setFailed] = useState(false);
   // Real photo when we have one. If it is missing or fails to load, fall back to the emoji tile instead of a broken image.
   // Cloudinary sends a smaller WebP/AVIF at a sensible width; small thumbnails need far fewer pixels
-  if (src && !failed) return <img src={cloudinaryUrl(src, size === 'sm' ? 160 : 600)} alt="" loading={eager ? 'eager' : 'lazy'} fetchPriority={eager ? 'high' : undefined} decoding="async" onError={() => setFailed(true)} className={cx('object-cover', size === 'sm' ? '' : 'w-full', ART_SIZE[size].replace(/text-\S+/g, ''), className)} />;
+  if (src && !failed) return <img src={cloudinaryUrl(src, size === 'sm' ? 160 : 600)} alt="" loading={eager ? 'eager' : 'lazy'} {...(eager ? { fetchpriority: 'high' } : {})} decoding="async" onError={() => setFailed(true)} className={cx('object-cover', size === 'sm' ? '' : 'w-full', ART_SIZE[size].replace(/text-\S+/g, ''), className)} />;
   return (
     <div className={cx('relative grid place-items-center overflow-hidden', ART_SIZE[size], className)} style={{ background: bg }}>
       <span className="absolute -right-8 -top-8 size-32 rounded-full bg-white/35" />
