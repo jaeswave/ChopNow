@@ -9,12 +9,19 @@ import jollof800Webp from '../assets/hero/jollof-800.webp';
 
 export const HERO_ALT = 'A takeaway pack of jollof rice with grilled chicken and fried plantain';
 
-// The main picture: loads first (not lazy), has a fixed size so nothing jumps, AVIF with a WebP fallback
+// Screens narrower than this get no picture, so the button stays near the top and no data is spent on it
+export const HERO_MIN_WIDTH = 360;
+// A 1 x 1 transparent GIF written into the page: on small screens the browser "loads" this instead of the photo
+const NO_IMAGE = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
+
+// The main picture: loads first (not lazy), has a fixed size so nothing jumps, AVIF with a WebP fallback.
+// Hidden below 360px wide (and not downloaded there).
 function HeroPicture({ minDiscount }) {
   const sizes = '(min-width: 768px) 45vw, 100vw';
   return (
-    <div className="relative mx-auto w-full max-w-md md:max-w-none">
+    <div className="relative mx-auto w-full max-w-md max-[360px]:hidden md:max-w-none">
       <picture>
+        <source media={`(max-width: ${HERO_MIN_WIDTH - 1}px)`} srcSet={NO_IMAGE} />
         <source type="image/avif" srcSet={`${jollof480Avif} 480w, ${jollof800Avif} 800w`} sizes={sizes} />
         <img
           src={jollof800Webp}

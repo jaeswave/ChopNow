@@ -4,7 +4,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { MetaProvider } from '../hooks/useMeta';
 import { DEFAULT_NUMBERS, TEST_META } from '../test/testMeta';
 import Home from './Home';
-import { HERO_ALT } from '../sections/Hero';
+import { HERO_ALT, HERO_MIN_WIDTH } from '../sections/Hero';
 
 const server = vi.hoisted(() => ({ stats: null, listings: [] }));
 vi.mock('../api', () => ({
@@ -86,9 +86,21 @@ describe('Landing page hero', () => {
     expect(img).toHaveAttribute('fetchpriority', 'high');
     expect(img.getAttribute('srcset')).toMatch(/480w.*800w/);
     // a modern format first, with a fallback
-    const source = img.closest('picture').querySelector('source');
-    expect(source).toHaveAttribute('type', 'image/avif');
+    const source = img.closest('picture').querySelector('source[type="image/avif"]');
+    expect(source.getAttribute('srcset')).toMatch(/480w.*800w/);
     expect(img.getAttribute('src')).toMatch(/\.webp$/);
+  });
+
+  it('hides the picture on screens narrower than 360px, without downloading it', () => {
+    renderHome({ stats: null });
+    const img = within(hero()).getByRole('img', { name: HERO_ALT });
+    const picture = img.closest('picture');
+    expect(HERO_MIN_WIDTH).toBe(360);
+    expect(picture.parentElement).toHaveClass('max-[360px]:hidden');
+    // the first source wins on small screens and points at a tiny built-in image, so the photo is never fetched
+    const first = picture.querySelector('source');
+    expect(first).toHaveAttribute('media', '(max-width: 359px)');
+    expect(first.getAttribute('srcset')).toMatch(/^data:image\/gif;base64,/);
   });
 
   it('keeps the category chips and the Live deals button', () => {

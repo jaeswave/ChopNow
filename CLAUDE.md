@@ -66,7 +66,7 @@ src/
                       useResendVerification, draft.js (new-listing draft in sessionStorage), errors.js
   payments/           hosted.js (startHostedCheckout, verifyPayment), opay.js, with stripe.js and flutterwave.js kept as fallbacks
   sections/           Landing page, top to bottom: Hero, StatsStrip (GET /public/stats), EndingSoon, HomeInfo
-                      (MiniExplainer, TrustStrip, BusinessTeaser). Keep the landing page about two phone screens long. Hero: "Surprise your taste buds. Pay less." with the jollof picture (src/assets/hero, AVIF + WebP, made by `npm run hero` from scripts/source/hero-jollof.webp); picture on the right from md up, below the chips on phones.
+                      (MiniExplainer, TrustStrip, BusinessTeaser). Keep the landing page about two phone screens long. Hero: "Surprise your taste buds. Pay less." with the jollof picture (src/assets/hero, AVIF + WebP, made by `npm run hero` from scripts/source/hero-jollof.webp); picture on the right from md up, below the chips on phones, and hidden (not even downloaded) below 360px wide.
 public/                manifest.webmanifest, sw.js (service worker), offline.html, icons/ (made by `npm run icons` from scripts/make-icons.mjs)
 ```
 
