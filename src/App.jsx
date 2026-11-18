@@ -284,11 +284,18 @@ function FeedbackPill() {
 }
 
 export default function App() {
-  const { ready } = useAuth();
+  const { ready, waking } = useAuth();
   if (!ready)
     return (
-      <div className="grid min-h-screen place-items-center bg-leaf font-display text-3xl font-extrabold text-white">
-        Gbaan<span className="text-palm">Jo</span>
+      <div className="grid min-h-screen place-content-center gap-4 bg-leaf p-6 text-center text-white">
+        <p className="font-display text-3xl font-extrabold">
+          Gbaan<span className="text-palm">Jo</span>
+        </p>
+        {waking && (
+          <p role="status" className="max-w-xs text-white/85">
+            Waking up the server. This can take up to a minute. You are still logged in.
+          </p>
+        )}
       </div>
     );
   return (
