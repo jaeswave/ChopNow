@@ -5,9 +5,9 @@ import { AuthProvider } from "./auth";
 import { ToastProvider } from "./ui";
 import "./styles.css";
 import { MetaProvider } from "./hooks/useMeta";
-import { registerServiceWorker } from "./registerSW";
+import { setupPwa } from "./pwa";
 
-registerServiceWorker();
+setupPwa(); // app tags, install prompt and (in production) the service worker
 
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
