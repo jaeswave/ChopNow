@@ -70,6 +70,17 @@ const LiveLink = ({ compact = false }) => (
   </Link>
 );
 
+// The same main links in the header, the phone menu and the footer
+const MAIN_LINKS = [
+  ["/deals", "Live deals"],
+  ["/how-it-works", "How it works"],
+  ["/sell-with-us", "Sell with us"],
+];
+// Where "My account" goes for each kind of user. Logged out: "Log in".
+const ACCOUNT_HOME = { SELLER: "/seller", BUYER: "/orders", ADMIN: "/admin" };
+const accountLink = (user) =>
+  user ? [ACCOUNT_HOME[user.role] || "/", "My account"] : ["/auth", "Log in"];
+
 function Navbar() {
   const { user, logout } = useAuth();
   const nav = useNavigate();
@@ -87,27 +98,19 @@ function Navbar() {
     setOpen(false);
   }, [pathname]);
 
-  const links = [
-    ["/how-it-works", "How it works"],
-    ["/sell-with-us", "Sell with us"],
-    ...(user?.role === "SELLER" ? [["/seller", "My shop"]] : []),
-    ...(user?.role === "BUYER" ? [["/orders", "My orders"]] : []),
-    ...(user?.role === "ADMIN" ? [["/admin", "Admin"]] : []),
-  ];
-  const auth = user ? (
-    <Button
-      variant="palm"
-      size="sm"
-      onClick={() => {
-        logout();
-        nav("/");
-      }}
-    >
-      Log out
+  const [accountTo, accountLabel] = accountLink(user);
+  const signOut = () => {
+    logout();
+    nav("/");
+  };
+  const account = (
+    <Button as={Link} to={accountTo} variant="palm" size="sm">
+      {accountLabel}
     </Button>
-  ) : (
-    <Button as={Link} to="/auth" variant="palm" size="sm">
-      Log in or sign up
+  );
+  const logOut = user && (
+    <Button variant="link" size="sm" className="text-white hover:text-palm" onClick={signOut}>
+      Log out
     </Button>
   );
 
@@ -122,16 +125,17 @@ function Navbar() {
         <Brand />
         <nav className="hidden items-center gap-7 md:flex" aria-label="Main">
           <LiveLink />
-          {links.map(([to, t]) => (
+          {MAIN_LINKS.slice(1).map(([to, t]) => (
             <Link
               key={t}
               to={to}
-              className="text-white/80 transition hover:text-white"
+              className={cx(tapText, "text-white/80 transition hover:text-white")}
             >
               {t}
             </Link>
           ))}
-          {auth}
+          {account}
+          {logOut}
         </nav>
         <div className="flex items-center gap-2 md:hidden">
           <LiveLink compact />
@@ -150,7 +154,7 @@ function Navbar() {
           className="grid gap-2 border-t border-white/10 px-5 pb-5 pt-3 md:hidden"
           aria-label="Mobile"
         >
-          {links.map(([to, t]) => (
+          {MAIN_LINKS.map(([to, t]) => (
             <Link
               key={t}
               to={to}
@@ -159,7 +163,10 @@ function Navbar() {
               {t}
             </Link>
           ))}
-          <div className="mt-2 grid">{auth}</div>
+          <div className="mt-2 grid gap-2">
+            {account}
+            {logOut}
+          </div>
         </nav>
       )}
     </header>
@@ -167,43 +174,38 @@ function Navbar() {
 }
 
 function Footer() {
+  const { user } = useAuth();
+  const [accountTo, accountLabel] = accountLink(user);
   const col = "grid content-start gap-2";
   const a = cx(tapText, "text-[#cfe0d6] transition hover:text-palm");
   return (
-    <footer className="bg-leaf pt-14 text-sm text-[#cfe0d6]">
-      <Container className="grid gap-10 md:grid-cols-[1.4fr_1fr_1fr_1.2fr]">
-        <div>
+    <footer className="bg-leaf pt-12 text-sm text-[#cfe0d6]">
+      <Container className="grid gap-8 sm:grid-cols-2 md:grid-cols-[1.4fr_1fr_1fr_1.2fr] md:gap-10">
+        <div className="sm:col-span-2 md:col-span-1">
           <Brand />
           <p className="mt-3 max-w-xs">
-            Good food at last-call prices, from Nigerian kitchens, bakeries,
+            Good food at last-call prices from Lagos kitchens, bakeries,
             markets and shops. Less waste, more good food.
           </p>
         </div>
+        <nav className={col} aria-label="Footer">
+          <b className="text-white">GbaanJo</b>
+          {MAIN_LINKS.map(([to, t]) => (
+            <Link key={t} className={a} to={to}>
+              {t}
+            </Link>
+          ))}
+          <Link className={a} to={accountTo}>
+            {accountLabel}
+          </Link>
+        </nav>
         <div className={col}>
-          <b className="text-white">Buyers</b>
-          <Link className={a} to="/how-it-works">
-            How it works
-          </Link>
-          <Link className={a} to="/deals">
-            Live deals
-          </Link>
+          <b className="text-white">Help</b>
           <Link className={a} to="/terms">
             Terms and refunds
           </Link>
           <Link className={a} to="/feedback">
             Send us feedback
-          </Link>
-        </div>
-        <div className={col}>
-          <b className="text-white">Sellers</b>
-          <Link className={a} to="/sell-with-us">
-            Why sell here
-          </Link>
-          <Link className={a} to="/auth">
-            Create a seller account
-          </Link>
-          <Link className={a} to="/seller">
-            My shop
           </Link>
         </div>
         <div className={col}>
@@ -214,7 +216,7 @@ function Footer() {
           </p>
         </div>
       </Container>
-      <div className="mt-12 border-t border-white/10 py-5 text-center text-xs text-white/60">
+      <div className="mt-10 border-t border-white/10 py-5 text-center text-xs text-white/60">
         © {yearLagos()} GbaanJo. Made in Nigeria.
       </div>
     </footer>
