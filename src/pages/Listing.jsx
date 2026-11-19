@@ -15,6 +15,7 @@ import { Button, Spinner, cx, tapText, useToast } from "../ui";
 import { useMeta } from "../hooks/useMeta";
 import { getPaymentProvider } from "../payments";
 import ReportButton from "../components/Report";
+import ShareDeal from "../components/Share";
 import usePageMeta from '../hooks/usePageMeta';
 
 export default function Listing() {
@@ -105,8 +106,12 @@ export default function Listing() {
               Sold by <b className="text-ink">{l.seller.businessName}</b>
               <Verified v={l.seller.verified} /> · {l.area}, {l.city}
             </p>
-            {/* Anyone but the seller of this listing can report it */}
-            {user?.id !== l.seller.id && <ReportButton targetType="listing" targetId={l.id} label="Report this listing" className="mt-1" />}
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              {/* Only for live deals (not hidden, ended or sold out) */}
+              <ShareDeal listing={l} business={l.seller.businessName} />
+              {/* Anyone but the seller of this listing can report it */}
+              {user?.id !== l.seller.id && <ReportButton targetType="listing" targetId={l.id} label="Report this listing" />}
+            </div>
           </div>
           {l.description && <p className="text-lg">{l.description}</p>}
 

@@ -337,3 +337,27 @@ describe('Application timeline', () => {
     expect(screen.getByRole('button', { name: 'Resubmit application' })).toBeInTheDocument();
   });
 });
+
+describe('after publishing', () => {
+  it("shows 'Share your deal' with the seller's own text", async () => {
+    setup({ hasPayout: true });
+    const soon = (h) => new Date(Date.now() + h * 36e5).toISOString();
+    mock.replies['POST /listings'] = { id: 'l9', title: 'Meat pies', price: 700, originalPrice: 1400, quantity: 6, quantityLeft: 6, status: 'ACTIVE', saleEndsAt: soon(3), pickupBy: soon(5), hiddenAt: null };
+    renderAt('/seller?tab=new');
+    fireEvent.submit((await screen.findByRole('button', { name: 'Publish listing' })).closest('form'));
+    const card = await screen.findByRole('region', { name: 'Your listing is live!' });
+    // jsdom has no share sheet, so the WhatsApp and Copy link buttons show
+    const wa = within(card).getByRole('link', { name: 'Share on WhatsApp' });
+    expect(decodeURIComponent(wa.getAttribute('href'))).toContain('Test Kitchen has Meat pies at 50% off. Now ₦700, collect by ');
+    expect(decodeURIComponent(wa.getAttribute('href'))).toContain('/listing/l9');
+    expect(within(card).getByRole('button', { name: 'Copy link' })).toBeInTheDocument();
+  });
+
+  it('shows no share card when the reply has no listing', async () => {
+    setup({ hasPayout: true });
+    renderAt('/seller?tab=new'); // the default fake reply is just { id: 2 }
+    fireEvent.submit((await screen.findByRole('button', { name: 'Publish listing' })).closest('form'));
+    await screen.findByText('Your listing is live!');
+    expect(screen.queryByRole('region', { name: 'Your listing is live!' })).not.toBeInTheDocument();
+  });
+});

@@ -13,6 +13,7 @@ import { clearDraft, loadDraft, restoreForm, saveDraft } from './seller/draft';
 import { setupBlockFromError } from './seller/errors';
 import { fromLagosInput, lagosInputInHours, toLagosInput } from '../components/time';
 import { cloudinaryUrl } from '../components/cloudinary';
+import ShareDeal, { canShareListing } from '../components/Share';
 import ApplicationTimeline from './seller/ApplicationTimeline';
 import usePageMeta from '../hooks/usePageMeta';
 
@@ -126,6 +127,7 @@ export default function Seller() {
   const verification = useResendVerification();
   const [f, setF] = useState(() => restoreForm(loadDraft(user?.id), blankForm()));
   const [err, setErr] = useState('');
+  const [published, setPublished] = useState(null); // the listing just published, for the 'Share your deal' card
   const [busy, setBusy] = useState(false);
   const [uploading, setUploading] = useState(false);
   // Every edit is also saved as a draft, so nothing is lost if the seller leaves the form for a moment
@@ -177,11 +179,12 @@ export default function Seller() {
   const submit = async (e) => {
     e.preventDefault(); setErr(''); setBusy(true);
     try {
-      await api('/listings', { method: 'POST', body: {
+      const created = await api('/listings', { method: 'POST', body: {
         ...f, imageUrl: f.imageUrl || undefined, originalPrice: Number(f.originalPrice), price: Number(f.price), quantity: Number(f.quantity),
         saleEndsAt: fromLagosInput(f.saleEndsAt).toISOString(), pickupBy: fromLagosInput(f.pickupBy).toISOString(),
       } });
       toast('Your listing is live!');
+      setPublished(created?.id ? created : null);
       clearDraft(user.id);
       setF({ ...blankForm(), category: f.category, city: f.city, area: f.area, address: f.address });
       await reload(); setTab('listings');
@@ -325,6 +328,16 @@ export default function Seller() {
 
       {tab === "listings" && (
         <div className="mt-5">
+          {published && canShareListing(published) && (
+            <section aria-labelledby="published-title" className={cx(box, "mb-4 grid gap-3 bg-leaf/5 ring-leaf")}>
+              <h2 id="published-title" className="text-lg font-extrabold">Your listing is live!</h2>
+              <p className="text-mute">Send it to your own customers so it sells faster.</p>
+              <div className="flex flex-wrap items-start gap-2">
+                <ShareDeal listing={published} business={user.businessName} label="Share your deal" />
+                <Button size="sm" variant="link" onClick={() => setPublished(null)}>Done</Button>
+              </div>
+            </section>
+          )}
           {mine && mine.length === 0 && (
             <div className={cx(box, "p-10 text-center")}>
               <div className="text-5xl">🍳</div>
