@@ -37,8 +37,8 @@ export default function Feedback() {
               {f.status === 'DONE' && <Pill tone="bg-leaf/10 text-leaf">Done</Pill>}
               <span className="text-sm text-mute">{dateTimeLagos(f.createdAt)}</span>
             </div>
-            <p className="whitespace-pre-wrap break-words">{f.message}</p>
-            <p className="break-words text-sm text-mute">
+            <p className="whitespace-pre-wrap [overflow-wrap:anywhere]">{f.message}</p>
+            <p className="[overflow-wrap:anywhere] text-sm text-mute">
               {f.user ? `${f.user.name} (${f.user.role}) · ${f.user.email}` : [f.name, f.email].filter(Boolean).join(' · ') || 'Anonymous'}
               {f.page ? ` · from ${f.page}` : ''}
             </p>

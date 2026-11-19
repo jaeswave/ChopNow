@@ -35,10 +35,10 @@ export default function Overview() {
             <li key={c.key}>
               <Link
                 to={c.to}
-                className={cx(tap, 'flex h-full flex-col justify-between gap-1 rounded-2xl bg-white p-4 ring-[1.5px] ring-line transition hover:ring-leaf focus-visible:outline-3 focus-visible:outline-palm')}
+                className={cx(tap, 'flex h-full min-w-0 flex-col justify-between gap-1 rounded-2xl [overflow-wrap:anywhere] bg-white p-4 ring-[1.5px] ring-line transition hover:ring-leaf focus-visible:outline-3 focus-visible:outline-palm')}
               >
                 <span className="text-sm text-mute">{c.label}</span>
-                <span className={cx('font-display text-3xl font-extrabold', URGENT.includes(c.key) && c.value > 0 && 'text-pepper')}>
+                <span className={cx('font-display text-2xl font-extrabold sm:text-3xl', URGENT.includes(c.key) && c.value > 0 && 'text-pepper')}>
                   {typeof c.value === 'number' ? c.value : '–'}
                 </span>
               </Link>

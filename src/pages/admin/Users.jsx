@@ -73,11 +73,11 @@ export default function Users() {
           <li key={u.id} className={cx(box, 'grid gap-3')}>
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
-                <b className="break-words">{u.businessName || u.name}</b><Pill>{u.role}</Pill>
+                <b className="[overflow-wrap:anywhere]">{u.businessName || u.name}</b><Pill>{u.role}</Pill>
                 {u.verified && <Pill tone="bg-leaf/10 text-leaf">Verified</Pill>}
                 {u.suspended && <Pill tone="bg-pepper text-white">Suspended</Pill>}
               </div>
-              <p className="break-words text-sm text-mute">{u.name} · {u.email} · {u.phone}{u.city ? ` · ${u.city}` : ''}</p>
+              <p className="[overflow-wrap:anywhere] text-sm text-mute">{u.name} · {u.email} · {u.phone}{u.city ? ` · ${u.city}` : ''}</p>
               <p className="text-sm text-mute">No-shows: {u.noShows ?? 0} · Joined {dateLagos(u.createdAt)}{u.role === 'SELLER' ? ` · Payout: ${u.accountName ? `${u.accountName} (${u.bankName})` : 'not set up'}` : ''}</p>
             </div>
             <div className="flex flex-wrap gap-2">

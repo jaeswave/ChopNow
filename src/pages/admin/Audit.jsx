@@ -36,10 +36,10 @@ export default function Audit() {
               <Pill>{a.targetType}</Pill>
               <span className="text-sm text-mute">{dateTimeLagos(a.createdAt)}</span>
             </div>
-            <p className="break-words text-sm text-mute">
+            <p className="[overflow-wrap:anywhere] text-sm text-mute">
               By {a.admin?.name || 'unknown'}{a.admin?.email ? ` (${a.admin.email})` : ''} · {a.targetType} <span className="font-mono">{a.targetId}</span>
             </p>
-            {a.reason && <p className="break-words text-sm">Reason: {a.reason}</p>}
+            {a.reason && <p className="[overflow-wrap:anywhere] text-sm">Reason: {a.reason}</p>}
           </li>
         ))}
       </ol>

@@ -5,8 +5,9 @@ import { Button, Field, Spinner, Textarea, cx } from '../../ui';
 
 // Small pieces shared by the admin screens
 export const box = 'rounded-2xl bg-white p-5 ring-[1.5px] ring-line';
+// Long emails, ids and big numbers wrap instead of pushing the page sideways on small phones
 export const Stat = ({ label, value, tone = '' }) => (
-  <div className={cx(box, 'p-4')}><p className="text-sm text-mute">{label}</p><p className={cx('font-display text-3xl font-extrabold', tone)}>{value}</p></div>
+  <div className={cx(box, 'min-w-0 p-4')}><p className="text-sm text-mute">{label}</p><p className={cx('font-display text-2xl font-extrabold [overflow-wrap:anywhere] sm:text-3xl', tone)}>{value}</p></div>
 );
 export const Pill = ({ children, tone = 'bg-paper text-ink' }) => <span className={cx('rounded-full px-2.5 py-0.5 text-xs font-bold', tone)}>{children}</span>;
 
@@ -33,7 +34,9 @@ export function Dialog({ title, onClose, children }) {
   closeRef.current = onClose; // always the latest, without re-running the effect below
   useEffect(() => {
     const before = document.activeElement;
-    ref.current?.querySelector('textarea, input, select, button:not([data-close])')?.focus();
+    // Start in the reason box if there is one; otherwise on the dialog itself, so it opens at the top and no
+    // button (such as 'Cancel order') is chosen by default
+    (ref.current?.querySelector('textarea, input, select') || ref.current)?.focus();
     const onKey = (e) => e.key === 'Escape' && closeRef.current();
     document.addEventListener('keydown', onKey);
     return () => {
@@ -48,7 +51,8 @@ export function Dialog({ title, onClose, children }) {
         role="dialog"
         aria-modal="true"
         aria-labelledby={id}
-        className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-t-3xl bg-white p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] text-ink shadow-2xl sm:rounded-3xl sm:p-6"
+        tabIndex={-1}
+        className="max-h-[90vh] outline-none w-full max-w-lg overflow-y-auto rounded-t-3xl bg-white p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] text-ink shadow-2xl sm:rounded-3xl sm:p-6"
       >
         <h2 id={id} className="text-xl font-extrabold">{title}</h2>
         {children}

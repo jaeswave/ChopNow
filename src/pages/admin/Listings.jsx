@@ -62,15 +62,15 @@ export default function Listings() {
           <li key={l.id} className={cx(box, 'grid gap-3', l.hiddenAt && 'bg-paper ring-pepper/40')}>
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
-                <b className="break-words">{l.title}</b>
+                <b className="[overflow-wrap:anywhere]">{l.title}</b>
                 <StatusBadge s={l.status} listing />
                 {l.hiddenAt && <Pill tone="bg-pepper text-white">Hidden by GbaanJo</Pill>}
               </div>
               {l.hiddenAt && (
                 <p className="mt-1 text-sm text-pepper">Hidden {dateTimeLagos(l.hiddenAt)}{l.hiddenReason ? `: ${l.hiddenReason}` : ''}</p>
               )}
-              <p className="break-words text-sm text-mute">{l.seller?.businessName}{l.seller?.verified ? ' (verified)' : ''} · {l.seller?.phone}</p>
-              <p className="break-words text-sm text-mute">{naira(l.price)} (was {naira(l.originalPrice)}) · {l.quantityLeft}/{l.quantity} left · {l.area}, {l.city}</p>
+              <p className="[overflow-wrap:anywhere] text-sm text-mute">{l.seller?.businessName}{l.seller?.verified ? ' (verified)' : ''} · {l.seller?.phone}</p>
+              <p className="[overflow-wrap:anywhere] text-sm text-mute">{naira(l.price)} (was {naira(l.originalPrice)}) · {l.quantityLeft}/{l.quantity} left · {l.area}, {l.city}</p>
             </div>
             <div className="flex flex-wrap gap-2">
               {l.hiddenAt ? (

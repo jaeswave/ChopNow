@@ -28,7 +28,7 @@ const CANCELLABLE = ['PENDING_PAYMENT', 'RESERVED'];
 const Row = ({ label, children }) => (
   <div className="flex flex-wrap justify-between gap-x-4 gap-y-0.5 border-b border-line py-2 last:border-0">
     <dt className="text-mute">{label}</dt>
-    <dd className="min-w-0 break-words text-right font-semibold">{children}</dd>
+    <dd className="min-w-0 [overflow-wrap:anywhere] text-right font-semibold">{children}</dd>
   </div>
 );
 const Section = ({ title, children }) => (
@@ -162,7 +162,7 @@ export default function Orders() {
                 <StatusBadge s={o.status} />
                 {o.refundDue && <Pill tone="bg-pepper/10 text-pepper">Refund owed</Pill>}
               </div>
-              <p className="break-words text-sm text-mute">
+              <p className="[overflow-wrap:anywhere] text-sm text-mute">
                 {o.buyer?.name} · {o.seller?.businessName} · {naira(o.amounts?.amountPaid ?? 0)}
               </p>
               {o.timeline?.[0] && <p className="text-sm text-mute">Placed {dateTimeLagos(o.timeline[0].at)}</p>}

@@ -43,11 +43,11 @@ export default function Sellers() {
           <li key={u.id} className={cx(box, 'grid gap-3')}>
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
-                <b className="break-words">{u.businessName}</b>
+                <b className="[overflow-wrap:anywhere]">{u.businessName}</b>
                 {u.emailVerifiedAt ? <Pill tone="bg-leaf/10 text-leaf">Email verified</Pill> : <Pill tone="bg-pepper/10 text-pepper">Email not verified</Pill>}
               </div>
               <p className="text-sm text-mute">CAC number: <span className="font-mono text-ink">{u.rcNumber}</span></p>
-              <p className="break-words text-sm text-mute">{u.name} · {u.email} · {u.phone} · applied {dateLagos(u.createdAt)}</p>
+              <p className="[overflow-wrap:anywhere] text-sm text-mute">{u.name} · {u.email} · {u.phone} · applied {dateLagos(u.createdAt)}</p>
               {u.rejectionReason && <p className="text-sm text-pepper">Rejected: {u.rejectionReason}</p>}
             </div>
             <div className="flex flex-wrap gap-2">
