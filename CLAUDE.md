@@ -62,6 +62,8 @@ src/
                       minFee, buyerFee, holdMinutes, ...), useListings, useCity, usePageMeta(title, description)
   pages/              Home, HowItWorks, Account, SellWithUs (+ sellerFaq.js), Deals, Listing, AuthPage, Seller, Orders, Payouts, Admin, PayCallback, Legal, Feedback,
                       VerifyEmail, ForgotPassword, ResetPassword
+  pages/admin/        Admin screens (Admin.jsx is the shell; ?tab= picks one): Overview, Sellers, Orders, Listings, Users,
+                      Feedback, Audit, Refunds, Payouts. kit.jsx: ActionDialog/useActionDialog, ErrorNote, usePagedList, Pager, useUrlParam.
   pages/seller/       Pieces of the Seller page: SetupChecklist, SetupBlocker, ApplicationTimeline,
                       useResendVerification, draft.js (new-listing draft in sessionStorage), errors.js
   payments/           hosted.js (startHostedCheckout, verifyPayment), opay.js, with stripe.js and flutterwave.js kept as fallbacks
@@ -75,6 +77,10 @@ public/                manifest.webmanifest, sw.js (service worker), offline.htm
 - **Seller setup:** `/seller?tab=orders|listings|new|insights|payouts` (no `tab` means orders, and Back works). The approval email links to `?tab=payouts`. Until the email is verified, a payout account exists and a first listing is published, a "Finish setting up" card shows. "+ New listing" shows a blocker card instead of the form while the email or payout account is missing. The form draft is kept in sessionStorage (`gj_listing_draft_<userId>`) and cleared after publishing.
 - **Info pages:** `/how-it-works` (buyer and seller paths, `?for=sellers`) and `/sell-with-us` (with an earnings estimate). Old links `/#how`, `/#faq` and `/#sell` redirect there (`LegacyHashRedirect` in App.jsx). "Apply as a seller" links to `/auth?mode=register&role=SELLER`.
 - **Installable app:** `/manifest.webmanifest` (standalone, start_url `/?source=app`). `public/sw.js` keeps hashed `/assets`, icons, the manifest and Google Fonts, and shows `/offline.html` when a page cannot load. It must **never** handle the API, other origins (Cloudinary, OPay, Resend), `/api/*`, non-GET requests or requests with an Authorization header; `src/sw.test.js` checks this. Bump `VERSION` in sw.js when you change what it caches. On phones, fixed things sit above the tab bar with `bottom-[calc(var(--tabbar-h)+env(safe-area-inset-bottom)+...)]`.
+- **Admin area:** `/admin?tab=overview|sellers|orders|listings|users|feedback|audit|refunds|payouts`, filters in the URL too. Only ADMIN users get in; everyone else is sent to `/` before any admin request. The contract is the server repo's `docs/ADMIN-API.md`.
+  - **Never show a pickup code** on an admin screen. Order details are rendered field by field; never print a whole order object. `src/pages/Admin.test.jsx` feeds a pickupCode and fails if it appears.
+  - Every admin action goes through `ActionDialog` (no `window.confirm`/`prompt`). Actions that need a reason pass `reasonLabel`: confirm stays disabled until the trimmed reason is 1 to 300 characters. Server errors (including a 400 `message` array, kept by `api()` as `err.messages`) show inside the dialog.
+  - Long emails and ids use `[overflow-wrap:anywhere]` (not `break-words`), or a card can push a 320px screen sideways.
 - **Pickup:** the buyer sees `pickupCode` in Orders and can share it on WhatsApp. The seller types it in Seller → `POST /orders/lookup` → `POST /orders/:id/complete`.
 - **Order statuses:** PENDING_PAYMENT, RESERVED, PICKED_UP, EXPIRED, CANCELLED. **Listing statuses:** ACTIVE, SOLD_OUT, EXPIRED.
 - Countdowns are for display only. The server decides what has expired.
@@ -116,6 +122,9 @@ public/                manifest.webmanifest, sw.js (service worker), offline.htm
 - **Accessibility:** labels on inputs (use `Field`), visible focus (the kit uses `focus-visible:outline-palm`), good contrast, aria attributes on custom controls.
 
 ## Known gaps (found while writing this file; not fixed yet)
+- The new admin routes (`/admin/sellers`, `/admin/orders`, `/admin/audit`, hide/unhide, POST suspend/unsuspend, feedback resolve, the new overview counts) need the server's `20261118_admin_ops` database change and a server deploy. Until then those screens show "This screen needs the latest server".
+- Admin Refunds and Seller payouts (payments) still use the browser's `confirm()`; leave them until the payments phase.
+- The overview "Problem orders" count has no exact list filter in the API; its link opens paid orders that are not collected yet.
 - Not yet tested on real phones: the Android install prompt, the installed app opening full screen, the iPhone home-screen icon, and offline mode were checked only in desktop Chrome/Edge imitating phones.
 - Google Fonts (loaded from fonts.googleapis.com) block the first paint on slow connections. Self-hosting the two fonts would help performance. When Google Fonts is unreachable, the page waits on that stylesheet before it finishes loading.
 - Refund and payout timing are not decided yet. **Do not add any refund or payout timing wording** until the owner sets the payout schedule. Older text still says refunds take "1 to 3 working days" in `pages/Legal.jsx` (section 3) and `pages/Orders.jsx` ("Refund in progress"); leave it until the owner decides.
