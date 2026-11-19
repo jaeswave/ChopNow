@@ -16,15 +16,15 @@ import Users from './admin/Users';
 // Admin area. Only ADMIN users get past the check below; everyone else is sent home.
 // The open tab is in the URL (/admin?tab=users), so links can open a screen directly.
 export const ADMIN_TABS = [
+  ['overview', 'Overview', Overview],
   ['sellers', 'Seller approvals', Sellers],
   ['orders', 'Orders', Orders],
-  ['overview', 'Overview', Overview],
-  ['refunds', 'Refunds', Refunds],
-  ['payouts', 'Seller payouts', Payouts],
-  ['users', 'Users', Users],
   ['listings', 'Listings', Listings],
+  ['users', 'Users', Users],
   ['feedback', 'Feedback', Feedback],
   ['audit', 'Audit log', Audit],
+  ['refunds', 'Refunds', Refunds],
+  ['payouts', 'Seller payouts', Payouts],
 ];
 
 export default function Admin() {
