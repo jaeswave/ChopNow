@@ -2,11 +2,13 @@ import { lazy, Suspense } from "react";
 import { Link, Route, Routes } from "react-router-dom";
 import { Button, Container } from "../ui";
 import Home from "../pages/Home";
-import usePageMeta from "../hooks/usePageMeta"; // the landing page stays in the main bundle, everything else loads when visited
+import usePageMeta from "../hooks/usePageMeta";
+import useComingSoon from "../hooks/useComingSoon";
+import { OpeningSoonPage } from "../sections/ComingSoon"; // the landing page stays in the main bundle, everything else loads when visited
 
 // Every routed page. To add a page: create it, then add one line here.
 const routes = [
-  { path: "/listing/:id", Component: lazy(() => import("../pages/Listing")) },
+  { path: "/listing/:id", Component: lazy(() => import("../pages/Listing")), soon: true },
   { path: "/auth", Component: lazy(() => import("../pages/AuthPage")) },
   { path: "/seller", Component: lazy(() => import("../pages/Seller")) },
   { path: "/orders", Component: lazy(() => import("../pages/Orders")) },
@@ -20,7 +22,7 @@ const routes = [
     path: "/verify-email",
     Component: lazy(() => import("../pages/VerifyEmail")),
   },
-  { path: "/deals", Component: lazy(() => import("../pages/Deals")) },
+  { path: "/deals", Component: lazy(() => import("../pages/Deals")), soon: true },
   { path: "/how-it-works", Component: lazy(() => import("../pages/HowItWorks")) },
   { path: "/sell-with-us", Component: lazy(() => import("../pages/SellWithUs")) },
   { path: "/account", Component: lazy(() => import("../pages/Account")) },
@@ -39,6 +41,11 @@ const Loading = () => (
     <span className="inline-block size-8 animate-spin rounded-full border-4 border-line border-t-leaf" />
   </div>
 );
+
+// Deals and listing pages: "We are opening soon" while coming soon mode is on (for visitors and buyers)
+function SoonGate({ Component }) {
+  return useComingSoon() ? <OpeningSoonPage /> : <Component />;
+}
 
 function NotFound() {
   usePageMeta("Page not found");
@@ -59,13 +66,13 @@ export default function AppRoutes() {
     <Suspense fallback={<Loading />}>
       <Routes>
         <Route path="/" element={<div className="motion-safe:animate-fade-in"><Home /></div>} />
-        {routes.map(({ path, Component }) => (
+        {routes.map(({ path, Component, soon }) => (
           <Route
             key={path}
             path={path}
             element={
               <Page>
-                <Component />
+                {soon ? <SoonGate Component={Component} /> : <Component />}
               </Page>
             }
           />

@@ -8,6 +8,7 @@ import CityConfirm from "./components/CityConfirm";
 import InstallCard from "./components/Install";
 import TabBar, { useKeyboardOpen } from "./components/TabBar";
 import ConsentPrompt from "./components/ConsentPrompt";
+import useComingSoon from "./hooks/useComingSoon";
 import { yearLagos } from "./components/time";
 
 // Optional ribbon for test versions: set VITE_BETA_NOTICE in Vercel to show it, leave it empty to hide it
@@ -82,8 +83,16 @@ const MAIN_LINKS = [
 // "My account" opens the Account page. Logged out: "Log in".
 const accountLink = (user) => (user ? ["/account", "My account"] : ["/auth", "Log in"]);
 
+// The main links without "Live deals" while coming soon mode is on for this person
+const useMainLinks = () => {
+  const soon = useComingSoon();
+  return soon ? MAIN_LINKS.filter(([to]) => to !== "/deals") : MAIN_LINKS;
+};
+
 function Navbar() {
   const { user, logout } = useAuth();
+  const soon = useComingSoon();
+  const links = useMainLinks();
   const nav = useNavigate();
   const { pathname } = useLocation();
   const [open, setOpen] = useState(false);
@@ -125,8 +134,8 @@ function Navbar() {
       <Container className="flex h-16 items-center justify-between">
         <Brand />
         <nav className="hidden items-center gap-7 md:flex" aria-label="Main">
-          <LiveLink />
-          {MAIN_LINKS.slice(1).map(([to, t]) => (
+          {!soon && <LiveLink />}
+          {links.filter(([to]) => to !== "/deals").map(([to, t]) => (
             <Link
               key={t}
               to={to}
@@ -139,7 +148,7 @@ function Navbar() {
           {logOut}
         </nav>
         <div className="flex items-center gap-2 md:hidden">
-          <LiveLink compact />
+          {!soon && <LiveLink compact />}
           <button
             className="grid size-11 shrink-0 cursor-pointer place-items-center rounded-lg text-2xl hover:bg-white/10"
             aria-label="Menu"
@@ -155,7 +164,7 @@ function Navbar() {
           className="grid gap-2 border-t border-white/10 px-5 pb-5 pt-3 md:hidden"
           aria-label="Mobile"
         >
-          {MAIN_LINKS.map(([to, t]) => (
+          {links.map(([to, t]) => (
             <Link
               key={t}
               to={to}
@@ -176,6 +185,7 @@ function Navbar() {
 
 function Footer() {
   const { user } = useAuth();
+  const links = useMainLinks();
   const { pathname } = useLocation();
   const [accountTo, accountLabel] = accountLink(user);
   const col = "grid content-start gap-2";
@@ -193,7 +203,7 @@ function Footer() {
         </div>
         <nav className={col} aria-label="Footer">
           <b className="text-white">GbaanJo</b>
-          {MAIN_LINKS.map(([to, t]) => (
+          {links.map(([to, t]) => (
             <Link key={t} className={a} to={to}>
               {t}
             </Link>

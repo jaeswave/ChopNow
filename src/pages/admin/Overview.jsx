@@ -54,7 +54,7 @@ export default function Overview() {
           <Stat label="Refunds to process" value={s.refundsPending ?? 0} tone={s.refundsPending ? 'text-pepper' : ''} />
           <Stat label="Buyers" value={s.buyers ?? 0} />
           <Stat label="Sellers" value={s.sellers ?? 0} />
-          <Stat label="Waitlist (outside Lagos)" value={s.waitlist ?? 0} />
+          <Stat label="Waitlist" value={s.waitlist ?? 0} />
           <Stat label="Picked up (all time)" value={s.pickedUp ?? 0} />
           <Stat label="No-shows (all time)" value={s.noShows ?? 0} tone={s.noShows ? 'text-pepper' : ''} />
         </div>

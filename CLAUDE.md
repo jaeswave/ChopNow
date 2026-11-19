@@ -31,6 +31,7 @@ This is the **WEBSITE** repo (React). The **server** is a separate repo looked a
 - `.env` is gitignored (along with `node_modules` and `dist`). **Never read, print, log, commit or paste it.** Use `.env.example` as the reference:
   - `VITE_API_URL`: backend base URL, with no trailing slash
   - `VITE_BETA_NOTICE`: optional ribbon text shown on every page
+  - `VITE_COMING_SOON`: `true` turns on coming soon mode (see Main flows). Anything else: the normal site. Built in at build time, so Vercel needs a redeploy after a change (steps in README).
 - Anything that starts with `VITE_` ends up in the public bundle. Never put a secret in one.
 
 ## Code map
@@ -80,6 +81,7 @@ public/                manifest.webmanifest, sw.js (service worker), offline.htm
 ### Main flows
 - **Buy:** Listing → `startHostedCheckout` → `POST /orders` → redirect to `authorizationUrl` → `/pay/callback` → `GET /orders/verify/:ref`. The browser never sends an amount.
 - **Seller setup:** `/seller?tab=orders|listings|new|insights|payouts` (no `tab` means orders, and Back works). The approval email links to `?tab=payouts`. Until the email is verified, a payout account exists and a first listing is published, a "Finish setting up" card shows. "+ New listing" shows a blocker card instead of the form while the email or payout account is missing. The form draft is kept in sessionStorage (`gj_listing_draft_<userId>`) and cleared after publishing.
+- **Coming soon mode** (`VITE_COMING_SOON=true`, read only through `config/launch.js` and `useComingSoon()`): visitors and buyers get `ComingSoonHome` (waitlist form, `POST /waitlist { email, city }`), and `/deals` and `/listing/:id` show `OpeningSoonPage`. Live deals is hidden in the header, menu, footer and tab bar. Sellers and admins see everything as normal. Sell with us, seller sign-up, How it works, Log in and the legal pages stay open. With the switch off, nothing changes.
 - **Info pages:** `/how-it-works` (buyer and seller paths, `?for=sellers`) and `/sell-with-us` (with an earnings estimate). Old links `/#how`, `/#faq` and `/#sell` redirect there (`LegacyHashRedirect` in App.jsx). "Apply as a seller" links to `/auth?mode=register&role=SELLER`.
 - **Installable app:** `/manifest.webmanifest` (standalone, start_url `/?source=app`). `public/sw.js` keeps hashed `/assets`, icons, the manifest and Google Fonts, and shows `/offline.html` when a page cannot load. It must **never** handle the API, other origins (Cloudinary, OPay, Resend), `/api/*`, non-GET requests or requests with an Authorization header; `src/sw.test.js` checks this. Bump `VERSION` in sw.js when you change what it caches. On phones, fixed things sit above the tab bar with `bottom-[calc(var(--tabbar-h)+env(safe-area-inset-bottom)+...)]`.
 - **Terms, privacy and data rights** (contract: the server repo's `docs/ACCOUNT-API.md`; admin side in `docs/ADMIN-API.md`):

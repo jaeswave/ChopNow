@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../auth';
 import { cx } from '../ui';
+import useComingSoon from '../hooks/useComingSoon';
 
 // Simple line icons (24 x 24), drawn with the current text colour
 const ICONS = {
@@ -19,11 +20,12 @@ const Icon = ({ name }) => (
 );
 
 // The tabs for each kind of user. match(pathname) decides which tab is lit.
-export function tabsFor(user) {
+// comingSoon: no Deals tab while coming soon mode is on for this person
+export function tabsFor(user, { comingSoon = false } = {}) {
   const tabs = [
     { to: '/', label: 'Home', icon: 'home', match: (p) => p === '/' },
     { to: '/deals', label: 'Deals', icon: 'deals', match: (p) => p.startsWith('/deals') || p.startsWith('/listing/') },
-  ];
+  ].filter((t) => !(comingSoon && t.to === '/deals'));
   if (user?.role === 'BUYER') tabs.push({ to: '/orders', label: 'Orders', icon: 'orders', match: (p) => p.startsWith('/orders') });
   if (user?.role === 'SELLER') tabs.push({ to: '/seller', label: 'My shop', icon: 'shop', match: (p) => p.startsWith('/seller') });
   if (user?.role === 'ADMIN') tabs.push({ to: '/admin', label: 'Admin', icon: 'admin', match: (p) => p.startsWith('/admin') });
@@ -56,12 +58,13 @@ export default function TabBar() {
   const { user } = useAuth();
   const { pathname } = useLocation();
   const keyboard = useKeyboardOpen();
+  const comingSoon = useComingSoon();
   if (hideTabBarOn(pathname) || keyboard) return null;
 
   return (
     <nav aria-label="App" className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden">
       <ul className="mx-auto flex max-w-lg gap-2 px-2">
-        {tabsFor(user).map((t) => {
+        {tabsFor(user, { comingSoon }).map((t) => {
           const active = t.match(pathname);
           return (
             <li key={t.to} className="flex-1">
