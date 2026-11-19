@@ -22,6 +22,7 @@ This is the **WEBSITE** repo (React). The **server** is a separate repo looked a
 - `npm test`: Vitest + React Testing Library (jsdom), run once. `npm run test:watch` keeps it running.
   - Tests sit next to the code as `*.test.js(x)`. Shared setup is in `src/test/setup.js`. Tests run with `TZ=Africa/Lagos` (set in `vite.config.js`). To test another phone time zone, use `vi.stubEnv('TZ', 'Asia/Tokyo')`; it is undone after each test.
   - When you mock `useAuth`, return one **stable** object. A new object on every render re-runs `useEffect([user])` forever, and the test hangs.
+  - Fill long forms with `fireEvent.change` (one step per field), not `userEvent.type`: typing letter by letter can pass the time limit on a busy computer (the repo sits in OneDrive, which syncs while tests run). Keep `userEvent` for clicks, checkboxes and short inputs. `testTimeout` is 15 seconds.
 - `npm run lint`: ESLint 9 (flat config in `eslint.config.js`) with React and React Hooks rules. It must show 0 errors.
   - ESLint stays on 9 because `eslint-plugin-react` does not support ESLint 10 yet.
   - `react-hooks/exhaustive-deps` warnings are known. Do not "fix" them by adding dependencies blindly, because that can cause refetch loops. Fix them one at a time, with a test.
@@ -58,6 +59,7 @@ src/
     Consent.jsx       "I agree to the Terms and the Privacy Policy" checkbox (links open in a new tab); ConsentPrompt.jsx: full-screen re-ask
     AccountData.jsx   Account "Your data": DownloadData (GET /me/export) and DeleteAccount (POST /me/delete, blockers in plain words)
     Dialog.jsx        Touch-friendly dialog (bottom sheet on phones); the admin kit re-exports it
+    Report.jsx        ReportButton + dialog (POST /reports): REPORT_REASONS labels, optional 300-character note, error texts
     ProductImage/, Section/ (no longer used by any page), CityConfirm.jsx, SellerInsights.jsx
   config/market.js    Things that change per market (currency, locale, categories, fallback business `rules`). The server's /listings/meta wins.
   config/seed.js      Demo image paths
@@ -65,7 +67,7 @@ src/
                       minFee, buyerFee, holdMinutes, ...), useListings, useCity, usePageMeta(title, description)
   pages/              Home, HowItWorks, Account, SellWithUs (+ sellerFaq.js), Deals, Listing, AuthPage, Seller, Orders, Payouts, Admin, PayCallback, Legal, Feedback,
                       VerifyEmail, ForgotPassword, ResetPassword
-  pages/admin/        Admin screens (Admin.jsx is the shell; ?tab= picks one): Overview, Sellers, Orders, Listings, Users, Deletions,
+  pages/admin/        Admin screens (Admin.jsx is the shell; ?tab= picks one): Overview, Sellers, Orders, Listings, Users, Reports, Deletions,
                       Feedback, Audit, Refunds, Payouts. kit.jsx: ActionDialog/useActionDialog, ErrorNote, usePagedList, Pager, useUrlParam.
   pages/seller/       Pieces of the Seller page: SetupChecklist, SetupBlocker, ApplicationTimeline,
                       useResendVerification, draft.js (new-listing draft in sessionStorage), errors.js
@@ -85,6 +87,8 @@ public/                manifest.webmanifest, sw.js (service worker), offline.htm
   - Sign-up sends `termsVersion`/`privacyVersion` only after the box is ticked. Users with `consentRequired: true` get the full-screen `ConsentPrompt`, which never covers `/admin`, `/terms`, `/pay`, `/verify-email` or `/reset-password`.
   - Do not write legal wording here. The Terms and Privacy text in `pages/Legal.jsx` stays as the owner gives it (still DRAFT). Privacy is section 5 of `/terms` (`/terms#privacy`).
   - Delete never logs out on an error (a wrong password is a 400, not a 401). Admin accounts get no delete section. Admins see blocker **codes**; users see plain sentences (`BLOCKER_TEXT`).
+- **Reports** (contract: the server repo's `docs/SAFETY-API.md`; admin side in `docs/ADMIN-API.md`): "Report this listing" on the listing page (hidden for that listing's seller) and "Report seller" on each buyer order card (`targetType: "user"`, `listing.seller.id`). Logged-out visitors are sent to `/auth?next=<this page>`; `AuthPage` follows `next` only for paths on this site.
+  - **Never say or imply that the reported person is told who reported.** Only admins see the reporter (Admin > Reports). Resolving a report needs a note and does not unhide a listing.
 - **Admin area:** `/admin?tab=overview|sellers|orders|listings|users|feedback|audit|refunds|payouts`, filters in the URL too. Only ADMIN users get in; everyone else is sent to `/` before any admin request. The contract is the server repo's `docs/ADMIN-API.md`.
   - **Never show a pickup code** on an admin screen. Order details are rendered field by field; never print a whole order object. `src/pages/Admin.test.jsx` feeds a pickupCode and fails if it appears.
   - Every admin action goes through `ActionDialog` (no `window.confirm`/`prompt`). Actions that need a reason pass `reasonLabel`: confirm stays disabled until the trimmed reason is 1 to 300 characters. Server errors (including a 400 `message` array, kept by `api()` as `err.messages`) show inside the dialog.
@@ -108,6 +112,10 @@ public/                manifest.webmanifest, sw.js (service worker), offline.htm
   | `EMAIL_NOT_VERIFIED` | 403 | `POST /listings` (also duplicate) or `POST /orders` before the email is verified |
   | `CONSENT_REQUIRED` | 400 | `POST /auth/register` or `POST /me/consent` without the current `termsVersion` and `privacyVersion` |
   | `DELETION_BLOCKED` | 409 | `POST /me/delete` or `POST /admin/users/:id/anonymise` while something is open; `api()` keeps the list as `err.blockers` (codes `UNPAID_ORDER`, `UNCOLLECTED_ORDER`, `REFUND_PENDING`, `LIVE_LISTING`, `OPEN_SALES`, `PAYOUT_PENDING`) |
+  | `REPORT_EXISTS` | 409 | `POST /reports` when this user already has an open report on the same target (shown as a calm note) |
+  | `REPORT_LIMIT` | 429 | `POST /reports` after 5 reports in 24 hours by this user |
+  | `LOGIN_LOCKED` | 429 | `POST /auth/login` after 5 wrong passwords for one email in 15 minutes; suggest a password reset |
+  A 429 **without** a `code` is the per-IP rate limit: ask the user to wait a minute.
 
   The server repo's CLAUDE.md is the source of truth for this table. Copy new codes here when the server adds them.
   - Seller listing flow: `pages/seller/errors.js` `setupBlockFromError(err)` maps these codes to the payout or email setup card.
