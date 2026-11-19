@@ -7,6 +7,7 @@ import AppRoutes from "./app/AppRoutes";
 import CityConfirm from "./components/CityConfirm";
 import InstallCard from "./components/Install";
 import TabBar, { useKeyboardOpen } from "./components/TabBar";
+import ConsentPrompt from "./components/ConsentPrompt";
 import { yearLagos } from "./components/time";
 
 // Optional ribbon for test versions: set VITE_BETA_NOTICE in Vercel to show it, leave it empty to hide it
@@ -317,6 +318,7 @@ export default function App() {
       <CityConfirm />
       <InstallCard />
       <TabBar />
+      <ConsentPrompt />
     </>
   );
 }
