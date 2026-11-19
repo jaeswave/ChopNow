@@ -18,7 +18,13 @@ export const REPORT_REASONS = [
 export const reasonLabel = (code) => REPORT_REASONS.find(([c]) => c === code)?.[1] || code;
 export const NOTE_MAX = 300;
 
-export const reportErrorText = (err) => err?.message || 'Something went wrong. Please try again.';
+// What to show for each kind of failure. REPORT_EXISTS is not really a problem, so it reads as a note.
+export function reportErrorText(err) {
+  if (err?.code === 'REPORT_EXISTS') return 'You have already reported this. We are looking into it.';
+  if (err?.code === 'REPORT_LIMIT') return 'You have sent too many reports today. Please try again tomorrow.';
+  if (err?.status === 429) return 'Please slow down a little. Wait a minute, then try again.';
+  return err?.message || 'Something went wrong. Please try again.';
+}
 
 function ReportForm({ targetType, targetId, onClose }) {
   const name = useId();
@@ -54,7 +60,7 @@ function ReportForm({ targetType, targetId, onClose }) {
       </div>
     );
   }
-  const already = false;
+  const already = error?.code === 'REPORT_EXISTS';
   return (
     <form onSubmit={send} className="mt-3 grid gap-4">
       <fieldset className="grid gap-1">
