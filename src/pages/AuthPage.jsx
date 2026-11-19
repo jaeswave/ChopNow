@@ -25,6 +25,7 @@ export default function AuthPage() {
   // Pre-filled from the city question they answered on their first visit. They can still change it here.
   const [f, setF] = useState({ role: params.get('role') === 'SELLER' ? 'SELLER' : 'BUYER', name: '', email: '', phone: '', password: '', businessName: '', rcNumber: '', city: getSavedCity() === 'Lagos' ? 'Lagos' : '' });
   const [err, setErr] = useState('');
+  const [locked, setLocked] = useState(''); // LOGIN_LOCKED: too many wrong passwords for this email
   const [busy, setBusy] = useState(false);
   const [show, setShow] = useState(false);
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
@@ -35,7 +36,7 @@ export default function AuthPage() {
   useEffect(() => { if (user) nav(safeNext || (user.role === 'SELLER' ? '/seller' : user.role === 'ADMIN' ? '/admin' : '/'), { replace: true }); }, [user]);
 
   const submit = async (e) => {
-    e.preventDefault(); setErr(''); setBusy(true);
+    e.preventDefault(); setErr(''); setLocked(''); setBusy(true);
     try {
       const seller = f.role === 'SELLER';
       if (mode === 'register' && f.city !== live) { setErr(f.city ? `GbaanJo is only live in ${live} for now. Use the "I am somewhere else" option on the home page to join the waitlist.` : 'Please choose your city.'); setBusy(false); return; }
@@ -44,7 +45,8 @@ export default function AuthPage() {
       login(await api('/auth/' + mode, { method: 'POST', body }));
     } catch (e2) {
       if (e2.code === 'CONSENT_REQUIRED') setAgreed(false); // the versions may have changed: read and tick again
-      setErr(e2.message);
+      if (e2.code === 'LOGIN_LOCKED') setLocked(e2.message);
+      else setErr(e2.message);
       setBusy(false);
     }
   };
@@ -100,9 +102,16 @@ export default function AuthPage() {
         {mode === 'login' && <Link to="/forgot-password" className={cx(tapText, "-mt-2 justify-self-start text-sm font-semibold underline underline-offset-4")}>Forgot your password?</Link>}
         {needConsent && <ConsentCheckbox checked={agreed} onChange={setAgreed} />}
         {err && <p role="alert" className="rounded-xl bg-pepper/10 p-3 font-medium text-pepper">{err}</p>}
+        {locked && (
+          <div role="alert" className="grid gap-1 rounded-xl bg-palm/25 p-3">
+            <p className="font-semibold">{locked}</p>
+            <p className="text-sm">Resetting your password lifts the pause straight away.</p>
+            <Link to="/forgot-password" className={cx(tapText, 'justify-self-start font-semibold text-leaf underline underline-offset-4')}>Forgot password</Link>
+          </div>
+        )}
         <Button size="lg" disabled={busy || (needConsent && !agreed)}>{busy ? <Spinner /> : mode === 'login' ? 'Log in' : 'Create account'}</Button>
         {mode === 'register' && !needConsent && <p className="text-xs text-mute">By creating an account you agree to our <Link to="/terms" className="underline">terms, refund policy and privacy notice</Link>.</p>}
-        <button type="button" className={cx(tapText, "cursor-pointer justify-center text-sm font-semibold underline underline-offset-4")} onClick={() => { setMode(mode === 'login' ? 'register' : 'login'); setErr(''); }}>
+        <button type="button" className={cx(tapText, "cursor-pointer justify-center text-sm font-semibold underline underline-offset-4")} onClick={() => { setMode(mode === 'login' ? 'register' : 'login'); setErr(''); setLocked(''); }}>
           {mode === 'login' ? 'New here? Create an account' : 'Already have an account? Log in'}
         </button>
       </form>
