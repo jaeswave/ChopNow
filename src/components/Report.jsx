@@ -44,7 +44,16 @@ function ReportForm({ targetType, targetId, onClose }) {
     setBusy(false);
   };
 
-  if (sent) onClose();
+  if (sent) {
+    return (
+      <div className="mt-3 grid gap-4">
+        <p role="status" className="rounded-xl bg-leaf/10 p-4 font-semibold text-leaf">Thanks, we will look into it.</p>
+        <div className="flex justify-end">
+          <Button data-close onClick={onClose}>Close</Button>
+        </div>
+      </div>
+    );
+  }
   const already = false;
   return (
     <form onSubmit={send} className="mt-3 grid gap-4">
