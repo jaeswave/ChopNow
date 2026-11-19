@@ -122,7 +122,6 @@ public/                manifest.webmanifest, sw.js (service worker), offline.htm
 - **Accessibility:** labels on inputs (use `Field`), visible focus (the kit uses `focus-visible:outline-palm`), good contrast, aria attributes on custom controls.
 
 ## Known gaps (found while writing this file; not fixed yet)
-- The new admin routes (`/admin/sellers`, `/admin/orders`, `/admin/audit`, hide/unhide, POST suspend/unsuspend, feedback resolve, the new overview counts) need the server's `20261118_admin_ops` database change and a server deploy. Until then those screens show "This screen needs the latest server".
 - Admin Refunds and Seller payouts (payments) still use the browser's `confirm()`; leave them until the payments phase.
 - The overview "Problem orders" count has no exact list filter in the API; its link opens paid orders that are not collected yet.
 - Not yet tested on real phones: the Android install prompt, the installed app opening full screen, the iPhone home-screen icon, and offline mode were checked only in desktop Chrome/Edge imitating phones.
