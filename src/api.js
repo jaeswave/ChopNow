@@ -8,6 +8,8 @@ function httpError(status, data) {
   const err = new Error(msg || 'Something went wrong');
   err.status = status;
   if (typeof data?.code === 'string') err.code = data.code;
+  // A 400 from validation sends a list of messages; keep the list so screens can show each one
+  if (Array.isArray(data?.message)) err.messages = data.message.map(String);
   return err;
 }
 

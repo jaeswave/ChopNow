@@ -103,3 +103,12 @@ describe('api()', () => {
     await expect(api('/listings')).rejects.toThrow('unexpected reply');
   });
 });
+
+describe('api() message lists', () => {
+  it('keeps the list of validation messages as err.messages', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify({ statusCode: 400, message: ['Give a reason (a few words is enough)', 'reason must be shorter'] }), { status: 400, headers: { 'Content-Type': 'application/json' } })));
+    const err = await api('/admin/sellers/1/reject', { method: 'POST', body: {} }).catch((e) => e);
+    expect(err.messages).toEqual(['Give a reason (a few words is enough)', 'reason must be shorter']);
+    expect(err.message).toBe('Give a reason (a few words is enough). reason must be shorter');
+  });
+});
