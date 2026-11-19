@@ -21,6 +21,12 @@ export function ErrorNote({ error, className = '' }) {
   return (
     <div role="alert" className={cx('rounded-xl bg-pepper/10 p-3 text-sm font-medium text-pepper', className)}>
       {list ? <ul className="list-disc pl-5">{list.map((m) => <li key={m}>{m}</li>)}</ul> : text}
+      {/* 409 DELETION_BLOCKED: admins see the stable codes */}
+      {error.blockers?.length > 0 && (
+        <ul aria-label="Still open" className="mt-2 flex flex-wrap gap-1.5">
+          {error.blockers.map((b) => <li key={b.code} className="rounded-full bg-white px-2.5 py-0.5 font-mono text-xs text-ink">{b.code}</li>)}
+        </ul>
+      )}
     </div>
   );
 }

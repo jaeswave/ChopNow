@@ -4,6 +4,7 @@ import { useAuth } from '../auth';
 import { Chip } from '../ui';
 import usePageMeta from '../hooks/usePageMeta';
 import Audit from './admin/Audit';
+import Deletions from './admin/Deletions';
 import Feedback from './admin/Feedback';
 import Listings from './admin/Listings';
 import Orders from './admin/Orders';
@@ -22,6 +23,7 @@ export const ADMIN_TABS = [
   ['listings', 'Listings', Listings],
   ['users', 'Users', Users],
   ['feedback', 'Feedback', Feedback],
+  ['deletions', 'Deletion requests', Deletions],
   ['audit', 'Audit log', Audit],
   ['refunds', 'Refunds', Refunds],
   ['payouts', 'Seller payouts', Payouts],

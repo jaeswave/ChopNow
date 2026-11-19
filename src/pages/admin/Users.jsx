@@ -76,6 +76,7 @@ export default function Users() {
                 <b className="[overflow-wrap:anywhere]">{u.businessName || u.name}</b><Pill>{u.role}</Pill>
                 {u.verified && <Pill tone="bg-leaf/10 text-leaf">Verified</Pill>}
                 {u.suspended && <Pill tone="bg-pepper text-white">Suspended</Pill>}
+                {u.deletedAt ? <Pill tone="bg-ink text-white">Deleted</Pill> : u.deletionRequestedAt ? <Pill tone="bg-palm/40 text-ink">Deletion requested</Pill> : null}
               </div>
               <p className="[overflow-wrap:anywhere] text-sm text-mute">{u.name} · {u.email} · {u.phone}{u.city ? ` · ${u.city}` : ''}</p>
               <p className="text-sm text-mute">No-shows: {u.noShows ?? 0} · Joined {dateLagos(u.createdAt)}{u.role === 'SELLER' ? ` · Payout: ${u.accountName ? `${u.accountName} (${u.bankName})` : 'not set up'}` : ''}</p>
