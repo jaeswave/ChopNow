@@ -14,6 +14,7 @@ import {
 import { Button, Spinner, cx, tapText, useToast } from "../ui";
 import { useMeta } from "../hooks/useMeta";
 import { getPaymentProvider } from "../payments";
+import ReportButton from "../components/Report";
 import usePageMeta from '../hooks/usePageMeta';
 
 export default function Listing() {
@@ -104,6 +105,8 @@ export default function Listing() {
               Sold by <b className="text-ink">{l.seller.businessName}</b>
               <Verified v={l.seller.verified} /> · {l.area}, {l.city}
             </p>
+            {/* Anyone but the seller of this listing can report it */}
+            {user?.id !== l.seller.id && <ReportButton targetType="listing" targetId={l.id} label="Report this listing" className="mt-1" />}
           </div>
           {l.description && <p className="text-lg">{l.description}</p>}
 

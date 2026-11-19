@@ -29,7 +29,10 @@ export default function AuthPage() {
   const [show, setShow] = useState(false);
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
 
-  useEffect(() => { if (user) nav(user.role === 'SELLER' ? '/seller' : user.role === 'ADMIN' ? '/admin' : '/', { replace: true }); }, [user]);
+  // ?next=/listing/1 brings people back after logging in (only paths on this site)
+  const next = params.get('next');
+  const safeNext = next && next.startsWith('/') && !next.startsWith('//') ? next : null;
+  useEffect(() => { if (user) nav(safeNext || (user.role === 'SELLER' ? '/seller' : user.role === 'ADMIN' ? '/admin' : '/'), { replace: true }); }, [user]);
 
   const submit = async (e) => {
     e.preventDefault(); setErr(''); setBusy(true);

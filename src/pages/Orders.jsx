@@ -11,6 +11,7 @@ import {
   when,
 } from "../components";
 import { Button, Chip, useToast } from "../ui";
+import ReportButton from "../components/Report";
 import usePageMeta from '../hooks/usePageMeta';
 
 export default function Orders() {
@@ -246,6 +247,9 @@ export default function Orders() {
                   </div>
                 </div>
               )}
+              <div className="mt-3 flex justify-end border-t border-line pt-2">
+                <ReportButton targetType="user" targetId={o.listing.seller?.id} label="Report seller" title={`Report ${o.listing.seller.businessName}`} />
+              </div>
             </li>
           );
         })}
