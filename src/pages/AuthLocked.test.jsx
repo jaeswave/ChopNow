@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { MetaProvider } from '../hooks/useMeta';
@@ -30,8 +30,8 @@ function openLogin(url = '/auth') {
   );
 }
 async function tryLogin(user) {
-  await user.type(screen.getByLabelText(/^Email/), 'ada@example.com');
-  await user.type(screen.getByLabelText(/^Password/), 'wrong-pass');
+  fireEvent.change(screen.getByLabelText(/^Email/), { target: { value: 'ada@example.com' } });
+  fireEvent.change(screen.getByLabelText(/^Password/), { target: { value: 'wrong-pass' } });
   await user.click(screen.getByRole('button', { name: 'Log in' }));
 }
 

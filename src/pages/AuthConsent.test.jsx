@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { MetaProvider } from '../hooks/useMeta';
@@ -31,12 +31,12 @@ function openSignUp(meta) {
     </MemoryRouter>,
   );
 }
+// Fill each field in one step (typing letter by letter is slow and not what these tests are about)
 async function fillForm(user) {
   await user.selectOptions(await screen.findByLabelText(/City/), 'Lagos');
-  await user.type(screen.getByLabelText(/Full name/), 'Test Buyer');
-  await user.type(screen.getByLabelText(/Phone number/), '08012345678');
-  await user.type(screen.getByLabelText(/^Email/), 'test@example.com');
-  await user.type(screen.getByLabelText(/^Password/), 'secret-pass-1');
+  for (const [label, value] of [[/Full name/, 'Test Buyer'], [/Phone number/, '08012345678'], [/^Email/, 'test@example.com'], [/^Password/, 'secret-pass-1']]) {
+    fireEvent.change(screen.getByLabelText(label), { target: { value } });
+  }
 }
 const createButton = () => screen.getByRole('button', { name: 'Create account' });
 

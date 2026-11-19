@@ -8,5 +8,7 @@ export default defineConfig({
     setupFiles: './src/test/setup.js',
     // Run tests on Lagos time so date output is the same on every computer and in CI
     env: { TZ: 'Africa/Lagos' },
+    // Tests that type whole forms take just over the default 5 seconds on a busy computer
+    testTimeout: 15000,
   },
 });
