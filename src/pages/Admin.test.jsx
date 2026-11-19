@@ -342,3 +342,80 @@ describe('Deletion requests', () => {
     expect(within(rows[1]).queryByText('Deletion requested')).not.toBeInTheDocument();
   });
 });
+
+describe('Reports', () => {
+  const report = (over = {}) => ({
+    id: 'r1', targetType: 'listing', targetId: 'l1', reason: 'UNSAFE_FOOD', note: 'Smelled off', status: 'OPEN',
+    createdAt: '2026-11-20T13:05:00Z', resolvedAt: null, resolutionNote: null,
+    reporter: { id: 'b1', name: 'Chidi Buyer', email: 'chidi@example.com' }, resolvedBy: null,
+    target: { name: 'Fried rice trays', businessName: 'Mama Tee', hidden: true, suspended: null }, openReportsOnTarget: 3, ...over,
+  });
+
+  it('lists open reports: target, tags, reason in plain words, note, reporter, count and Lagos time', async () => {
+    server.replies['GET /admin/reports'] = paged([report(), report({ id: 'r2', targetType: 'user', targetId: 's1', reason: 'PAY_OUTSIDE', note: null, target: { name: 'Bola', businessName: 'Bola Bakery', hidden: null, suspended: true }, openReportsOnTarget: 1 })], 45);
+    openAdmin('/admin?tab=reports');
+    const rows = await screen.findAllByRole('listitem');
+    expect(lastQuery('/admin/reports').get('status')).toBe('open');
+    expect(rows[0]).toHaveTextContent('Fried rice trays');
+    expect(rows[0]).toHaveTextContent('Mama Tee');
+    expect(within(rows[0]).getByText('Hidden')).toBeInTheDocument();
+    expect(rows[0]).toHaveTextContent('The food looked or tasted unsafe');
+    expect(rows[0]).toHaveTextContent('“Smelled off”');
+    expect(rows[0]).toHaveTextContent('Reported by Chidi Buyer (chidi@example.com)');
+    expect(rows[0]).toHaveTextContent('3 open reports on this');
+    expect(rows[0]).toHaveTextContent('20/11/2026, 14:05:00');
+    expect(within(rows[1]).getByText('Suspended')).toBeInTheDocument();
+    expect(rows[1]).toHaveTextContent('I was asked to pay outside GbaanJo');
+    expect(within(rows[1]).getByRole('link', { name: 'Open in Users' })).toHaveAttribute('href', '/admin?tab=users&q=Bola');
+  });
+
+  it('filters to done reports and pages', async () => {
+    const user = userEvent.setup();
+    server.replies['GET /admin/reports'] = (q) =>
+      q.get('status') === 'done'
+        ? paged([report({ status: 'DONE', resolvedAt: '2026-11-20T15:00:00Z', resolutionNote: 'Called the seller', resolvedBy: { id: 'a1', name: 'Ada Admin' } })])
+        : paged([report()], 45);
+    openAdmin('/admin?tab=reports');
+    await screen.findByText('Fried rice trays');
+    await user.click(screen.getByRole('button', { name: 'Next' }));
+    await waitFor(() => expect(lastQuery('/admin/reports').get('page')).toBe('2'));
+    await user.click(screen.getByRole('button', { name: 'Done' }));
+    expect(await screen.findByText(/Called the seller/)).toBeInTheDocument();
+    expect(screen.getByText(/Resolved/).closest('p')).toHaveTextContent('Resolved by Ada Admin');
+    expect(screen.queryByRole('button', { name: 'Resolve' })).not.toBeInTheDocument();
+  });
+
+  it('resolves only with a non-blank note, sent trimmed', async () => {
+    const user = userEvent.setup();
+    server.replies['GET /admin/reports'] = paged([report()]);
+    server.replies['POST /admin/reports/r1/resolve'] = { ok: true };
+    openAdmin('/admin?tab=reports');
+    await user.click(await screen.findByRole('button', { name: 'Resolve' }));
+    const d = within(await dialog());
+    const confirm = d.getByRole('button', { name: 'Resolve' });
+    expect(confirm).toBeDisabled();
+    await user.type(d.getByLabelText(/What did you find or do/), '   ');
+    expect(confirm).toBeDisabled();
+    await user.type(d.getByLabelText(/What did you find or do/), 'Seller warned  ');
+    await user.click(confirm);
+    await waitFor(() => expect(calls('POST', '/admin/reports/r1/resolve')).toHaveLength(1));
+    expect(calls('POST', '/admin/reports/r1/resolve')[0][1].body).toEqual({ note: 'Seller warned' });
+  });
+
+  it('cannot be opened by a non-admin', async () => {
+    openAdmin('/admin?tab=reports', { id: 'b', role: 'BUYER', name: 'Buyer' });
+    expect(await screen.findByText('Home page')).toBeInTheDocument();
+    expect(calls('GET', '/admin/reports')).toHaveLength(0);
+  });
+
+  it('names the new audit actions in plain words', async () => {
+    server.replies['GET /admin/audit'] = paged([
+      { id: 'x1', action: 'listing.auto_hide', targetType: 'listing', targetId: 'l1', reason: 'Auto-hidden: several reports', createdAt: '2026-11-20T10:00:00Z', admin: { name: 'Chidi Buyer' } },
+      { id: 'x2', action: 'report.resolve', targetType: 'report', targetId: 'r1', reason: 'Seller warned', createdAt: '2026-11-20T09:00:00Z', admin: { name: 'Ada Admin' } },
+    ]);
+    openAdmin('/admin?tab=audit');
+    const rows = await screen.findAllByRole('listitem');
+    expect(rows[0]).toHaveTextContent('Listing hidden automatically after several reports');
+    expect(rows[1]).toHaveTextContent('Resolved a report');
+  });
+});
