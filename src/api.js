@@ -10,6 +10,8 @@ function httpError(status, data) {
   if (typeof data?.code === 'string') err.code = data.code;
   // A 400 from validation sends a list of messages; keep the list so screens can show each one
   if (Array.isArray(data?.message)) err.messages = data.message.map(String);
+  // Extra details some errors carry, e.g. DELETION_BLOCKED's list of blockers
+  if (Array.isArray(data?.blockers)) err.blockers = data.blockers;
   return err;
 }
 

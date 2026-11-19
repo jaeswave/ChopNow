@@ -50,6 +50,9 @@ export function MetaProvider({ children }) {
         : fallbackCategories,
       cities: server?.cities || [],
       comingSoon: server?.comingSoon || [],
+      // { termsVersion, privacyVersion } from a server that supports consent; null from an older server.
+      // Release safety: no consent checkbox, prompt or versions are sent while this is null.
+      legal: server?.legal?.termsVersion && server?.legal?.privacyVersion ? server.legal : null,
       rules: server?.rules || {}, // the server's rules only (checkout relies on this staying empty until they load)
       ruleValues: { ...fallbackRules, ...server?.rules }, // with fallbacks, for copy and calculators
       feePercent: server?.rules?.PLATFORM_FEE_PERCENT ?? fallbackFee,

@@ -1,6 +1,6 @@
 import usePageMeta from '../hooks/usePageMeta';
 
-const H = ({ children }) => <h2 className="mt-8 text-2xl font-extrabold">{children}</h2>;
+const H = ({ id, children }) => <h2 id={id} className="mt-8 scroll-mt-20 text-2xl font-extrabold">{children}</h2>;
 const P = ({ children }) => <p className="mt-2 text-mute">{children}</p>;
 
 export default function Legal() {
@@ -22,7 +22,7 @@ export default function Legal() {
       <H>4. Selling</H>
       <P>Sellers must set up a payout bank account. When a buyer pays, GbaanJo receives the payment and pays the seller's share to the bank account the seller provides, after the order is handed over. GbaanJo keeps a service fee, shown when you create a listing. Sellers must only list food that is safe to eat, describe it honestly, and hand it over when the buyer shows their code. GbaanJo can remove listings and suspend accounts that break these rules. Sellers must be registered with the Corporate Affairs Commission and give us their registration number, which we check before they can list.</P>
 
-      <H>5. Your information</H>
+      <H id="privacy">5. Your information</H>
       <P>We collect your name, email, phone number and, for sellers, bank details, to run your account, process orders and keep the platform safe. Payment details are handled by our payment provider and are never stored by GbaanJo. We share your name and phone number with the other side of an order only so you can complete pickup. We do not sell your information.</P>
 
       <H>6. Contact</H>

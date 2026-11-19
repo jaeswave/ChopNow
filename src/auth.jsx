@@ -47,5 +47,7 @@ export function AuthProvider({ children }) {
 
   const login = ({ token, user }) => { localStorage.setItem('token', token); setUser(user); };
   const logout = () => { localStorage.removeItem('token'); setUser(null); };
-  return <Ctx.Provider value={{ user, ready, waking, login, logout, refresh }}>{children}</Ctx.Provider>;
+  // Replace the user with a fresh copy the server sent back (e.g. after POST /me/consent)
+  const updateUser = (u) => setUser(u);
+  return <Ctx.Provider value={{ user, ready, waking, login, logout, refresh, updateUser }}>{children}</Ctx.Provider>;
 }
