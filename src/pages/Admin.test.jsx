@@ -286,3 +286,59 @@ describe('Audit log', () => {
     expect(rows[1]).toHaveTextContent('Approved seller');
   });
 });
+
+describe('Deletion requests', () => {
+  const req = (over = {}) => ({ id: 'u5', name: 'Kemi Seller', email: 'kemi@example.com', role: 'SELLER', businessName: 'Kemi Foods', deletionRequestedAt: '2026-11-18T13:05:00Z', createdAt: '2026-01-01T00:00:00Z', blockers: [], ...over });
+
+  it('lists name, email, role, business, date and the blocker CODES, not the user-worded messages', async () => {
+    server.replies['GET /admin/deletion-requests'] = paged([req({ blockers: [{ code: 'PAYOUT_PENDING', message: 'We still owe you a payout.' }] }), req({ id: 'u6', name: 'Tunde', role: 'BUYER', businessName: null })]);
+    openAdmin('/admin?tab=deletions');
+    const rows = await screen.findAllByRole('listitem');
+    expect(rows[0]).toHaveTextContent('Kemi Foods');
+    expect(rows[0]).toHaveTextContent('kemi@example.com');
+    expect(rows[0]).toHaveTextContent('SELLER');
+    expect(rows[0]).toHaveTextContent('Asked 18/11/2026, 14:05:00');
+    expect(within(rows[0]).getByText('PAYOUT_PENDING')).toBeInTheDocument();
+    expect(screen.queryByText('We still owe you a payout.')).not.toBeInTheDocument();
+    expect(screen.getByText(/Nothing open: this can be finished now/)).toBeInTheDocument();
+    expect(lastQuery('/admin/deletion-requests').get('pageSize')).toBe('20');
+  });
+
+  it('anonymises after a confirm', async () => {
+    const user = userEvent.setup();
+    server.replies['GET /admin/deletion-requests'] = paged([req()]);
+    server.replies['POST /admin/users/u5/anonymise'] = { ok: true };
+    openAdmin('/admin?tab=deletions');
+    await user.click(await screen.findByRole('button', { name: 'Anonymise' }));
+    const d = within(await dialog());
+    expect(d.getByText('This cannot be undone.')).toBeInTheDocument();
+    expect(calls('POST', '/admin/users/u5/anonymise')).toHaveLength(0); // nothing happens before the confirm
+    await user.click(d.getByRole('button', { name: 'Anonymise' }));
+    await waitFor(() => expect(calls('POST', '/admin/users/u5/anonymise')).toHaveLength(1));
+    expect(await screen.findByText('Account anonymised')).toBeInTheDocument();
+  });
+
+  it('shows 409 blocker codes in the dialog', async () => {
+    const user = userEvent.setup();
+    server.replies['GET /admin/deletion-requests'] = paged([req()]);
+    server.replies['POST /admin/users/u5/anonymise'] = Object.assign(httpError(409, 'We cannot delete this account yet.'), { code: 'DELETION_BLOCKED', blockers: [{ code: 'LIVE_LISTING', message: 'x' }, { code: 'OPEN_SALES', message: 'y' }] });
+    openAdmin('/admin?tab=deletions');
+    await user.click(await screen.findByRole('button', { name: 'Anonymise' }));
+    const d = within(await dialog());
+    await user.click(d.getByRole('button', { name: 'Anonymise' }));
+    const alert = await d.findByRole('alert');
+    expect(within(alert).getByRole('list', { name: 'Still open' })).toHaveTextContent('LIVE_LISTINGOPEN_SALES');
+  });
+
+  it('tags users who asked for, or completed, deletion', async () => {
+    server.replies['GET /admin/users'] = [
+      { id: 'u1', role: 'BUYER', name: 'Asked', email: 'a@example.com', createdAt: '2026-01-01T00:00:00Z', deletionRequestedAt: '2026-11-18T10:00:00Z', deletedAt: null },
+      { id: 'u2', role: 'BUYER', name: 'Deleted user', email: 'deleted@example.invalid', createdAt: '2026-01-01T00:00:00Z', deletionRequestedAt: '2026-11-18T10:00:00Z', deletedAt: '2026-11-19T10:00:00Z' },
+    ];
+    openAdmin('/admin?tab=users');
+    const rows = await screen.findAllByRole('listitem');
+    expect(within(rows[0]).getByText('Deletion requested')).toBeInTheDocument();
+    expect(within(rows[1]).getByText('Deleted')).toBeInTheDocument();
+    expect(within(rows[1]).queryByText('Deletion requested')).not.toBeInTheDocument();
+  });
+});
