@@ -11,6 +11,7 @@ import Orders from './admin/Orders';
 import Overview from './admin/Overview';
 import Payouts from './admin/Payouts';
 import Refunds from './admin/Refunds';
+import Reports from './admin/Reports';
 import Sellers from './admin/Sellers';
 import Users from './admin/Users';
 
@@ -22,6 +23,7 @@ export const ADMIN_TABS = [
   ['orders', 'Orders', Orders],
   ['listings', 'Listings', Listings],
   ['users', 'Users', Users],
+  ['reports', 'Reports', Reports],
   ['feedback', 'Feedback', Feedback],
   ['deletions', 'Deletion requests', Deletions],
   ['audit', 'Audit log', Audit],
