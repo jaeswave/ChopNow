@@ -8,14 +8,14 @@ import { ToastProvider } from '../ui';
 import { api } from '../api';
 import { TEST_META } from '../test/testMeta';
 import App from '../App';
-import { WAITLIST_THANKS } from '../components/Waitlist';
+import { WAITLIST_THANKS, waitlistCities } from '../components/Waitlist';
 
 // The whole app (header, menu, tab bar, footer, pages) with the real login provider and a fake server
 const server = vi.hoisted(() => ({ me: null, waitlist: null }));
 vi.mock('../api', () => ({
   api: vi.fn((path, opts = {}) => {
     const p = path.split('?')[0];
-    if (p === '/listings/meta') return Promise.resolve({ ...TEST_META, cities: ['Lagos'] });
+    if (p === '/listings/meta') return Promise.resolve({ ...TEST_META, cities: ['Lagos'], comingSoon: ['Abuja', 'Ibadan', 'Other'] });
     if (p === '/auth/me') return server.me ? Promise.resolve(server.me) : Promise.reject(Object.assign(new Error('Please log in'), { status: 401 }));
     if (p === '/waitlist' && opts.method === 'POST') return server.waitlist(opts.body);
     if (p === '/listings' || p === '/listings/mine/all' || p === '/orders/seller' || p === '/admin/sellers') return Promise.resolve([]);
@@ -121,16 +121,24 @@ describe('coming soon mode is on', () => {
     expect(call[1].body).toEqual({ email: 'ada@example.com', city: 'Lagos' });
   });
 
-  it('asks for the name of another city', async () => {
+  it("offers the server's cities (Lagos first and chosen, then the coming-soon list with Other) and sends the one picked", async () => {
     const user = userEvent.setup();
     openSite('/');
     const form = within(await screen.findByRole('form', { name: 'Join the waitlist' }));
+    const select = form.getByLabelText('Your city');
+    await waitFor(() => expect(within(select).getAllByRole('option').map((o) => o.textContent)).toEqual(['Lagos', 'Abuja', 'Ibadan', 'Other']));
+    expect(select).toHaveValue('Lagos');
+    expect(form.queryByLabelText('Which city?')).not.toBeInTheDocument(); // no typed city any more
     fireEvent.change(form.getByLabelText('Your email'), { target: { value: 'ada@example.com' } });
-    await user.selectOptions(form.getByLabelText('Your city'), 'Another city');
-    fireEvent.change(form.getByLabelText('Which city?'), { target: { value: 'Ibadan' } });
+    await user.selectOptions(select, 'Ibadan');
     await user.click(form.getByRole('button', { name: 'Join the waitlist' }));
     await screen.findByText(`✓ ${WAITLIST_THANKS}`);
     expect(api.mock.calls.find(([p]) => p === '/waitlist')[1].body).toEqual({ email: 'ada@example.com', city: 'Ibadan' });
+  });
+
+  it('falls back to Lagos alone until the server answers, and never repeats a city', () => {
+    expect(waitlistCities(null)).toEqual(['Lagos']);
+    expect(waitlistCities({ cities: ['Lagos'], comingSoon: ['Lagos', 'Abuja', 'Other'] })).toEqual(['Lagos', 'Abuja', 'Other']);
   });
 
   it.each([

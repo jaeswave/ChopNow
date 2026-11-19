@@ -3,19 +3,24 @@ import { api } from '../api';
 import { useMeta } from '../hooks/useMeta';
 import { Button, Field, Input, Select, Spinner, cx } from '../ui';
 
-const OTHER = '__other';
 export const WAITLIST_THANKS = 'You are on the list. We will email you the day we open. Tell a friend who loves a good deal.';
 
-// Waitlist sign-up (POST /waitlist { email, city }). Lagos is chosen by default; "Another city" asks for its name.
+// The cities to offer: the live ones first (Lagos), then the server's coming-soon list (which may end with "Other")
+export const waitlistCities = (meta) => {
+  const live = meta?.cities?.length ? meta.cities : ['Lagos'];
+  return [...new Set([...live, ...(meta?.comingSoon || [])])];
+};
+
+// Waitlist sign-up (POST /waitlist { email, city }). The first live city (Lagos) is chosen by default.
 export default function Waitlist({ className = '', tone = 'light' }) {
-  const live = useMeta()?.cities?.[0] || 'Lagos';
+  const meta = useMeta();
+  const cities = waitlistCities(meta);
   const [email, setEmail] = useState('');
-  const [choice, setChoice] = useState(live);
-  const [other, setOther] = useState('');
+  const [picked, setPicked] = useState(null); // null: the default, the first live city
+  const city = picked ?? cities[0];
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
   const [done, setDone] = useState(false);
-  const city = choice === OTHER ? other.trim() : choice;
 
   const join = async (e) => {
     e.preventDefault();
@@ -46,18 +51,12 @@ export default function Waitlist({ className = '', tone = 'light' }) {
         <Input type="email" required autoComplete="email" inputMode="email" value={email} onChange={(e) => setEmail(e.target.value)} />
       </Field>
       <Field label="Your city">
-        <Select value={choice} onChange={(e) => setChoice(e.target.value)}>
-          <option value={live}>{live}</option>
-          <option value={OTHER}>Another city</option>
+        <Select value={city} onChange={(e) => setPicked(e.target.value)}>
+          {cities.map((c) => <option key={c} value={c}>{c}</option>)}
         </Select>
       </Field>
-      {choice === OTHER && (
-        <Field label="Which city?">
-          <Input required minLength={2} maxLength={40} value={other} onChange={(e) => setOther(e.target.value)} />
-        </Field>
-      )}
       {message && <p role="alert" className="rounded-xl bg-pepper/10 p-3 text-sm font-medium text-pepper">{message}</p>}
-      <Button type="submit" size="lg" disabled={busy || !email.trim() || city.length < 2}>{busy ? <Spinner /> : 'Join the waitlist'}</Button>
+      <Button type="submit" size="lg" disabled={busy || !email.trim() || !city}>{busy ? <Spinner /> : 'Join the waitlist'}</Button>
     </form>
   );
 }
