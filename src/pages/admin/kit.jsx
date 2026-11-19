@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useId, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { api } from '../../api';
+import { Dialog } from '../../components/Dialog';
 import { Button, Field, Spinner, Textarea, cx } from '../../ui';
 
 // Small pieces shared by the admin screens
@@ -24,42 +25,8 @@ export function ErrorNote({ error, className = '' }) {
   );
 }
 
-/* ---------- Dialog ---------- */
-// A touch-friendly dialog instead of the browser's confirm()/prompt(): a sheet at the bottom on phones,
-// centred on wider screens. Escape or a tap outside closes it, and focus goes back where it was.
-export function Dialog({ title, onClose, children }) {
-  const id = useId();
-  const ref = useRef(null);
-  const closeRef = useRef(onClose);
-  closeRef.current = onClose; // always the latest, without re-running the effect below
-  useEffect(() => {
-    const before = document.activeElement;
-    // Start in the reason box if there is one; otherwise on the dialog itself, so it opens at the top and no
-    // button (such as 'Cancel order') is chosen by default
-    (ref.current?.querySelector('textarea, input, select') || ref.current)?.focus();
-    const onKey = (e) => e.key === 'Escape' && closeRef.current();
-    document.addEventListener('keydown', onKey);
-    return () => {
-      document.removeEventListener('keydown', onKey);
-      before?.focus?.();
-    };
-  }, []);
-  return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 sm:items-center sm:p-4" onMouseDown={(e) => e.target === e.currentTarget && closeRef.current()}>
-      <div
-        ref={ref}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby={id}
-        tabIndex={-1}
-        className="max-h-[90vh] outline-none w-full max-w-lg overflow-y-auto rounded-t-3xl bg-white p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] text-ink shadow-2xl sm:rounded-3xl sm:p-6"
-      >
-        <h2 id={id} className="text-xl font-extrabold">{title}</h2>
-        {children}
-      </div>
-    </div>
-  );
-}
+/* ---------- Dialog (shared with the rest of the site; lives in components/Dialog.jsx) ---------- */
+export { Dialog };
 
 export const REASON_MAX = 300; // the server accepts 1 to 300 characters, not blank
 export const reasonOk = (r) => r.trim().length > 0 && r.trim().length <= REASON_MAX;

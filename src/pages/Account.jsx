@@ -1,7 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth';
 import { InstallRow } from '../components/Install';
-import { DownloadData } from '../components/AccountData';
+import { DeleteAccount, DownloadData } from '../components/AccountData';
 import { useMeta } from '../hooks/useMeta';
 import usePageMeta from '../hooks/usePageMeta';
 import { Button, cx, tap } from '../ui';
@@ -96,6 +96,7 @@ export default function Account() {
           <h2 id="data-title" className="mb-2 text-sm font-bold uppercase tracking-wide text-mute">Your data</h2>
           <div className={cx(box, 'grid gap-4 p-4')}>
             <DownloadData />
+            <DeleteAccount />
           </div>
         </section>
       )}
