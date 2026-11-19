@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import Waitlist from '../components/Waitlist';
 import usePageMeta from '../hooks/usePageMeta';
 import { useRules } from '../hooks/useMeta';
-import { Button, Container } from '../ui';
+import { Button, Container, cx, tapText } from '../ui';
 
 const STEPS = [
   ['🔎', 'Find a deal near you.'],
@@ -17,7 +17,7 @@ export function ComingSoonHome() {
   return (
     <>
       <section className="bg-leaf bg-[radial-gradient(rgba(244,181,46,.14)_1.5px,transparent_1.5px)] bg-[length:24px_24px] text-white">
-        <Container className="grid items-center gap-8 py-8 sm:py-12 md:grid-cols-[1.1fr_.9fr] md:gap-10 lg:py-16">
+        <Container className="grid items-center gap-6 py-8 sm:py-12 md:grid-cols-[1.1fr_.9fr] md:gap-x-10 lg:py-16">
           <div className="min-w-0">
             <p className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-sm font-semibold text-palm">
               <span aria-hidden="true">📍</span> Coming soon to Lagos
@@ -28,11 +28,14 @@ export function ComingSoonHome() {
             <p className="mt-4 max-w-xl text-white/85 sm:text-lg">
               Great food from Lagos kitchens, <strong className="font-bold text-white">at least {r.minDiscount}% off</strong>, ready to collect near you. We are opening very soon.
             </p>
-            <Button as={Link} to="/sell-with-us" variant="ghost" size="lg" className="mt-5 w-full sm:w-auto">
+          </div>
+          {/* Phones: the waitlist straight after the text, then the business button. Wider screens: form on the right. */}
+          <Waitlist tone="dark" className="md:col-start-2 md:row-span-2 md:row-start-1" />
+          <div className="md:col-start-1 md:row-start-2 md:self-start">
+            <Button as={Link} to="/sell-with-us" variant="ghost" size="lg" className="w-full sm:w-auto">
               I run a food business
             </Button>
           </div>
-          <Waitlist tone="dark" />
         </Container>
       </section>
       <section aria-labelledby="soon-how">
@@ -62,7 +65,7 @@ export function OpeningSoonPage() {
       <h1 className="text-3xl font-extrabold sm:text-4xl">We are opening soon</h1>
       <p className="text-mute">Deals from Lagos kitchens, at least {r.minDiscount}% off, are on their way. Join the waitlist and we will email you the day we open.</p>
       <Waitlist className="text-left" />
-      <Link to="/how-it-works" className="font-semibold text-leaf underline underline-offset-4">How GbaanJo works</Link>
+      <Link to="/how-it-works" className={cx(tapText, 'justify-self-center font-semibold text-leaf underline underline-offset-4')}>How GbaanJo works</Link>
     </div>
   );
 }
