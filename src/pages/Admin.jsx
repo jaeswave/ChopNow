@@ -5,6 +5,7 @@ import { Chip } from '../ui';
 import usePageMeta from '../hooks/usePageMeta';
 import Feedback from './admin/Feedback';
 import Listings from './admin/Listings';
+import Orders from './admin/Orders';
 import Overview from './admin/Overview';
 import Payouts from './admin/Payouts';
 import Refunds from './admin/Refunds';
@@ -15,6 +16,7 @@ import Users from './admin/Users';
 // The open tab is in the URL (/admin?tab=users), so links can open a screen directly.
 export const ADMIN_TABS = [
   ['sellers', 'Seller approvals', Sellers],
+  ['orders', 'Orders', Orders],
   ['overview', 'Overview', Overview],
   ['refunds', 'Refunds', Refunds],
   ['payouts', 'Seller payouts', Payouts],
