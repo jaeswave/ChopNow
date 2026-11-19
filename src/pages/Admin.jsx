@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../auth';
 import { Chip } from '../ui';
 import usePageMeta from '../hooks/usePageMeta';
+import Audit from './admin/Audit';
 import Feedback from './admin/Feedback';
 import Listings from './admin/Listings';
 import Orders from './admin/Orders';
@@ -23,6 +24,7 @@ export const ADMIN_TABS = [
   ['users', 'Users', Users],
   ['listings', 'Listings', Listings],
   ['feedback', 'Feedback', Feedback],
+  ['audit', 'Audit log', Audit],
 ];
 
 export default function Admin() {
