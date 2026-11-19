@@ -1,6 +1,8 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth';
 import { InstallRow } from '../components/Install';
+import { DownloadData } from '../components/AccountData';
+import { useMeta } from '../hooks/useMeta';
 import usePageMeta from '../hooks/usePageMeta';
 import { Button, cx, tap } from '../ui';
 
@@ -35,6 +37,8 @@ function LinkList({ items, label }) {
 export default function Account() {
   usePageMeta('Account');
   const { user, logout } = useAuth();
+  // The data section needs a server with the data-rights routes; 'legal' in meta is the sign of one (release safety)
+  const legal = useMeta()?.legal; // null until a server with consent support answers
   const nav = useNavigate();
 
   return (
@@ -86,6 +90,15 @@ export default function Account() {
       <section className={cx(box, 'p-4')}>
         <InstallRow />
       </section>
+
+      {user && legal && (
+        <section aria-labelledby="data-title">
+          <h2 id="data-title" className="mb-2 text-sm font-bold uppercase tracking-wide text-mute">Your data</h2>
+          <div className={cx(box, 'grid gap-4 p-4')}>
+            <DownloadData />
+          </div>
+        </section>
+      )}
 
       <section>
         <h2 className="mb-2 text-sm font-bold uppercase tracking-wide text-mute">Help</h2>

@@ -16,7 +16,7 @@ export const shouldAskConsent = (user, legal, pathname) => !!(user?.consentRequi
 // Only when the server sends 'legal' (release safety). The user can accept or log out.
 export default function ConsentPrompt() {
   const { user, logout, updateUser } = useAuth();
-  const { legal } = useMeta();
+  const legal = useMeta()?.legal; // null until a server with consent support answers
   const { pathname } = useLocation();
   const nav = useNavigate();
   const [agreed, setAgreed] = useState(false);
