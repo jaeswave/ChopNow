@@ -9,6 +9,7 @@ import InstallCard from "./components/Install";
 import TabBar, { useKeyboardOpen } from "./components/TabBar";
 import ConsentPrompt from "./components/ConsentPrompt";
 import useComingSoon from "./hooks/useComingSoon";
+import usePreview, { PreviewCapture } from "./hooks/usePreview";
 import { yearLagos } from "./components/time";
 
 // Optional ribbon for test versions: set VITE_BETA_NOTICE in Vercel to show it, leave it empty to hide it
@@ -185,6 +186,7 @@ function Navbar() {
 
 function Footer() {
   const { user } = useAuth();
+  const preview = usePreview();
   const links = useMainLinks();
   const { pathname } = useLocation();
   const [accountTo, accountLabel] = accountLink(user);
@@ -231,6 +233,12 @@ function Footer() {
       </Container>
       <div className="mt-10 border-t border-white/10 py-5 text-center text-xs text-white/60">
         © {yearLagos()} GbaanJo. Made in Nigeria.
+        {preview.unlocked && (
+          <span className="mt-2 flex flex-wrap items-center justify-center gap-x-3">
+            <span className="rounded-full bg-palm px-2.5 py-0.5 font-bold text-[#2a1d00]">Preview mode</span>
+            <button type="button" onClick={preview.leave} className={cx(tapText, "cursor-pointer underline underline-offset-4 hover:text-palm")}>Leave preview</button>
+          </span>
+        )}
       </div>
     </footer>
   );
@@ -312,6 +320,7 @@ export default function App() {
   return (
     <>
       <LegacyHashRedirect />
+      <PreviewCapture />
       <ScrollToHash />
       {BETA && (
         <div className="bg-ink px-4 py-1.5 text-center text-xs font-semibold text-white">

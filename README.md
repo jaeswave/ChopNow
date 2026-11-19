@@ -21,6 +21,7 @@ Note: `/api/geo` (the city hint) only works on Vercel. Locally, the site simply 
 | `VITE_API_URL` | yes | Base URL of the server, no trailing slash |
 | `VITE_BETA_NOTICE` | no | Short message shown in a ribbon on every page. Leave empty to hide it. |
 | `VITE_COMING_SOON` | no | `true` turns on coming soon mode (see below). Missing or anything else: the normal site. |
+| `VITE_PREVIEW_CODE` | no | A word that unlocks the full site in coming soon mode (see below). Empty: off. |
 
 Everything starting with `VITE_` ends up in the public website bundle. Never put a secret in one. `.env` files are gitignored; only `.env.example` is committed.
 
@@ -31,6 +32,14 @@ The value is built into the website, so a change needs a new deploy:
 - **Turn it on in Vercel:** Project > Settings > Environment Variables > add `VITE_COMING_SOON` with the value `true` (for Production, and Preview if you want it there too) > Save. Then Deployments > the latest deployment > ⋯ > **Redeploy**.
 - **Turn it off:** delete the variable (or change its value to `false`), Save, and **Redeploy** the same way.
 - **Locally:** put `VITE_COMING_SOON=true` in your own `.env` (never commit it) and restart `npm run dev`.
+
+### Preview unlock (`VITE_PREVIEW_CODE`)
+To let someone see the real site while coming soon mode is on (a pilot partner's customer, a tester), set `VITE_PREVIEW_CODE` to a word (in Vercel: the same steps as above, then Redeploy) and send them a link like `https://www.gbaanjo.com/?preview=<word>`.
+- The right word is remembered in that browser, and the address bar drops it. The visitor then sees everything a seller or admin sees: deals, listing pages and ordering.
+- A wrong word does nothing and shows no error.
+- The footer says "Preview mode" with a **Leave preview** link that switches it off again.
+- Changing the word locks old previews out. An empty `VITE_PREVIEW_CODE` turns the feature off.
+- **This is a soft lock, not security.** Like every `VITE_` setting, the word is inside the public website code, so anyone determined can find it. Never use a password or anything secret as the word.
 
 ## Deploy on Vercel
 - Framework preset: Vite. Build command `npm run build`, output directory `dist`.
