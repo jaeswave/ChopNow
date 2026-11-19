@@ -3,18 +3,18 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../auth';
 import { Chip } from '../ui';
 import usePageMeta from '../hooks/usePageMeta';
-import Applications from './admin/Applications';
 import Feedback from './admin/Feedback';
 import Listings from './admin/Listings';
 import Overview from './admin/Overview';
 import Payouts from './admin/Payouts';
 import Refunds from './admin/Refunds';
+import Sellers from './admin/Sellers';
 import Users from './admin/Users';
 
 // Admin area. Only ADMIN users get past the check below; everyone else is sent home.
 // The open tab is in the URL (/admin?tab=users), so links can open a screen directly.
 export const ADMIN_TABS = [
-  ['applications', 'Seller applications', Applications],
+  ['sellers', 'Seller approvals', Sellers],
   ['overview', 'Overview', Overview],
   ['refunds', 'Refunds', Refunds],
   ['payouts', 'Seller payouts', Payouts],
