@@ -16,6 +16,8 @@ export const ACTIONS = {
   'listing.remove': 'Removed listing',
   'order.cancel': 'Cancelled order',
   'feedback.resolve': 'Resolved feedback',
+  'report.resolve': 'Resolved a report',
+  'listing.auto_hide': 'Listing hidden automatically after several reports',
   'user.anonymise': 'Anonymised account',
   'user.export': 'User downloaded their data',
   'user.delete': 'User deleted their account',
